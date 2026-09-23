@@ -24,3 +24,8 @@ obj/
 # Machine-specific paths (ISO location) — never commit
 local.json
 HANDOFF_PROMPT.md
+
+# Posed hurtbox exports are ~500 MB total; regenerate with tools/ShieldPose
+data/*_hurtboxes.csv
+# ad-hoc pose dumps
+*_posedump*.csv

@@ -1,0 +1,416 @@
+{
+  "code": "Fe",
+  "name": "Roy",
+  "ft_kind": 26,
+  "has_tilt": true,
+  "tilt_note": null,
+  "sources": {
+    "fighter_data": "gamedata/PlFe.dat",
+    "costume_rest_pose": "gamedata/PlFeNr.dat",
+    "guard_figatree": "gamedata/PlFeAJ.dat action 38",
+    "guard_figatree_symbol": "PlyEmblem5K_Share_ACTION_Guard_figatree",
+    "common": "gamedata/PlCo.dat"
+  },
+  "figatree_frames": 370,
+  "figatree_nodes": 92,
+  "joints": 92,
+  "parts_num": 92,
+  "optional_part_slots": [],
+  "part_to_joint": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91
+  ],
+  "part_to_joint_derivation": "parts[] slots i for which ftParts_8007506C(kind, i) != 0 (PlCo.dat ftLoadCommonData pData[5] = Fighter_804D6540[kind], entries\u0027 byte x0) hold no costume joint; the remaining slots take the costume Joint tree in preorder (ftParts_8007462C, ftparts.c:457-498). Hurtbox bone_index and ModelLookupTables ShieldBone (x11) index parts[] (ftcoll.c:3189-3193, ftCo_Guard.c:241-244).",
+  "shield_part": 90,
+  "shield_joint": 90,
+  "shield_chain_to_root": [
+    {
+      "joint": 90,
+      "part": 90,
+      "costume_flags": "0x00000009",
+      "classical_scale": true,
+      "guard_tracks": [
+        5,
+        6,
+        7
+      ],
+      "b4": false
+    },
+    {
+      "joint": 3,
+      "part": 3,
+      "costume_flags": "0x10000009",
+      "classical_scale": true,
+      "guard_tracks": [],
+      "b4": false
+    },
+    {
+      "joint": 2,
+      "part": 2,
+      "costume_flags": "0x10000009",
+      "classical_scale": true,
+      "guard_tracks": [
+        5,
+        6,
+        7
+      ],
+      "b4": false
+    },
+    {
+      "joint": 1,
+      "part": 1,
+      "costume_flags": "0x10000009",
+      "classical_scale": true,
+      "guard_tracks": [],
+      "b4": true
+    },
+    {
+      "joint": 0,
+      "part": 0,
+      "costume_flags": "0x1005008E",
+      "classical_scale": true,
+      "guard_tracks": [],
+      "b4": false
+    }
+  ],
+  "transN_on_shield_chain": true,
+  "item_hold_part": 42,
+  "flags_b4_parts": [
+    1,
+    91
+  ],
+  "flags_b4_derivation": "parts[part_to_joint[FtPart_TransN]] and parts[part_to_joint[0x35]] (ftparts.c:691-692, PlCo.dat BoneTables[kind]\u002B0x04 table), plus parts[1] for Mewtwo (ftmewtwo.c:295).",
+  "dynamics_parts_b0": [
+    47,
+    48,
+    49,
+    50,
+    52,
+    53,
+    54,
+    55,
+    57,
+    58,
+    59,
+    60
+  ],
+  "dynamics_descs_part_count": [
+    [
+      57,
+      4
+    ],
+    [
+      47,
+      4
+    ],
+    [
+      52,
+      4
+    ]
+  ],
+  "model_scale": 1.08,
+  "initial_shield_size": 11.75,
+  "shield_radius": {
+    "formula": "b = initial_shield_size * (x264 \u002B (1 - x264) * (health / x260) * (ls * (x2D8 - x2D4) \u002B x2D4)) [inlineB0, ftCo_Guard.c:177-191; set as the shield bone\u0027s scale, ftCo_Guard.c:241-244]. The collider has size 1 in the bone\u0027s local space (ftCo_Guard.c:259-266) and the hit test measures the hurt radius through the bone\u0027s world matrix (lbColl_80006E58, lbcollision.c:1407-1421), so world radius = b * (uniform scale of the shield bone\u0027s parent world matrix), which includes TopN\u0027s model_scaling (fighter.c:213-230).",
+    "shield_radius_full": "full health (60), hard/digital press (trigger forced to 1 -\u003E ls = 1, fighter.c:1888-1890): b = 6.7562504 (= 0.57500005 * size)",
+    "shield_radius_min": "health -\u003E 0 limit: b = x264 * size = 1.7625",
+    "lightest_shield_full_health_b": "11.75",
+    "common_values": {
+      "x260": 60,
+      "x264": 0.15,
+      "x2D4": 1,
+      "x2D8": 0.5
+    },
+    "chain_scale_note": "uniform scale = cbrt(|det|) of the parent world matrix, evaluated in double.",
+    "ellipsoid": {
+      "radius_full_range_over_samples": [
+        7.2967505,
+        7.2967505
+      ],
+      "parent_world_scale_singular_value_range": [
+        1.0800000429153442,
+        1.0800000429153453
+      ],
+      "max_anisotropy": 1.1102230246251565E-15,
+      "note": "The bubble is the unit sphere through the shield bone\u0027s world matrix, i.e. an ellipsoid when the parent chain carries non-uniform scale (Guard figatree SCA tracks). shield_radius_* use the geometric mean cbrt(|det|); semi-axes = b * singular values of the parent world matrix."
+    }
+  },
+  "notes": [],
+  "columns": {
+    "sweep": "grid = every lstick value the engine can hold (MECHANICS 5); polar = theta 0..359 step 1 x mag 0..1 step 0.05",
+    "stick_x/stick_y": "grid only: integer stick units after HSD_PadClamp (radius 80) and the 0.28 per-axis deadzone; lstick = k/80. Fighter faces right, \u002Bx = forward.",
+    "angle": "settled tilt angle in degrees (0 = forward, 90 = up); Guard figatree frame = 10 \u002B angle",
+    "mag": "settled blend weight x4 = min(1, |lstick|)",
+    "bone_x/y/z": "shield bone world translation minus TopN translation (cur_pos), world axes, facing right, including TopN model scale",
+    "shield_radius_full/min": "see shield_radius"
+  },
+  "grid_samples": 8153,
+  "polar_samples": 7560,
+  "hurtboxes": {
+    "exported": true,
+    "file": "data/Fe_hurtboxes.csv",
+    "samples": "same samples as the main CSV (grid \u002B full polar)",
+    "endpoints": "lb_8000B1CC(bone, offset): offset (0,0,0) -\u003E world translation column, else MTXMultVec(bone world mtx, offset); values are world coordinates relative to TopN (cur_pos = 0), facing right.",
+    "radius": "file radius * cbrt(|det(bone world matrix)|) (the hit test scales the local radius through the bone\u0027s world matrix, lbcollision.c:1407-1421); includes model_scaling and joint scales.",
+    "max_bone_matrix_anisotropy": 7.408450695134405E-07,
+    "anisotropy_note": "max over samples/hurtboxes of (largest / smallest singular value - 1) of the bone world matrix; where \u003E 0 the engine\u0027s effective radius depends on direction and \u0060radius\u0060 is the geometric mean.",
+    "shield_bone_scale_used": "6.7562504",
+    "dynamics_bones": "hurtboxes on dynamics (flags_b0) bones use the costume rest local pose; the engine simulates them.",
+    "guard_intangibility": "Posed geometry only. Shield-state hurtbox intangibility is not applied.",
+    "list": [
+      {
+        "index": 0,
+        "part": 4,
+        "joint": 4,
+        "type": 1,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x10000009"
+      },
+      {
+        "index": 1,
+        "part": 23,
+        "joint": 23,
+        "type": 1,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x10000009"
+      },
+      {
+        "index": 2,
+        "part": 62,
+        "joint": 62,
+        "type": 2,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x00000009"
+      },
+      {
+        "index": 3,
+        "part": 72,
+        "joint": 72,
+        "type": 1,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x10000009"
+      },
+      {
+        "index": 4,
+        "part": 30,
+        "joint": 30,
+        "type": 1,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x00000009"
+      },
+      {
+        "index": 5,
+        "part": 73,
+        "joint": 73,
+        "type": 1,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x10000009"
+      },
+      {
+        "index": 6,
+        "part": 31,
+        "joint": 31,
+        "type": 1,
+        "grabbable": 0,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x00000009"
+      },
+      {
+        "index": 7,
+        "part": 14,
+        "joint": 14,
+        "type": 0,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x00000009"
+      },
+      {
+        "index": 8,
+        "part": 6,
+        "joint": 6,
+        "type": 0,
+        "grabbable": 1,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x00000009"
+      },
+      {
+        "index": 9,
+        "part": 15,
+        "joint": 15,
+        "type": 0,
+        "grabbable": 0,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x00000009"
+      },
+      {
+        "index": 10,
+        "part": 7,
+        "joint": 7,
+        "type": 0,
+        "grabbable": 0,
+        "on_dynamics_bone": false,
+        "descendant_of_shield_bone": false,
+        "costume_flags": "0x00000009"
+      }
+    ]
+  },
+  "checks": {
+    "m0_equals_shieldpose": {
+      "max_joint_world_pos_diff": 0,
+      "max_bubble_diff_across_angles": 0,
+      "max_bubble_jump_m0_vs_m1e-6": 3.0561551435695336E-06,
+      "pass": true
+    },
+    "theta_wraps_360": {
+      "max_bubble_diff": 0,
+      "anim_frame10_vs_frame370_bubble_diff": 0,
+      "anim_frame10_vs_frame370_max_joint_diff": 0.2843271029745191,
+      "pass": true
+    },
+    "m1_continuity": {
+      "max_bubble_jump_m1_vs_1minus1e-6": 3.881630934516176E-06,
+      "worst_theta": 79,
+      "b4_joints": [
+        {
+          "part": 1,
+          "joint": 1,
+          "animated_by_guard": false,
+          "tracks": [],
+          "on_shield_chain": true,
+          "anim_or_rest_minus_sp_at_frame10": {
+            "dT": 0,
+            "dR": 0,
+            "dS": 0
+          }
+        },
+        {
+          "part": 91,
+          "joint": 91,
+          "animated_by_guard": false,
+          "tracks": [],
+          "on_shield_chain": false,
+          "anim_or_rest_minus_sp_at_frame10": {
+            "dT": 0,
+            "dR": 0,
+            "dS": 0
+          }
+        }
+      ],
+      "pass": true
+    },
+    "facing_left_mirror": {
+      "max_abs(xL \u002B xR)": 4.76837158203125E-07,
+      "max_abs(yL - yR)": 0,
+      "max_abs(zL \u002B zR)": 2.384185791015625E-07,
+      "note": "Facing is a \u002B/-90 deg TopN Y rotation; cosf((float)pi/2) = -4.37e-8 leaves a residual of ~1e-7 * |local x|.",
+      "pass": true
+    }
+  },
+  "float_model": "All pose math in float32 in decomp operation order. Doubles used only where the source uses them (1.0/fterm, 1.0/scale, M_PI_2*facing, lb_8000D008\u0027s pi-atanf) and for diagnostics (radius chain scale cbrt(det), anisotropy, check distances). See tools/ShieldPose/README.md."
+}
