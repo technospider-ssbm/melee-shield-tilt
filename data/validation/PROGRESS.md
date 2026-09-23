@@ -133,8 +133,25 @@ were affected that a full clean rerun was simpler than partial-resume logic.
   after the CPU-opponent/facing fix above (first run had 6/49 rows with
   4-9 unit errors purely from CPU-inflicted facing flips; fully traced and
   fixed, not a pose-solver or harness bug — see the section above).
-- Game & Watch (Gw, shield_bone_index=51): queued next.
+- **Game & Watch (Gw): DONE.** 49/49 reachable, **max/mean position error =
+  0.0000**, no retries needed at all (clean run start to finish). This is a
+  good extra confirmation since G&W's shield bone does *not* hang under
+  TransN (per HANDOFF_PROMPT.md's Phase-3 watch-out); the pose-solver's
+  alternate parent-chain handling for that case checks out live too.
 - Kirby, Yoshi, Marth, Popo: not started (budget-permitting, per brief scope).
+
+## Summary table
+
+| Char | code | samples | reachable | max err | mean err |
+|------|------|---------|-----------|---------|----------|
+| Fox | Fx | 49 | 49/49 | 0.0000 | 0.0000 |
+| Bowser | Kp | 49 | 49/49 | 0.0000 | 0.0000 |
+| Game & Watch | Gw | 49 | 49/49 | 0.0000 | 0.0000 |
+
+All three characters match the pose-solver's `data/<code>.csv` exactly
+(to displayed float precision) once the harness bugs (JObj mtx offset,
+CPU-opponent facing flips) were fixed. No pose-solver discrepancies found
+for these three characters.
 
 ## Next steps
 1. Finish Fox capture, run `compare.py Fx`, record max/mean error here.
