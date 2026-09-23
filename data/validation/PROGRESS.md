@@ -173,8 +173,11 @@ were affected that a full clean rerun was simpler than partial-resume logic.
     only because our 16-angle grid doesn't happen to sample the exact
     extremum stick value; same order of magnitude and consistent with the
     predicted ellipsoidal (not spherical) bubble.
-- Marth (`Ms`, shield_bone_index=88), Popo (`Pp`, shield_bone_index=47):
-  queued next.
+- **Marth (Ms): DONE.** 49/49 reachable, **max/mean position error = 0.0000**,
+  no retries. Spherical bubble (`axis_scale` constant 7.7429, aniso 0.0000
+  throughout) as expected for a character without a non-uniform parent
+  scale chain.
+- Popo (`Pp`, shield_bone_index=47): queued next.
 
 ## Summary table
 
@@ -184,6 +187,7 @@ were affected that a full clean rerun was simpler than partial-resume logic.
 | Bowser | Kp | 49 | 49/49 | 0.0000 | 0.0000 |
 | Game & Watch | Gw | 49 | 49/49 | 0.0000 | 0.0000 |
 | Kirby | Kb | 49 | 49/49 | 0.0000 | 0.0000 |
+| Marth | Ms | 49 | 49/49 | 0.0000 | 0.0000 |
 
 All three characters match the pose-solver's `data/<code>.csv` exactly
 (to displayed float precision) once the harness bugs (JObj mtx offset,
