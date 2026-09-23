@@ -90,14 +90,21 @@ def start(scratch_dir: str, character: enums.Character, stage: enums.Stage = enu
             cpu_level=0,
             autostart=True,
         )
+        # cpu_level=0: a "human" pipe controller that we simply never send
+        # input to after this point (release_all() below, then untouched).
+        # A level-1 CPU still walks/attacks sometimes and invalidated
+        # earlier Bowser samples (technospider, 2026-09-23); an idle human
+        # slot just stands still.
         menu_helper.menu_helper_simple(
             gamestate, controller2,
             character_selected=enums.Character.FOX,
             stage_selected=stage,
             connect_code=None,
-            cpu_level=1,
+            cpu_level=0,
             autostart=True,
         )
+    controller2.release_all()
+    controller2.flush()
     return console, controller1, controller2
 
 
@@ -108,14 +115,41 @@ def hold_shield_toward(controller: melee.Controller, stick_x: int, stick_y: int)
     controller.flush()
 
 
-def ramp_shield_toward(console, controller, port_index, target_x, target_y,
-                        step=0.03, hold_neutral_frames=15, settle_frames=75):
-    """Move the main stick from neutral to (target_x, target_y) (melee's
+def ramp_stick_to(console, controller, port_index, cur_x, cur_y, target_x, target_y,
+                   step=0.03, settle_frames=75):
+    """Move the main stick from (cur_x, cur_y) to (target_x, target_y) (melee's
     internal [-80,80] units) gradually while holding a digital shield, to
     avoid tripping the roll/spotdodge/jump smash-input timers (see
     ftCo_Escape.c / ftCo_Jump.c: a stick axis must stay inside the
     smash-deadzone -> full-tilt path for several frames, not snap there).
+    Does NOT release the shield button; assumes it's already held.
 
+    Returns the GameState from the final settle frame (or None).
+    """
+    import ram
+
+    cx, cy = cur_x / 80.0, cur_y / 80.0
+    tx, ty = target_x / 80.0, target_y / 80.0
+    dist = max(abs(tx - cx), abs(ty - cy), 1e-9)
+    n_steps = max(1, int(dist / step) + 1)
+    gs = None
+    for i in range(1, n_steps + 1):
+        frac = i / n_steps
+        controller.tilt_analog_unit(enums.Button.BUTTON_MAIN, cx + (tx - cx) * frac, cy + (ty - cy) * frac)
+        controller.flush()
+        gs = console.step()
+        ram.pin_shield_health(port_index)
+
+    for _ in range(settle_frames):
+        gs = console.step()
+        ram.pin_shield_health(port_index)
+    return gs
+
+
+def ramp_shield_toward(console, controller, port_index, target_x, target_y,
+                        step=0.03, hold_neutral_frames=15, settle_frames=75):
+    """Press digital shield at neutral, wait for GuardOn to clear, then ramp
+    to (target_x, target_y). See ramp_stick_to for the ramp itself.
     Returns the GameState from the final settle frame (or None).
     """
     import ram
@@ -127,22 +161,8 @@ def ramp_shield_toward(console, controller, port_index, target_x, target_y,
         console.step()
         ram.pin_shield_health(port_index)
 
-    tx = target_x / 80.0
-    ty = target_y / 80.0
-    dist = max(abs(tx), abs(ty), 1e-9)
-    n_steps = max(1, int(dist / step) + 1)
-    gs = None
-    for i in range(1, n_steps + 1):
-        frac = i / n_steps
-        controller.tilt_analog_unit(enums.Button.BUTTON_MAIN, tx * frac, ty * frac)
-        controller.flush()
-        gs = console.step()
-        ram.pin_shield_health(port_index)
-
-    for _ in range(settle_frames):
-        gs = console.step()
-        ram.pin_shield_health(port_index)
-    return gs
+    return ramp_stick_to(console, controller, port_index, 0, 0, target_x, target_y,
+                          step=step, settle_frames=settle_frames)
 
 
 def release(controller: melee.Controller):

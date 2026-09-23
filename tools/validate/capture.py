@@ -44,20 +44,22 @@ SHIELD_BREAK_ACTIONS = {"SHIELD_BREAK_FLY", "SHIELD_BREAK_FALL", "SHIELD_BREAK_D
                          "SHIELD_BREAK_TEETER"}
 
 
-def compute_targets(n_angles: int, magnitudes):
-    targets = [(0.0, 0.0, 0)]  # angle, mag placeholders for untilted (m=0)
-    out = []
-    out.append({"angle": None, "mag": 0.0, "sx": 0, "sy": 0})
-    for i in range(n_angles):
-        theta = 360.0 * i / n_angles
-        rad = math.radians(theta)
-        for m in magnitudes:
-            sx = round(m * 80.0 * math.cos(rad))
-            sy = round(m * 80.0 * math.sin(rad))
-            sx = max(-80, min(80, sx))
-            sy = max(-80, min(80, sy))
-            out.append({"angle": theta, "mag": m, "sx": sx, "sy": sy})
-    return out
+def compute_rings(n_angles: int, magnitudes):
+    """Returns a list of rings, each a list of target dicts sharing a fixed
+    magnitude, in angle order, so consecutive samples within a ring can be
+    reached by a direct slow ramp (walking around the circle) instead of
+    releasing and re-pressing shield every time."""
+    rings = [[{"angle": None, "mag": 0.0, "sx": 0, "sy": 0}]]
+    for m in magnitudes:
+        ring = []
+        for i in range(n_angles):
+            theta = 360.0 * i / n_angles
+            rad = math.radians(theta)
+            sx = max(-80, min(80, round(m * 80.0 * math.cos(rad))))
+            sy = max(-80, min(80, round(m * 80.0 * math.sin(rad))))
+            ring.append({"angle": theta, "mag": m, "sx": sx, "sy": sy})
+        rings.append(ring)
+    return rings
 
 
 def main():
@@ -89,42 +91,14 @@ def main():
     console, c1, c2 = drive.start(scratch, character)
     ram.connect()
 
-    targets = compute_targets(args.angles, args.magnitudes)
+    rings = compute_rings(args.angles, args.magnitudes)
     rows = []
 
     # let the fighter finish its entry animation
     for _ in range(120):
         console.step()
 
-    for t in targets:
-        # shield_health is pinned to 60 every frame inside ramp_shield_toward
-        # (technospider, 2026-09-23: write-only exception for this one field,
-        # since health only affects bubble scale, not pose/position). Just
-        # wait out a shield break if one somehow slips through.
-        waited = 0
-        while waited < MAX_REGEN_WAIT_FRAMES:
-            gs = console.step()
-            action_name = gs.players[1].action.name if (gs and 1 in gs.players) else None
-            if action_name not in SHIELD_BREAK_ACTIONS:
-                break
-            waited += 1
-        step = 0.03
-        max_attempts = 4
-        ok = False
-        for attempt in range(max_attempts):
-            gs = drive.ramp_shield_toward(console, c1, 0, t["sx"], t["sy"],
-                                           step=step, settle_frames=args.settle)
-            action_name = gs.players[1].action.name if (gs and 1 in gs.players) else "?"
-            if action_name == "SHIELD":
-                ok = True
-                break
-            print(f"  retry (attempt {attempt}) angle={t['angle']} mag={t['mag']} "
-                  f"action={action_name} step={step} -> slowing down")
-            drive.release(c1)
-            for _ in range(10):
-                console.step()
-            step *= 0.5
-
+    def sample_and_record(t, ok):
         st = ram.read_fighter_state(0, shield_bone_index)
         facing_right = st["facing_dir"] > 0
         rel = tuple(st["bone_world"][k] - st["pos"][k] for k in range(3))
@@ -151,9 +125,55 @@ def main():
               f"-> x4={st['guard_x4']:.4f} x8={st['guard_x8']:.4f} rel={rel} "
               f"health={st['shield_health']:.1f} reachable={ok}")
 
-        # release; the top of the next loop iteration will wait for regen.
+    # technospider (2026-09-23): with health pinned, hold shield continuously
+    # and walk the stick from sample to sample within a ring (fixed
+    # magnitude) instead of releasing/re-pressing every time -- the tilt
+    # eases toward the stick target regardless of where it came from, so a
+    # settled sample doesn't depend on history. Only release and restart
+    # from neutral between rings (where the direct path could cross a smash
+    # threshold) or after a failed sample.
+    cur_x, cur_y = 0, 0
+    for ring_idx, ring in enumerate(rings):
+        first_in_ring = True
+        for t in ring:
+            step = 0.03
+            max_attempts = 4
+            ok = False
+            for attempt in range(max_attempts):
+                if first_in_ring:
+                    gs = drive.ramp_shield_toward(console, c1, 0, t["sx"], t["sy"],
+                                                   step=step, settle_frames=args.settle)
+                else:
+                    gs = drive.ramp_stick_to(console, c1, 0, cur_x, cur_y, t["sx"], t["sy"],
+                                              step=step, settle_frames=args.settle)
+                action_name = gs.players[1].action.name if (gs and 1 in gs.players) else "?"
+                # Also require facing right: a CPU/opponent hit can turn the
+                # fighter around mid-sweep. lstick is raw/absolute (not
+                # facing-relative), but the pose-solver CSV assumes
+                # facing=+1 throughout, so a facing-left sample would need a
+                # different (mirrored) stick target to mean the same
+                # in-fighter-space angle -- just retry until facing is right.
+                facing_ok = ram.get_facing_dir(0) > 0
+                if action_name == "SHIELD" and facing_ok:
+                    ok = True
+                    break
+                print(f"  retry (attempt {attempt}) angle={t['angle']} mag={t['mag']} "
+                      f"action={action_name} facing_ok={facing_ok} step={step} -> slowing down, from neutral")
+                drive.release(c1)
+                for _ in range(10):
+                    console.step()
+                step *= 0.5
+                first_in_ring = True  # re-approach from neutral after a failure
+
+            sample_and_record(t, ok)
+            cur_x, cur_y = t["sx"], t["sy"]
+            first_in_ring = False
+
+        # Between rings: release and reset to neutral before the next ring
+        # starts (a direct jump between ring magnitudes could cross a smash
+        # threshold too fast).
         drive.release(c1)
-        for _ in range(5):
+        for _ in range(10):
             console.step()
 
     drive.release(c1)

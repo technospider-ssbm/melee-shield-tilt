@@ -80,6 +80,11 @@ def _write_f32(addr: int, value: float):
     dme.write_bytes(addr, struct.pack(">f", value))
 
 
+def get_facing_dir(port_index: int) -> float:
+    fp = get_fighter_ptr(port_index)
+    return _read_f32(fp + FP_FACING_DIR)
+
+
 def pin_shield_health(port_index: int, value: float = 60.0):
     """Write-only exception (technospider, 2026-09-23): keep shield_health
     topped up during capture so it doesn't break mid-sweep. Only the

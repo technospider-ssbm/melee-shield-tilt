@@ -93,6 +93,34 @@ Checked after the Fox run:
   only hooks a process literally named `Dolphin.exe`). The real install
   directory was only ever read from, never written to.
 
+## CPU opponent contamination (found, fixed) — technospider, 2026-09-23
+First Bowser run used `cpu_level=1` for the port-2 opponent (copied from the
+smoke-test default). A level-1 CPU walks and attacks occasionally; several
+Bowser samples near angle 0/337.5/315 took real hits (`SHIELD_STUN`,
+`DAMAGE_AIR_2`, even a death/respawn). Root cause of the resulting position
+errors: taking a hit can turn the fighter to face the opponent
+(`facing_dir` flips). `fp->input.lstick` is raw/absolute (not
+facing-relative; MECHANICS.md's `theta = atan2(y, x*facing)` multiplies by
+facing separately), but the pose-solver's `data/<code>.csv` was generated
+assuming `facing = +1` throughout. So a facing-left sample driven with the
+same raw stick target actually settles to a *mirrored* effective angle
+(confirmed: a `sx=80,sy=0` sample taken while facing left settled to
+`guard_x8=190` = 10+180°, and its bone position matched the solver's
+`angle=180` row exactly, not `angle=0`) — `compare.py`'s nearest-stick match
+doesn't correct for this, so those rows produced large (4-9 unit) false
+errors. Fixed two ways:
+1. `drive.py`: port 2 is now `cpu_level=0` (a "human" pipe controller we
+   never send input to after character select, so it just stands still) —
+   not a real CPU at all. A level-1 CPU is not reliable for this ("they
+   still walk and attack sometimes").
+2. `capture.py`: a sample is only accepted if the action is `Action.SHIELD`
+   **and** `ram.get_facing_dir(0) > 0` at settle end; otherwise it retries
+   from neutral with a slower ramp, same as an action-state failure.
+
+The first Bowser run (`data/validation/Kp.csv` as originally written) is
+being redone with the fix rather than patched in place, since so few samples
+were affected that a full clean rerun was simpler than partial-resume logic.
+
 ## Results so far
 - **Fox (Fx): DONE.** 49/49 samples reachable (16 angles x {0.33,0.66,1.0} +
   untilted). `tools/validate/compare.py Fx`: **max position error = 0.0000,
@@ -101,8 +129,12 @@ Checked after the Fox run:
   breaks/rolls that were already filtered out by `reachable`). This is as
   strong a confirmation as the harness can give: the pose-solver's geometry,
   easing, and blend all match the live emulator exactly for Fox.
-- Bowser (Kp, shield_bone_index=74), Game & Watch (Gw, shield_bone_index=51):
-  queued next, same harness, not yet run.
+- **Bowser (Kp): DONE.** 49/49 reachable, **max/mean position error = 0.0000**
+  after the CPU-opponent/facing fix above (first run had 6/49 rows with
+  4-9 unit errors purely from CPU-inflicted facing flips; fully traced and
+  fixed, not a pose-solver or harness bug — see the section above).
+- Game & Watch (Gw, shield_bone_index=51): queued next.
+- Kirby, Yoshi, Marth, Popo: not started (budget-permitting, per brief scope).
 
 ## Next steps
 1. Finish Fox capture, run `compare.py Fx`, record max/mean error here.
