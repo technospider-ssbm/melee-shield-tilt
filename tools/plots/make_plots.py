@@ -289,6 +289,54 @@ COMPASS_CELLS = {
 }
 
 
+def _place_label(ax, renderer, xy, text, avoid_bboxes, near=None,
+                  fontsize=6.3, color=ORANGE):
+    """Place `text` anchored at data point `xy`, trying offset candidates
+    (in points, growing radius) until one clears every bbox in
+    avoid_bboxes (display/pixel coords, e.g. from get_window_extent).
+    `near` is another data point (e.g. the other end of a connector) whose
+    bearing is deprioritised, so two related end-labels don't grow toward
+    each other. Falls back to the last-tried candidate if nothing is
+    collision-free."""
+    away = None
+    if near is not None:
+        x0, y0 = ax.transData.transform(xy)
+        x1, y1 = ax.transData.transform(near)
+        away = np.degrees(np.arctan2(y0 - y1, x0 - x1))
+
+    candidates = [(r, ang) for r in (12, 20, 30, 42)
+                  for ang in (0, 45, 90, 135, 180, 225, 270, 315)]
+    if away is not None:
+        def pref(c):
+            r, ang = c
+            d = abs(((ang - away + 180) % 360) - 180)  # 0 = toward `near`
+            return (d < 100, r)
+        candidates.sort(key=pref)
+
+    def _try(r, ang):
+        rad = np.radians(ang)
+        dx, dy = r * np.cos(rad), r * np.sin(rad)
+        ha = "left" if dx > 2 else ("right" if dx < -2 else "center")
+        va = "bottom" if dy > 2 else ("top" if dy < -2 else "center")
+        # a short leader line disambiguates which point the label belongs
+        # to once it's nudged away to dodge a collision (e.g. Link, where
+        # the two forward points are only 0.24 units apart)
+        t = ax.annotate(text, xy=xy, xycoords="data", xytext=(dx, dy),
+                         textcoords="offset points", fontsize=fontsize,
+                         color=color, ha=ha, va=va, zorder=9,
+                         arrowprops=dict(arrowstyle="-", color=color, lw=0.6,
+                                         alpha=0.6, shrinkA=0, shrinkB=3))
+        return t
+
+    for r, ang in candidates:
+        t = _try(r, ang)
+        bbox = t.get_window_extent(renderer=renderer).expanded(1.05, 1.2)
+        if not any(bbox.overlaps(b) for b in avoid_bboxes):
+            return t
+        t.remove()
+    return _try(*candidates[-1])  # best effort
+
+
 def draw_left_panel(ax, geo):
     """'Where the shield can go': the centre path, no per-pose hurtbox
     fills at all (those are what made Dk.png unreadable) - just a faint
@@ -318,17 +366,24 @@ def draw_left_panel(ax, geo):
             path_effects=[pe.Stroke(linewidth=4.5, foreground=SURFACE), pe.Normal()],
             label="full tilt (m=1)")
 
-    # bubbles: untilted (black), min-size (dashed), 8 extremes (thin outline)
+    # bubbles: untilted (black), min-size (dashed), 8 extremes (thin outline).
+    # Skip the plain "Forward" text label when there's a forward-hysteresis
+    # pair (DK/YL/Link) - the two short labels added below stand in for it,
+    # at the same spot, so drawing both would just collide.
+    direction_texts = []
     if geo["has_tilt"]:
         for label, (ex, ey) in geo["extremes"].items():
             ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=ACCENT,
                                  lw=0.6, alpha=0.45, zorder=4))
+            if label == "Forward" and geo["fwd_alt"] is not None:
+                continue
             dx, dy = ex - ux, ey - uy
             norm = np.hypot(dx, dy) or 1
             lx = ex + dx / norm * (r_full * 0.35 + 1.0)
             ly = ey + dy / norm * (r_full * 0.35 + 1.0)
-            ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
-                    va="center", zorder=7)
+            t = ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
+                        va="center", zorder=7)
+            direction_texts.append(t)
     ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=INK_PRIMARY,
                          lw=1.4, zorder=5))
     ax.add_patch(Circle((ux, uy), r_min, fill=False, edgecolor=ORANGE,
@@ -336,32 +391,10 @@ def draw_left_panel(ax, geo):
                          label="min-size bubble"))
     ax.plot([ux], [uy], marker="o", ms=4, color=INK_PRIMARY, zorder=8)
 
-    # forward hysteresis (DK, Young Link, Link): second resting point
-    if geo["fwd_alt"] is not None:
-        fx, fy, fd = geo["fwd_alt"]
-        fwd0 = geo["extremes"].get("Forward")
-        if fwd0 is not None:
-            ax.plot([fwd0[0], fx], [fwd0[1], fy], color=ORANGE, lw=0.8,
-                    alpha=0.7, zorder=7)
-        ax.plot([fx], [fy], marker="D", ms=5, mfc=ORANGE, mec=ORANGE, zorder=8)
-        ax.annotate(
-            f"forward, if swept in from below (frame 370):\n"
-            f"centre at ({fx:.2f}, {fy:.2f})", xy=(fx, fy), xycoords="data",
-            xytext=(0.99, 0.20), textcoords="axes fraction", fontsize=6.5,
-            color=ORANGE, ha="right", va="center", zorder=8,
-            arrowprops=dict(arrowstyle="-", color=ORANGE, lw=0.7, alpha=0.7,
-                            shrinkA=0, shrinkB=3))
-
+    # axis limits/aspect must be final before we measure any text bounding
+    # boxes below (they depend on the data->display transform)
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlim(*geo["x_reach"]); ax.set_ylim(*geo["y_reach"])
-    ax.grid(True, color=GRIDLINE, lw=0.6, zorder=0)
-    ax.set_axisbelow(True)
-    for spine in ("top", "right"):
-        ax.spines[spine].set_visible(False)
-    ax.set_title("Where the shield can go", fontsize=11, color=INK_PRIMARY,
-                 loc="left")
-    ax.set_xlabel("forward →  (game units, relative to TopN)")
-    ax.set_ylabel("up →")
 
     handles = [
         Line2D([0], [0], color=INK_PRIMARY, lw=1.4, label="untilted bubble"),
@@ -371,8 +404,44 @@ def draw_left_panel(ax, geo):
         Line2D([0], [0], color=ACCENT, lw=0.6, alpha=0.6, label="bubble at stick extreme"),
         Line2D([0], [0], color=BASELINE, lw=0.5, label="untilted body outline"),
     ]
-    ax.legend(handles=handles, loc="lower right", fontsize=6.3, frameon=False,
-             labelcolor=INK_SECONDARY)
+    if geo["fwd_alt"] is not None:
+        handles.append(Line2D([0], [0], color=ORANGE, lw=1.2, ls="--",
+                               label="forward: 2 resting points (depends on approach)"))
+    legend = ax.legend(handles=handles, loc="lower right", fontsize=6.3,
+                        frameon=False, labelcolor=INK_SECONDARY)
+
+    # forward hysteresis (DK, Young Link, Link): dashed segment straight
+    # between the two real forward samples (angle 0 / frame 10 and angle
+    # 360 / frame 370), each end labelled and nudged to clear every other
+    # label/legend already on the panel.
+    if geo["fwd_alt"] is not None:
+        fx, fy, fd = geo["fwd_alt"]
+        fwd0 = geo["extremes"].get("Forward")
+        ax.figure.canvas.draw()  # need real text/legend extents to avoid
+        renderer = ax.figure.canvas.get_renderer()
+        avoid = [t.get_window_extent(renderer=renderer).expanded(1.1, 1.3)
+                 for t in direction_texts]
+        avoid.append(legend.get_window_extent(renderer=renderer).expanded(1.05, 1.05))
+
+        if fwd0 is not None:
+            ax.plot([fwd0[0], fx], [fwd0[1], fy], color=ORANGE, lw=1.2,
+                    ls="--", alpha=0.85, zorder=7)
+            t0 = _place_label(ax, renderer, fwd0, "fwd: from above / fresh shield",
+                               avoid, near=(fx, fy))
+            if t0 is not None:
+                avoid.append(t0.get_window_extent(renderer=renderer).expanded(1.05, 1.2))
+        ax.plot([fx], [fy], marker="D", ms=5, mfc=ORANGE, mec=ORANGE, zorder=8)
+        _place_label(ax, renderer, (fx, fy), "fwd: swept in from below",
+                     avoid, near=fwd0 or (fx, fy))
+
+    ax.grid(True, color=GRIDLINE, lw=0.6, zorder=0)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+    ax.set_title("Where the shield can go", fontsize=11, color=INK_PRIMARY,
+                 loc="left")
+    ax.set_xlabel("forward →  (game units, relative to TopN)")
+    ax.set_ylabel("up →")
 
 
 def draw_body_grid(fig, gs_cell, geo):
