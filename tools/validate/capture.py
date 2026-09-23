@@ -119,11 +119,17 @@ def main():
             "shield_health": st["shield_health"],
             "lightshield_amount": st["lightshield_amount"],
             "facing_dir": st["facing_dir"],
+            "axis_scale_x": st["axis_scale"][0],
+            "axis_scale_y": st["axis_scale"][1],
+            "axis_scale_z": st["axis_scale"][2],
             "reachable": ok,
         })
+        ax = st["axis_scale"]
+        aniso = (max(ax) - min(ax)) / (sum(ax) / 3.0)
         print(f"angle={t['angle']} mag={t['mag']} sx={t['sx']} sy={t['sy']} "
               f"-> x4={st['guard_x4']:.4f} x8={st['guard_x8']:.4f} rel={rel} "
-              f"health={st['shield_health']:.1f} reachable={ok}")
+              f"health={st['shield_health']:.1f} reachable={ok} "
+              f"axis_scale={tuple(round(a,4) for a in ax)} aniso={aniso:.4f}")
 
     # technospider (2026-09-23): with health pinned, hold shield continuously
     # and walk the stick from sample to sample within a ring (fixed

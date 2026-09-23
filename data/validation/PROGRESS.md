@@ -151,15 +151,30 @@ were affected that a full clean rerun was simpler than partial-resume logic.
   add a print of the raw button/stick state each frame during the first
   ramp, and check whether `Action.SHIELD` is even reachable manually (human
   play) with this harness's Yoshi character-select path.
-- Kirby (`Kb`, shield_bone_index=57), Marth (`Ms`, shield_bone_index=88),
-  Popo (`Pp`, shield_bone_index=47): not attempted. Kirby needs the
-  part-index -> joint-index remap noted in `HANDOFF_PROMPT.md` (his
-  `shield_bone_index` from `characters.json` is a lookup-table part index,
-  not necessarily the joint index `ram.py` assumes) — `capture.py`/`ram.py`
-  use the raw characters.json index directly, which was only verified
-  correct for Fox/Bowser/G&W (none of which have the optional-parts quirk).
-  Don't run Kirby without fixing that mapping first, or the result will be
-  silently wrong rather than erroring.
+- **Kirby (Kb): DONE.** 49/49 reachable, **max/mean position error = 0.0000**.
+  The "part-index -> joint-index remap" concern above turned out to be a
+  false alarm for RAM reads specifically: `fp->parts[]` in the running game
+  is indexed by **part** (not joint) already, i.e. `parts[57].joint` (part
+  57 = the shield part) directly gives the correct `HSD_JObj*` for joint 44
+  — confirmed against `data/Kb_meta.json`'s `part_to_joint[57] == 44` and by
+  the exact position match. The part/joint distinction only matters when
+  walking the *animation/pose* data directly (which is what the offline
+  pose-solver and `data/Kb_meta.json`'s `part_to_joint` table are for); the
+  live `parts[]` array the game itself maintains is already part-indexed
+  the same way `characters.json`'s `shield_bone_index` is, so no code change
+  was needed beyond what Fox/Bowser/G&W already did.
+  - **Ellipsoid check** (`ram.py` now also returns `axis_scale`, the column
+    norms of the shield joint's 3x3 world-matrix submatrix — exact
+    semi-axis lengths since the whole parent chain is `classical_scale`):
+    live axis_scale ranged **7.05 - 8.12** across the 49 samples, live
+    anisotropy `(max-min)/mean` ranged **0.0 - 0.138**. `data/Kb_meta.json`
+    predicts `radius_full` about 7.78 and `max_anisotropy` about 0.152 (from
+    its own, denser offline sweep) — live max anisotropy is a bit lower
+    only because our 16-angle grid doesn't happen to sample the exact
+    extremum stick value; same order of magnitude and consistent with the
+    predicted ellipsoidal (not spherical) bubble.
+- Marth (`Ms`, shield_bone_index=88), Popo (`Pp`, shield_bone_index=47):
+  queued next.
 
 ## Summary table
 
@@ -168,6 +183,7 @@ were affected that a full clean rerun was simpler than partial-resume logic.
 | Fox | Fx | 49 | 49/49 | 0.0000 | 0.0000 |
 | Bowser | Kp | 49 | 49/49 | 0.0000 | 0.0000 |
 | Game & Watch | Gw | 49 | 49/49 | 0.0000 | 0.0000 |
+| Kirby | Kb | 49 | 49/49 | 0.0000 | 0.0000 |
 
 All three characters match the pose-solver's `data/<code>.csv` exactly
 (to displayed float precision) once the harness bugs (JObj mtx offset,

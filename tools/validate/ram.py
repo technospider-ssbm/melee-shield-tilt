@@ -29,6 +29,7 @@ GameState before trusting them for capture.
 """
 from __future__ import annotations
 
+import math
 import struct
 import dolphin_memory_engine as dme
 
@@ -143,6 +144,15 @@ def read_fighter_state(port_index: int, shield_bone_index: int) -> dict:
     mtx = read_world_mtx(joint)
     # World position is the translation column (col 3) of each row.
     bone_world = (mtx[0][3], mtx[1][3], mtx[2][3])
+    # Ellipsoid check: column norms of the 3x3 rotation+scale submatrix are
+    # the world-space semi-axis lengths (classical_scale means R is
+    # orthonormal, so ||R*S column j|| == S_jj exactly). See
+    # data/<code>_meta.json "shield_radius.ellipsoid" for the offline
+    # prediction to compare against.
+    axis_scale = tuple(
+        math.sqrt(mtx[0][j] ** 2 + mtx[1][j] ** 2 + mtx[2][j] ** 2)
+        for j in range(3)
+    )
 
     return {
         "fp": fp,
@@ -155,6 +165,7 @@ def read_fighter_state(port_index: int, shield_bone_index: int) -> dict:
         "guard_x4": guard_x4,
         "guard_x8": guard_x8,
         "bone_world": bone_world,
+        "axis_scale": axis_scale,
     }
 
 
