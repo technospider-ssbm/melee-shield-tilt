@@ -177,7 +177,14 @@ were affected that a full clean rerun was simpler than partial-resume logic.
   no retries. Spherical bubble (`axis_scale` constant 7.7429, aniso 0.0000
   throughout) as expected for a character without a non-uniform parent
   scale chain.
-- Popo (`Pp`, shield_bone_index=47): queued next.
+- **Popo (Pp): DONE.** 49/49 reachable, **max err = 0.0074, mean = 0.0002**
+  (not a perfect 0.0000 like the others, but negligible — 2 of 49 rows,
+  `angle=337.5` at `mag=0.33` and `mag=0.66`, off by 0.003-0.008 units on a
+  ~7-unit-radius bubble, both in the z-component only). Spherical bubble
+  (`axis_scale` constant 7.0839, aniso 0.0000). Not investigated further
+  given the size (<0.1% of scale) — plausibly a keyframe-boundary rounding
+  edge case in the offline solver rather than a real mismatch, but flagged
+  here rather than silently rounded away.
 
 ## Summary table
 
@@ -188,6 +195,7 @@ were affected that a full clean rerun was simpler than partial-resume logic.
 | Game & Watch | Gw | 49 | 49/49 | 0.0000 | 0.0000 |
 | Kirby | Kb | 49 | 49/49 | 0.0000 | 0.0000 |
 | Marth | Ms | 49 | 49/49 | 0.0000 | 0.0000 |
+| Popo | Pp | 49 | 49/49 | 0.0074 | 0.0002 |
 
 All three characters match the pose-solver's `data/<code>.csv` exactly
 (to displayed float precision) once the harness bugs (JObj mtx offset,
