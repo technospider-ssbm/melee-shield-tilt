@@ -1,0 +1,5 @@
+[
+  "PlCo.dat BoneTables[] gives a bone/joint count per internal fighter-kind index, but the kind-\u003Echaracter mapping was not independently confirmed (Ft_Kind enum order != extraction order). Treat bone_tables_by_kind_index as indexed by internal kind id, not by the Code list below.",
+  "Ys: action-table entry 38 name \u0027\u0027 does NOT contain \u0027Guard\u0027 as expected",
+  "Nn: action-table entry 38 name \u0027\u0027 does NOT contain \u0027Guard\u0027 as expected"
+]

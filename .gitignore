@@ -20,3 +20,6 @@ bin/
 obj/
 *.user
 .vs/
+
+# Machine-specific paths (ISO location) — never commit
+local.json

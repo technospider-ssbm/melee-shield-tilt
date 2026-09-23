@@ -1,0 +1,6126 @@
+{
+  "Mr": {
+    "root_symbol": "ftDataMario",
+    "root_type": "SBM_ftDataMario",
+    "shield_bone_index": 59,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 10.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1,
+        "z2": 0,
+        "radius": 2.2
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 2,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.2,
+        "z2": 0,
+        "radius": 2.3
+      },
+      {
+        "bone_index": 31,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 8,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 32,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 54,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 48,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 49,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 10,
+    "hurtbox_max_bone_index": 55,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyMario5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 117216,
+          "animation_size_bytes": 6177
+        },
+        {
+          "index": 37,
+          "name": "PlyMario5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 149568,
+          "animation_size_bytes": 3705
+        },
+        {
+          "index": 38,
+          "name": "PlyMario5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 153280,
+          "animation_size_bytes": 5575
+        },
+        {
+          "index": 39,
+          "name": "PlyMario5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 142336,
+          "animation_size_bytes": 7218
+        },
+        {
+          "index": 40,
+          "name": "PlyMario5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 158880,
+          "animation_size_bytes": 3857
+        },
+        {
+          "index": 41,
+          "name": "PlyMario5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 184032,
+          "animation_size_bytes": 6785
+        },
+        {
+          "index": 42,
+          "name": "PlyMario5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 175488,
+          "animation_size_bytes": 8529
+        }
+      ],
+      "total_action_count": 303,
+      "entry_38_name": "PlyMario5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 153280,
+      "entry_38_animation_size_bytes": 5575,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyMario5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Mario"
+  },
+  "Lg": {
+    "root_symbol": "ftDataLuigi",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 59,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 10.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 2.4,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.2,
+        "z2": 0,
+        "radius": 2.1
+      },
+      {
+        "bone_index": 31,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 8,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 32,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 54,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 48,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 49,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 10,
+    "hurtbox_max_bone_index": 55,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyMario5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 118272,
+          "animation_size_bytes": 6177
+        },
+        {
+          "index": 37,
+          "name": "PlyMario5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 150624,
+          "animation_size_bytes": 3705
+        },
+        {
+          "index": 38,
+          "name": "PlyMario5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 154336,
+          "animation_size_bytes": 5575
+        },
+        {
+          "index": 39,
+          "name": "PlyMario5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 143392,
+          "animation_size_bytes": 7218
+        },
+        {
+          "index": 40,
+          "name": "PlyMario5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 159936,
+          "animation_size_bytes": 3857
+        },
+        {
+          "index": 41,
+          "name": "PlyMario5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 185088,
+          "animation_size_bytes": 6785
+        },
+        {
+          "index": 42,
+          "name": "PlyMario5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 176544,
+          "animation_size_bytes": 8529
+        }
+      ],
+      "total_action_count": 312,
+      "entry_38_name": "PlyMario5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 154336,
+      "entry_38_animation_size_bytes": 5575,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyMario5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Luigi"
+  },
+  "Pe": {
+    "root_symbol": "ftDataPeach",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 112,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 11.875,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.5,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": -0.5,
+        "z2": 0,
+        "radius": 2.1
+      },
+      {
+        "bone_index": 66,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 67,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.5,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 1.68
+      },
+      {
+        "bone_index": 87,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.5,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.3,
+        "z2": 0,
+        "radius": 1.68
+      },
+      {
+        "bone_index": 97,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 71,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 97,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 71,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 98,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 72,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.1
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.1
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.6,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.9
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.6,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.9
+      }
+    ],
+    "hurtbox_count": 14,
+    "hurtbox_max_bone_index": 98,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyPeach5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 266016,
+          "animation_size_bytes": 12901
+        },
+        {
+          "index": 37,
+          "name": "PlyPeach5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 328416,
+          "animation_size_bytes": 7097
+        },
+        {
+          "index": 38,
+          "name": "PlyPeach5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 315328,
+          "animation_size_bytes": 6291
+        },
+        {
+          "index": 39,
+          "name": "PlyPeach5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 321632,
+          "animation_size_bytes": 6766
+        },
+        {
+          "index": 40,
+          "name": "PlyPeach5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 335520,
+          "animation_size_bytes": 3657
+        },
+        {
+          "index": 41,
+          "name": "PlyPeach5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 370176,
+          "animation_size_bytes": 8381
+        },
+        {
+          "index": 42,
+          "name": "PlyPeach5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 359808,
+          "animation_size_bytes": 10361
+        }
+      ],
+      "total_action_count": 318,
+      "entry_38_name": "PlyPeach5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 315328,
+      "entry_38_animation_size_bytes": 6291,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyPeach5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Peach"
+  },
+  "Kp": {
+    "root_symbol": "ftDataKoopa",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 74,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 31.25,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 30,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 3.5,
+        "z2": -1,
+        "radius": 10
+      },
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.5,
+        "z2": -2,
+        "radius": 9.6
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1.5,
+        "z1": 1,
+        "x2": 0,
+        "y2": 2,
+        "z2": 1.5,
+        "radius": 4.8
+      },
+      {
+        "bone_index": 48,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 3,
+        "z2": 0,
+        "radius": 7.2
+      },
+      {
+        "bone_index": 60,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 4.56
+      },
+      {
+        "bone_index": 33,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 4.56
+      },
+      {
+        "bone_index": 61,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 3.6
+      },
+      {
+        "bone_index": 34,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 3.6
+      },
+      {
+        "bone_index": 15,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 2,
+        "z2": 0,
+        "radius": 4.8
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 2,
+        "z2": 0,
+        "radius": 4.8
+      },
+      {
+        "bone_index": 16,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 3.6
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 3.6
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.8
+      },
+      {
+        "bone_index": 10,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.8
+      },
+      {
+        "bone_index": 29,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 6,
+        "x2": 0,
+        "y2": 5,
+        "z2": 6,
+        "radius": 7
+      }
+    ],
+    "hurtbox_count": 15,
+    "hurtbox_max_bone_index": 61,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyKoopa5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 173664,
+          "animation_size_bytes": 6889
+        },
+        {
+          "index": 37,
+          "name": "PlyKoopa5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 217376,
+          "animation_size_bytes": 3977
+        },
+        {
+          "index": 38,
+          "name": "PlyKoopa5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 221376,
+          "animation_size_bytes": 4799
+        },
+        {
+          "index": 39,
+          "name": "PlyKoopa5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 211232,
+          "animation_size_bytes": 6134
+        },
+        {
+          "index": 40,
+          "name": "PlyKoopa5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 226176,
+          "animation_size_bytes": 4049
+        },
+        {
+          "index": 41,
+          "name": "PlyKoopa5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 263328,
+          "animation_size_bytes": 11925
+        },
+        {
+          "index": 42,
+          "name": "PlyKoopa5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 251392,
+          "animation_size_bytes": 11905
+        }
+      ],
+      "total_action_count": 316,
+      "entry_38_name": "PlyKoopa5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 221376,
+      "entry_38_animation_size_bytes": 4799,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyKoopa5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Bowser"
+  },
+  "Ys": {
+    "root_symbol": "ftDataYoshi",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 68,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 6,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 0,
+      "shield_pose_jobj_present": false
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 1.6,
+        "x2": 0,
+        "y2": 0,
+        "z2": -0.7,
+        "radius": 3
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0.4,
+        "x2": 0,
+        "y2": 1.2,
+        "z2": 0.4,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 38,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 4.4,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.9,
+        "z2": 0,
+        "radius": 3
+      },
+      {
+        "bone_index": 42,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.6,
+        "z2": 2,
+        "radius": 2.64
+      },
+      {
+        "bone_index": 57,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 27,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 14,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 17,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0.7,
+        "y1": 0,
+        "z1": 0,
+        "x2": -1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 10,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0.7,
+        "y1": 0,
+        "z1": 0,
+        "x2": -1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 21,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": -0.3,
+        "z2": 0,
+        "radius": 1.44
+      }
+    ],
+    "hurtbox_count": 13,
+    "hurtbox_max_bone_index": 57,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyYoshi5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 154432,
+          "animation_size_bytes": 5749
+        },
+        {
+          "index": 37,
+          "name": "PlyYoshi5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 182688,
+          "animation_size_bytes": 3677
+        },
+        {
+          "index": 38,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 39,
+          "name": "PlyYoshi5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 177760,
+          "animation_size_bytes": 4906
+        },
+        {
+          "index": 40,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 41,
+          "name": "PlyYoshi5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 201696,
+          "animation_size_bytes": 7265
+        },
+        {
+          "index": 42,
+          "name": "PlyYoshi5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 197568,
+          "animation_size_bytes": 4105
+        }
+      ],
+      "total_action_count": 314,
+      "entry_38_name": null,
+      "entry_38_animation_offset_in_AJ": 0,
+      "entry_38_animation_size_bytes": 0,
+      "entry_38_name_contains_guard": false
+    },
+    "name": "Yoshi"
+  },
+  "Dk": {
+    "root_symbol": "ftDataDonkey",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 73,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 17.5,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2,
+        "z2": 1.5,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 26,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0.3,
+        "y1": 0.5,
+        "z1": 1,
+        "x2": 1.7,
+        "y2": 5,
+        "z2": -0.5,
+        "radius": 4.8
+      },
+      {
+        "bone_index": 26,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0.5,
+        "z1": 1,
+        "x2": -1.7,
+        "y2": 5,
+        "z2": -0.5,
+        "radius": 4.8
+      },
+      {
+        "bone_index": 44,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 2.5,
+        "x2": 0,
+        "y2": 2,
+        "z2": -0.5,
+        "radius": 3.6
+      },
+      {
+        "bone_index": 51,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.7
+      },
+      {
+        "bone_index": 29,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.7
+      },
+      {
+        "bone_index": 52,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 3
+      },
+      {
+        "bone_index": 30,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 3
+      },
+      {
+        "bone_index": 16,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 1,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": -1,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 17,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 1.5,
+        "z1": 0,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0.5,
+        "y1": 1.5,
+        "z1": 0,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2
+      },
+      {
+        "bone_index": 25,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 3,
+        "z1": 5,
+        "x2": 0,
+        "y2": 4,
+        "z2": 5,
+        "radius": 6
+      }
+    ],
+    "hurtbox_count": 13,
+    "hurtbox_max_bone_index": 52,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyDonkey5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 148896,
+          "animation_size_bytes": 6090
+        },
+        {
+          "index": 37,
+          "name": "PlyDonkey5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 178208,
+          "animation_size_bytes": 4838
+        },
+        {
+          "index": 38,
+          "name": "PlyDonkey5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 183072,
+          "animation_size_bytes": 5672
+        },
+        {
+          "index": 39,
+          "name": "PlyDonkey5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 172032,
+          "animation_size_bytes": 6155
+        },
+        {
+          "index": 40,
+          "name": "PlyDonkey5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 188768,
+          "animation_size_bytes": 4478
+        },
+        {
+          "index": 41,
+          "name": "PlyDonkey5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 216992,
+          "animation_size_bytes": 10154
+        },
+        {
+          "index": 42,
+          "name": "PlyDonkey5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 209152,
+          "animation_size_bytes": 7834
+        }
+      ],
+      "total_action_count": 337,
+      "entry_38_name": "PlyDonkey5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 183072,
+      "entry_38_animation_size_bytes": 5672,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyDonkey5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "DonkeyKong"
+  },
+  "Ca": {
+    "root_symbol": "ftDataCaptain",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 61,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 15,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 1,
+        "x2": 0,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.7,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.5,
+        "z2": 0,
+        "radius": 3.3
+      },
+      {
+        "bone_index": 39,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1.2,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.2,
+        "z2": 0.5,
+        "radius": 1.68
+      },
+      {
+        "bone_index": 45,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 46,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.32
+      },
+      {
+        "bone_index": 24,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.32
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 14,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.9,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 8,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.9,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      }
+    ],
+    "hurtbox_count": 11,
+    "hurtbox_max_bone_index": 46,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyCaptain5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 180608,
+          "animation_size_bytes": 8587
+        },
+        {
+          "index": 37,
+          "name": "PlyCaptain5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 216448,
+          "animation_size_bytes": 4019
+        },
+        {
+          "index": 38,
+          "name": "PlyCaptain5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 220480,
+          "animation_size_bytes": 4353
+        },
+        {
+          "index": 39,
+          "name": "PlyCaptain5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 209664,
+          "animation_size_bytes": 6760
+        },
+        {
+          "index": 40,
+          "name": "PlyCaptain5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 224864,
+          "animation_size_bytes": 3991
+        },
+        {
+          "index": 41,
+          "name": "PlyCaptain5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 262016,
+          "animation_size_bytes": 7871
+        },
+        {
+          "index": 42,
+          "name": "PlyCaptain5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 250816,
+          "animation_size_bytes": 11179
+        }
+      ],
+      "total_action_count": 318,
+      "entry_38_name": "PlyCaptain5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 220480,
+      "entry_38_animation_size_bytes": 4353,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyCaptain5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "CaptainFalcon"
+  },
+  "Gn": {
+    "root_symbol": "ftDataGanon",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 82,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 15,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 1,
+        "x2": 0,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.64
+      },
+      {
+        "bone_index": 18,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.5,
+        "z2": 0,
+        "radius": 3.6
+      },
+      {
+        "bone_index": 54,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.9,
+        "z1": -0.1,
+        "x2": 0,
+        "y2": 0.5,
+        "z2": -0.1,
+        "radius": 1.68
+      },
+      {
+        "bone_index": 54,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1.2,
+        "z1": 0.5,
+        "x2": 0,
+        "y2": 0.5,
+        "z2": 0.5,
+        "radius": 1.32
+      },
+      {
+        "bone_index": 66,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 22,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 67,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.32
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.32
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.9,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.9,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      }
+    ],
+    "hurtbox_count": 12,
+    "hurtbox_max_bone_index": 67,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyGanon5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 181216,
+          "animation_size_bytes": 6593
+        },
+        {
+          "index": 37,
+          "name": "PlyGanon5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 213920,
+          "animation_size_bytes": 4889
+        },
+        {
+          "index": 38,
+          "name": "PlyGanon5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 218816,
+          "animation_size_bytes": 5219
+        },
+        {
+          "index": 39,
+          "name": "PlyGanon5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 206432,
+          "animation_size_bytes": 7486
+        },
+        {
+          "index": 40,
+          "name": "PlyGanon5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 224064,
+          "animation_size_bytes": 4617
+        },
+        {
+          "index": 41,
+          "name": "PlyGanon5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 264640,
+          "animation_size_bytes": 8073
+        },
+        {
+          "index": 42,
+          "name": "PlyGanon5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 252672,
+          "animation_size_bytes": 11953
+        }
+      ],
+      "total_action_count": 318,
+      "entry_38_name": "PlyGanon5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 218816,
+      "entry_38_animation_size_bytes": 5219,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyGanon5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Ganondorf"
+  },
+  "Fc": {
+    "root_symbol": "ftDataFalco",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 65,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 12.5,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0.1,
+        "y1": 0,
+        "z1": 0,
+        "x2": -0.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.04
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0.3,
+        "y1": 0.5,
+        "z1": 0,
+        "x2": -0.3,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 39,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1.3,
+        "z1": 0.4,
+        "x2": 0,
+        "y2": 2.2,
+        "z2": -0.1,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 46,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.5,
+        "z1": 1,
+        "x2": 0,
+        "y2": 0.4,
+        "z2": 1.4,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 49,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.2,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0.2,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.2,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0.2,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 50,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 24,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 17,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0,
+        "z2": -1.8,
+        "radius": 1.62
+      }
+    ],
+    "hurtbox_count": 13,
+    "hurtbox_max_bone_index": 50,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyFalco5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 138976,
+          "animation_size_bytes": 5933
+        },
+        {
+          "index": 37,
+          "name": "PlyFalco5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 169440,
+          "animation_size_bytes": 4253
+        },
+        {
+          "index": 38,
+          "name": "PlyFalco5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 173696,
+          "animation_size_bytes": 5159
+        },
+        {
+          "index": 39,
+          "name": "PlyFalco5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 164160,
+          "animation_size_bytes": 5258
+        },
+        {
+          "index": 40,
+          "name": "PlyFalco5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 178880,
+          "animation_size_bytes": 4077
+        },
+        {
+          "index": 41,
+          "name": "PlyFalco5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 212288,
+          "animation_size_bytes": 9005
+        },
+        {
+          "index": 42,
+          "name": "PlyFalco5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 202816,
+          "animation_size_bytes": 9461
+        }
+      ],
+      "total_action_count": 327,
+      "entry_38_name": "PlyFalco5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 173696,
+      "entry_38_animation_size_bytes": 5159,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyFalco5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Falco"
+  },
+  "Fx": {
+    "root_symbol": "ftDataFox",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 71,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 14.375,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.04
+      },
+      {
+        "bone_index": 22,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 1,
+        "y1": 0.5,
+        "z1": 0,
+        "x2": -1,
+        "y2": 1,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 41,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 2,
+        "z1": 0,
+        "x2": 0,
+        "y2": 3,
+        "z2": 0.3,
+        "radius": 2.5
+      },
+      {
+        "bone_index": 41,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1.6,
+        "z1": 2,
+        "x2": 0,
+        "y2": 1.6,
+        "z2": 2.5,
+        "radius": 1.5
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.2,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0.2,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 25,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.2,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0.2,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 56,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.35,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 26,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.35,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 18,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0.8,
+        "x2": 0,
+        "y2": 0,
+        "z2": -0.8,
+        "radius": 1.62
+      }
+    ],
+    "hurtbox_count": 13,
+    "hurtbox_max_bone_index": 56,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyFox5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 106368,
+          "animation_size_bytes": 5759
+        },
+        {
+          "index": 37,
+          "name": "PlyFox5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 135840,
+          "animation_size_bytes": 4187
+        },
+        {
+          "index": 38,
+          "name": "PlyFox5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 140032,
+          "animation_size_bytes": 4965
+        },
+        {
+          "index": 39,
+          "name": "PlyFox5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 130720,
+          "animation_size_bytes": 5096
+        },
+        {
+          "index": 40,
+          "name": "PlyFox5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 145024,
+          "animation_size_bytes": 4175
+        },
+        {
+          "index": 41,
+          "name": "PlyFox5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 179456,
+          "animation_size_bytes": 9687
+        },
+        {
+          "index": 42,
+          "name": "PlyFox5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 169696,
+          "animation_size_bytes": 9731
+        }
+      ],
+      "total_action_count": 327,
+      "entry_38_name": "PlyFox5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 140032,
+      "entry_38_animation_size_bytes": 4965,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyFox5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Fox"
+  },
+  "Ns": {
+    "root_symbol": "ftDataNess",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 61,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 13.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.4,
+        "z2": 0,
+        "radius": 3.1
+      },
+      {
+        "bone_index": 24,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 2.2,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.6,
+        "z2": 0,
+        "radius": 3.5
+      },
+      {
+        "bone_index": 31,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 32,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 10,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 48,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 56,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 49,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      }
+    ],
+    "hurtbox_count": 10,
+    "hurtbox_max_bone_index": 56,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyNess5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 135776,
+          "animation_size_bytes": 6384
+        },
+        {
+          "index": 37,
+          "name": "PlyNess5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 176704,
+          "animation_size_bytes": 3944
+        },
+        {
+          "index": 38,
+          "name": "PlyNess5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 180672,
+          "animation_size_bytes": 5270
+        },
+        {
+          "index": 39,
+          "name": "PlyNess5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 170016,
+          "animation_size_bytes": 6681
+        },
+        {
+          "index": 40,
+          "name": "PlyNess5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 185952,
+          "animation_size_bytes": 6148
+        },
+        {
+          "index": 41,
+          "name": "PlyNess5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 222016,
+          "animation_size_bytes": 7616
+        },
+        {
+          "index": 42,
+          "name": "PlyNess5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 210560,
+          "animation_size_bytes": 11440
+        }
+      ],
+      "total_action_count": 326,
+      "entry_38_name": "PlyNess5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 180672,
+      "entry_38_animation_size_bytes": 5270,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyNess5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Ness"
+  },
+  "Pp": {
+    "root_symbol": "ftDataPopo",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 47,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 10.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 1.2,
+        "y1": -0.1,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 2.8
+      },
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -1.2,
+        "y1": -0.1,
+        "z1": 0,
+        "x2": -0.8,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 2.8
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -0.1,
+        "z1": 0,
+        "x2": 0,
+        "y2": -0.1,
+        "z2": 0,
+        "radius": 3.45
+      },
+      {
+        "bone_index": 24,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 25,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 10,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 46,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.2,
+        "y2": 0.1,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 40,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.2,
+        "y2": 0.1,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 44,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 38,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 43,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.3
+      },
+      {
+        "bone_index": 37,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.3
+      }
+    ],
+    "hurtbox_count": 13,
+    "hurtbox_max_bone_index": 46,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyPopo5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 111232,
+          "animation_size_bytes": 5460
+        },
+        {
+          "index": 37,
+          "name": "PlyPopo5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 139808,
+          "animation_size_bytes": 3256
+        },
+        {
+          "index": 38,
+          "name": "PlyPopo5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 143072,
+          "animation_size_bytes": 4646
+        },
+        {
+          "index": 39,
+          "name": "PlyPopo5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 134304,
+          "animation_size_bytes": 5481
+        },
+        {
+          "index": 40,
+          "name": "PlyPopo5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 147744,
+          "animation_size_bytes": 3044
+        },
+        {
+          "index": 41,
+          "name": "PlyPopo5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 179520,
+          "animation_size_bytes": 9080
+        },
+        {
+          "index": 42,
+          "name": "PlyPopo5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 168704,
+          "animation_size_bytes": 10796
+        }
+      ],
+      "total_action_count": 321,
+      "entry_38_name": "PlyPopo5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 143072,
+      "entry_38_animation_size_bytes": 4646,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyPopo5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Popo"
+  },
+  "Nn": {
+    "root_symbol": "ftDataNana",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 47,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 10.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 1.2,
+        "y1": -0.1,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 2.8
+      },
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -1.2,
+        "y1": -0.1,
+        "z1": 0,
+        "x2": -0.8,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 2.8
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -0.1,
+        "z1": 0,
+        "x2": 0,
+        "y2": -0.1,
+        "z2": 0,
+        "radius": 3.45
+      },
+      {
+        "bone_index": 24,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 25,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 10,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 46,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.2,
+        "y2": 0.1,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 40,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.2,
+        "y2": 0.1,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 44,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 38,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 43,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.3
+      },
+      {
+        "bone_index": 37,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.3
+      }
+    ],
+    "hurtbox_count": 13,
+    "hurtbox_max_bone_index": 46,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 37,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 38,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 39,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 40,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 41,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        },
+        {
+          "index": 42,
+          "name": null,
+          "animation_offset_in_AJ": 0,
+          "animation_size_bytes": 0
+        }
+      ],
+      "total_action_count": 321,
+      "entry_38_name": null,
+      "entry_38_animation_offset_in_AJ": 0,
+      "entry_38_animation_size_bytes": 0,
+      "entry_38_name_contains_guard": false
+    },
+    "name": "Nana"
+  },
+  "Kb": {
+    "root_symbol": "ftDataKirby",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 57,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 14.7,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.15,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.15,
+        "z2": 0,
+        "radius": 5.6
+      },
+      {
+        "bone_index": 42,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 37,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.8,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 1.92
+      },
+      {
+        "bone_index": 49,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.8,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 1.92
+      }
+    ],
+    "hurtbox_count": 5,
+    "hurtbox_max_bone_index": 55,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyKirby5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 147168,
+          "animation_size_bytes": 4881
+        },
+        {
+          "index": 37,
+          "name": "PlyKirby5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 177536,
+          "animation_size_bytes": 2901
+        },
+        {
+          "index": 38,
+          "name": "PlyKirby5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 180448,
+          "animation_size_bytes": 6087
+        },
+        {
+          "index": 39,
+          "name": "PlyKirby5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 172800,
+          "animation_size_bytes": 4730
+        },
+        {
+          "index": 40,
+          "name": "PlyKirby5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 186560,
+          "animation_size_bytes": 2761
+        },
+        {
+          "index": 41,
+          "name": "PlyKirby5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 211424,
+          "animation_size_bytes": 6969
+        },
+        {
+          "index": 42,
+          "name": "PlyKirby5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 203680,
+          "animation_size_bytes": 7733
+        }
+      ],
+      "total_action_count": 479,
+      "entry_38_name": "PlyKirby5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 180448,
+      "entry_38_animation_size_bytes": 6087,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyKirby5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Kirby"
+  },
+  "Ss": {
+    "root_symbol": "ftDataSamus",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 58,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 16.25,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.5,
+        "y1": 0,
+        "z1": 1,
+        "x2": -0.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.92
+      },
+      {
+        "bone_index": 20,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 3
+      },
+      {
+        "bone_index": 42,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.8,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 44,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -1.2,
+        "y1": 0.8,
+        "z1": 0,
+        "x2": -1.2,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 22,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 1.2,
+        "y1": 0.8,
+        "z1": 0,
+        "x2": 1.2,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 48,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 26,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 49,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 1.5,
+        "y1": 0,
+        "z1": 0,
+        "x2": 6,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.44
+      },
+      {
+        "bone_index": 27,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.6,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.08
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.4,
+        "z1": -0.4,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.62
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.4,
+        "z1": 0.4,
+        "x2": 4.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.62
+      },
+      {
+        "bone_index": 14,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 6,
+        "y2": 0.4,
+        "z2": 0,
+        "radius": 1.5
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 6,
+        "y2": 0.4,
+        "z2": 0,
+        "radius": 1.5
+      }
+    ],
+    "hurtbox_count": 13,
+    "hurtbox_max_bone_index": 49,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlySamus5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 111072,
+          "animation_size_bytes": 6869
+        },
+        {
+          "index": 37,
+          "name": "PlySamus5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 141408,
+          "animation_size_bytes": 4389
+        },
+        {
+          "index": 38,
+          "name": "PlySamus5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 145824,
+          "animation_size_bytes": 4267
+        },
+        {
+          "index": 39,
+          "name": "PlySamus5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 134784,
+          "animation_size_bytes": 6622
+        },
+        {
+          "index": 40,
+          "name": "PlySamus5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 150112,
+          "animation_size_bytes": 3725
+        },
+        {
+          "index": 41,
+          "name": "PlySamus5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 177952,
+          "animation_size_bytes": 8073
+        },
+        {
+          "index": 42,
+          "name": "PlySamus5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 169856,
+          "animation_size_bytes": 8077
+        }
+      ],
+      "total_action_count": 313,
+      "entry_38_name": "PlySamus5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 145824,
+      "entry_38_animation_size_bytes": 4267,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlySamus5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Samus"
+  },
+  "Zd": {
+    "root_symbol": "ftDataZelda",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 116,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 11.875,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 66,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.1
+      },
+      {
+        "bone_index": 67,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.3,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 1.4
+      },
+      {
+        "bone_index": 89,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.6,
+        "z1": -0.09,
+        "x2": 0,
+        "y2": 0.6,
+        "z2": 0.2,
+        "radius": 1.5
+      },
+      {
+        "bone_index": 100,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.8
+      },
+      {
+        "bone_index": 72,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.8
+      },
+      {
+        "bone_index": 101,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.8
+      },
+      {
+        "bone_index": 73,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.8
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.6,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.9
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.6,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.9
+      }
+    ],
+    "hurtbox_count": 12,
+    "hurtbox_max_bone_index": 101,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyZelda5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 252192,
+          "animation_size_bytes": 10705
+        },
+        {
+          "index": 37,
+          "name": "PlyZelda5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 303872,
+          "animation_size_bytes": 7681
+        },
+        {
+          "index": 38,
+          "name": "PlyZelda5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 311584,
+          "animation_size_bytes": 7643
+        },
+        {
+          "index": 39,
+          "name": "PlyZelda5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 296704,
+          "animation_size_bytes": 7138
+        },
+        {
+          "index": 40,
+          "name": "PlyZelda5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 319232,
+          "animation_size_bytes": 6157
+        },
+        {
+          "index": 41,
+          "name": "PlyZelda5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 358624,
+          "animation_size_bytes": 9509
+        },
+        {
+          "index": 42,
+          "name": "PlyZelda5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 345696,
+          "animation_size_bytes": 12913
+        }
+      ],
+      "total_action_count": 311,
+      "entry_38_name": "PlyZelda5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 311584,
+      "entry_38_animation_size_bytes": 7643,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyZelda5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Zelda"
+  },
+  "Sk": {
+    "root_symbol": "ftDataSeak",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 56,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 11.625,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.5,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0.5,
+        "y2": -0.5,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 18,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.5,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 2.1
+      },
+      {
+        "bone_index": 36,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.8,
+        "z2": 0,
+        "radius": 1.56
+      },
+      {
+        "bone_index": 41,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 21,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 42,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 22,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      }
+    ],
+    "hurtbox_count": 11,
+    "hurtbox_max_bone_index": 42,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlySeak5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 120864,
+          "animation_size_bytes": 7528
+        },
+        {
+          "index": 37,
+          "name": "PlySeak5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 151936,
+          "animation_size_bytes": 3972
+        },
+        {
+          "index": 38,
+          "name": "PlySeak5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 155936,
+          "animation_size_bytes": 4850
+        },
+        {
+          "index": 39,
+          "name": "PlySeak5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 146944,
+          "animation_size_bytes": 4973
+        },
+        {
+          "index": 40,
+          "name": "PlySeak5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 160800,
+          "animation_size_bytes": 2968
+        },
+        {
+          "index": 41,
+          "name": "PlySeak5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 190336,
+          "animation_size_bytes": 7972
+        },
+        {
+          "index": 42,
+          "name": "PlySeak5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 181088,
+          "animation_size_bytes": 9240
+        }
+      ],
+      "total_action_count": 317,
+      "entry_38_name": "PlySeak5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 155936,
+      "entry_38_animation_size_bytes": 4850,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlySeak5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Sheik"
+  },
+  "Lk": {
+    "root_symbol": "ftDataLink",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 74,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 11.625,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.4,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0.4,
+        "y2": -0.5,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 17,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.2,
+        "z2": 0,
+        "radius": 2.16
+      },
+      {
+        "bone_index": 40,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 53,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 21,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 54,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 22,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 11,
+    "hurtbox_max_bone_index": 54,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyLink5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 142272,
+          "animation_size_bytes": 6364
+        },
+        {
+          "index": 37,
+          "name": "PlyLink5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 170720,
+          "animation_size_bytes": 4948
+        },
+        {
+          "index": 38,
+          "name": "PlyLink5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 175680,
+          "animation_size_bytes": 5334
+        },
+        {
+          "index": 39,
+          "name": "PlyLink5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 165760,
+          "animation_size_bytes": 4957
+        },
+        {
+          "index": 40,
+          "name": "PlyLink5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 181024,
+          "animation_size_bytes": 4552
+        },
+        {
+          "index": 41,
+          "name": "PlyLink5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 214240,
+          "animation_size_bytes": 7420
+        },
+        {
+          "index": 42,
+          "name": "PlyLink5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 203296,
+          "animation_size_bytes": 10924
+        }
+      ],
+      "total_action_count": 314,
+      "entry_38_name": "PlyLink5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 175680,
+      "entry_38_animation_size_bytes": 5334,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyLink5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Link"
+  },
+  "Cl": {
+    "root_symbol": "ftDataClink",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 78,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 11.625,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.4,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0.4,
+        "y2": -0.5,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 17,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.2,
+        "z2": 0,
+        "radius": 2.16
+      },
+      {
+        "bone_index": 42,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1,
+        "z2": 0,
+        "radius": 2.52
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 21,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 56,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 22,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0.5,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0.5,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 11,
+    "hurtbox_max_bone_index": 56,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyClink5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 204928,
+          "animation_size_bytes": 7101
+        },
+        {
+          "index": 37,
+          "name": "PlyClink5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 242112,
+          "animation_size_bytes": 5649
+        },
+        {
+          "index": 38,
+          "name": "PlyClink5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 247776,
+          "animation_size_bytes": 6199
+        },
+        {
+          "index": 39,
+          "name": "PlyClink5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 236288,
+          "animation_size_bytes": 5806
+        },
+        {
+          "index": 40,
+          "name": "PlyClink5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 253984,
+          "animation_size_bytes": 5269
+        },
+        {
+          "index": 41,
+          "name": "PlyClink5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 289408,
+          "animation_size_bytes": 7921
+        },
+        {
+          "index": 42,
+          "name": "PlyClink5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 277888,
+          "animation_size_bytes": 11497
+        }
+      ],
+      "total_action_count": 314,
+      "entry_38_name": "PlyClink5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 247776,
+      "entry_38_animation_size_bytes": 6199,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyClink5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "YoungLink"
+  },
+  "Pk": {
+    "root_symbol": "ftDataPikachu",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 51,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 12,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -2,
+        "z1": -0.1,
+        "x2": 0,
+        "y2": 1,
+        "z2": 0.7,
+        "radius": 3.84
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1.1,
+        "z1": -1.2,
+        "x2": 0,
+        "y2": 1,
+        "z2": -0.8,
+        "radius": 3.72
+      },
+      {
+        "bone_index": 24,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.8,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 8,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.8,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 25,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.6
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.6
+      },
+      {
+        "bone_index": 40,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.1
+      },
+      {
+        "bone_index": 32,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 2.1
+      },
+      {
+        "bone_index": 41,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.15
+      },
+      {
+        "bone_index": 33,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.15
+      },
+      {
+        "bone_index": 47,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 2.8,
+        "y1": 3.7,
+        "z1": -1,
+        "x2": 0,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.92
+      }
+    ],
+    "hurtbox_count": 11,
+    "hurtbox_max_bone_index": 47,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyPikachu5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 140672,
+          "animation_size_bytes": 7087
+        },
+        {
+          "index": 37,
+          "name": "PlyPikachu5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 171424,
+          "animation_size_bytes": 3175
+        },
+        {
+          "index": 38,
+          "name": "PlyPikachu5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 174624,
+          "animation_size_bytes": 6165
+        },
+        {
+          "index": 39,
+          "name": "PlyPikachu5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 167584,
+          "animation_size_bytes": 3824
+        },
+        {
+          "index": 40,
+          "name": "PlyPikachu5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 180800,
+          "animation_size_bytes": 3899
+        },
+        {
+          "index": 41,
+          "name": "PlyPikachu5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 203808,
+          "animation_size_bytes": 6147
+        },
+        {
+          "index": 42,
+          "name": "PlyPikachu5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 197056,
+          "animation_size_bytes": 6731
+        }
+      ],
+      "total_action_count": 320,
+      "entry_38_name": "PlyPikachu5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 174624,
+      "entry_38_animation_size_bytes": 6165,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyPikachu5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Pikachu"
+  },
+  "Pc": {
+    "root_symbol": "ftDataPichu",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 44,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 24.3,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 21,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.5,
+        "z2": 0,
+        "radius": 3.1
+      },
+      {
+        "bone_index": 18,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.5,
+        "z2": 0,
+        "radius": 3.1
+      },
+      {
+        "bone_index": 22,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.5,
+        "z2": 0,
+        "radius": 2.6
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.5,
+        "z2": 0,
+        "radius": 2.6
+      },
+      {
+        "bone_index": 16,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": -2,
+        "y1": -5.4,
+        "z1": 2.2,
+        "x2": 2,
+        "y2": -5.4,
+        "z2": 2.2,
+        "radius": 5.1
+      },
+      {
+        "bone_index": 16,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": -2.2,
+        "y1": -5.4,
+        "z1": -0.3,
+        "x2": 2.2,
+        "y2": -5.4,
+        "z2": -0.3,
+        "radius": 5.1
+      },
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0.3,
+        "x2": 0,
+        "y2": 0,
+        "z2": -0.3,
+        "radius": 4.2
+      },
+      {
+        "bone_index": 25,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.4,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.3
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.4,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.3
+      },
+      {
+        "bone_index": 26,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": -0.5,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1
+      },
+      {
+        "bone_index": 10,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": -0.5,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1
+      },
+      {
+        "bone_index": 42,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 1,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": -2,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.1
+      },
+      {
+        "bone_index": 36,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 1,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": -2,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.1
+      },
+      {
+        "bone_index": 43,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 1.5,
+        "y1": 2,
+        "z1": -1.25,
+        "x2": 0,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 14,
+    "hurtbox_max_bone_index": 43,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyPichu5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 119552,
+          "animation_size_bytes": 7357
+        },
+        {
+          "index": 37,
+          "name": "PlyPichu5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 156576,
+          "animation_size_bytes": 2917
+        },
+        {
+          "index": 38,
+          "name": "PlyPichu5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 159520,
+          "animation_size_bytes": 11631
+        },
+        {
+          "index": 39,
+          "name": "PlyPichu5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 153056,
+          "animation_size_bytes": 3490
+        },
+        {
+          "index": 40,
+          "name": "PlyPichu5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 171168,
+          "animation_size_bytes": 2985
+        },
+        {
+          "index": 41,
+          "name": "PlyPichu5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 189280,
+          "animation_size_bytes": 4889
+        },
+        {
+          "index": 42,
+          "name": "PlyPichu5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 184096,
+          "animation_size_bytes": 5173
+        }
+      ],
+      "total_action_count": 320,
+      "entry_38_name": "PlyPichu5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 159520,
+      "entry_38_animation_size_bytes": 11631,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyPichu5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Pichu"
+  },
+  "Pr": {
+    "root_symbol": "ftDataPurin",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 48,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 13.125,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": -0.3,
+        "z2": 1.5,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 8,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.1,
+        "y2": -0.5,
+        "z2": 1.5,
+        "radius": 1.7
+      },
+      {
+        "bone_index": 26,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 0,
+        "x1": 0.4,
+        "y1": 0,
+        "z1": -0.8,
+        "x2": 0,
+        "y2": 0.8,
+        "z2": -0.5,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 0,
+        "x1": -0.4,
+        "y1": 0,
+        "z1": -0.8,
+        "x2": 0,
+        "y2": 0.8,
+        "z2": -0.5,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.25,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.25,
+        "z2": 0,
+        "radius": 5.6
+      },
+      {
+        "bone_index": 33,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.84
+      },
+      {
+        "bone_index": 29,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.84
+      },
+      {
+        "bone_index": 46,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -0.4,
+        "y1": 0.6,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0.6,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 40,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -0.4,
+        "y1": 0.6,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0.6,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 9,
+    "hurtbox_max_bone_index": 46,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyPurin5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 115872,
+          "animation_size_bytes": 3717
+        },
+        {
+          "index": 37,
+          "name": "PlyPurin5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 141120,
+          "animation_size_bytes": 2721
+        },
+        {
+          "index": 38,
+          "name": "PlyPurin5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 143872,
+          "animation_size_bytes": 4607
+        },
+        {
+          "index": 39,
+          "name": "PlyPurin5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 137088,
+          "animation_size_bytes": 4026
+        },
+        {
+          "index": 40,
+          "name": "PlyPurin5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 148480,
+          "animation_size_bytes": 2657
+        },
+        {
+          "index": 41,
+          "name": "PlyPurin5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 167712,
+          "animation_size_bytes": 3961
+        },
+        {
+          "index": 42,
+          "name": "PlyPurin5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 161952,
+          "animation_size_bytes": 5741
+        }
+      ],
+      "total_action_count": 327,
+      "entry_38_name": "PlyPurin5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 143872,
+      "entry_38_animation_size_bytes": 4607,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyPurin5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Jigglypuff"
+  },
+  "Mt": {
+    "root_symbol": "ftDataMewtwo",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 66,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 16.25,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 3,
+      "total_joints_root_plus_children": 4,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 28,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.5,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.5,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 43,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 2.6,
+        "z1": -1.2,
+        "x2": 0,
+        "y2": 1.6,
+        "z2": 0.8,
+        "radius": 2.64
+      },
+      {
+        "bone_index": 54,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 31,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.1,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.72
+      },
+      {
+        "bone_index": 55,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 32,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3.4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.86
+      },
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -2.1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.3,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 19,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": -1,
+        "x2": 0,
+        "y2": 0,
+        "z2": 1,
+        "radius": 2
+      },
+      {
+        "bone_index": 21,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": -3,
+        "x2": 0,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": -2,
+        "x2": 0,
+        "y2": 0,
+        "z2": 0.5,
+        "radius": 1.3
+      },
+      {
+        "bone_index": 14,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.92
+      },
+      {
+        "bone_index": 8,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.3,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.92
+      },
+      {
+        "bone_index": 17,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0.4,
+        "y1": 1,
+        "z1": 0,
+        "x2": 3.3,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.08
+      },
+      {
+        "bone_index": 11,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0.4,
+        "y1": 1,
+        "z1": 0,
+        "x2": 3.3,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.08
+      }
+    ],
+    "hurtbox_count": 14,
+    "hurtbox_max_bone_index": 55,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyMewtwo5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 141760,
+          "animation_size_bytes": 6702
+        },
+        {
+          "index": 37,
+          "name": "PlyMewtwo5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 171808,
+          "animation_size_bytes": 4622
+        },
+        {
+          "index": 38,
+          "name": "PlyMewtwo5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 176448,
+          "animation_size_bytes": 6840
+        },
+        {
+          "index": 39,
+          "name": "PlyMewtwo5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 164960,
+          "animation_size_bytes": 6819
+        },
+        {
+          "index": 40,
+          "name": "PlyMewtwo5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 183296,
+          "animation_size_bytes": 4066
+        },
+        {
+          "index": 41,
+          "name": "PlyMewtwo5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 205664,
+          "animation_size_bytes": 6034
+        },
+        {
+          "index": 42,
+          "name": "PlyMewtwo5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 200352,
+          "animation_size_bytes": 5306
+        }
+      ],
+      "total_action_count": 314,
+      "entry_38_name": "PlyMewtwo5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 176448,
+      "entry_38_animation_size_bytes": 6840,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyMewtwo5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Mewtwo"
+  },
+  "Gw": {
+    "root_symbol": "ftDataGamewatch",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 51,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 10.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 3,
+      "total_joints_root_plus_children": 4,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": -0.3,
+        "z1": 0,
+        "x2": 0,
+        "y2": 0.5,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 20,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1.9,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.9,
+        "z2": 0,
+        "radius": 3.12
+      },
+      {
+        "bone_index": 20,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 3.4,
+        "z1": 3,
+        "x2": 0,
+        "y2": 3.7,
+        "z2": 3.5,
+        "radius": 1.12
+      },
+      {
+        "bone_index": 26,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 11,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 27,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 12,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 29,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.5
+      },
+      {
+        "bone_index": 14,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.5
+      },
+      {
+        "bone_index": 44,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 36,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 45,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 37,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.7
+      },
+      {
+        "bone_index": 48,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -1.5,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 40,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": -1.5,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0.8,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 15,
+    "hurtbox_max_bone_index": 48,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyGamewatch5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 140480,
+          "animation_size_bytes": 5405
+        },
+        {
+          "index": 37,
+          "name": "PlyGamewatch5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 173600,
+          "animation_size_bytes": 5265
+        },
+        {
+          "index": 38,
+          "name": "PlyGamewatch5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 178880,
+          "animation_size_bytes": 7875
+        },
+        {
+          "index": 39,
+          "name": "PlyGamewatch5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 168320,
+          "animation_size_bytes": 5266
+        },
+        {
+          "index": 40,
+          "name": "PlyGamewatch5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 186784,
+          "animation_size_bytes": 5937
+        },
+        {
+          "index": 41,
+          "name": "PlyGamewatch5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 212128,
+          "animation_size_bytes": 5541
+        },
+        {
+          "index": 42,
+          "name": "PlyGamewatch5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 205248,
+          "animation_size_bytes": 6877
+        }
+      ],
+      "total_action_count": 323,
+      "entry_38_name": "PlyGamewatch5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 178880,
+      "entry_38_animation_size_bytes": 7875,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyGamewatch5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "MrGameAndWatch"
+  },
+  "Ms": {
+    "root_symbol": "ftDataMars",
+    "root_type": "SBM_ftDataMars",
+    "shield_bone_index": 88,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 11.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.4,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0.4,
+        "y2": -0.5,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 21,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.2,
+        "z2": 0,
+        "radius": 2.16
+      },
+      {
+        "bone_index": 60,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.9,
+        "z1": 0.1,
+        "x2": 0,
+        "y2": 0.9,
+        "z2": 0.1,
+        "radius": 1.5
+      },
+      {
+        "bone_index": 70,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 28,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 71,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 29,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.5,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 13,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 14,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 11,
+    "hurtbox_max_bone_index": 71,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyMars5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 148864,
+          "animation_size_bytes": 9180
+        },
+        {
+          "index": 37,
+          "name": "PlyMars5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 192256,
+          "animation_size_bytes": 6736
+        },
+        {
+          "index": 38,
+          "name": "PlyMars5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 199008,
+          "animation_size_bytes": 7918
+        },
+        {
+          "index": 39,
+          "name": "PlyMars5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 184640,
+          "animation_size_bytes": 7593
+        },
+        {
+          "index": 40,
+          "name": "PlyMars5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 206944,
+          "animation_size_bytes": 5324
+        },
+        {
+          "index": 41,
+          "name": "PlyMars5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 243360,
+          "animation_size_bytes": 8744
+        },
+        {
+          "index": 42,
+          "name": "PlyMars5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 232032,
+          "animation_size_bytes": 11308
+        }
+      ],
+      "total_action_count": 327,
+      "entry_38_name": "PlyMars5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 199008,
+      "entry_38_animation_size_bytes": 7918,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyMars5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Marth"
+  },
+  "Fe": {
+    "root_symbol": "ftDataEmblem",
+    "root_type": "SBM_ftDataMars",
+    "shield_bone_index": 90,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 11.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 4,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": -0.4,
+        "y1": -0.5,
+        "z1": 0,
+        "x2": 0.4,
+        "y2": -0.5,
+        "z2": 0,
+        "radius": 1.8
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 1,
+        "z1": 0,
+        "x2": 0,
+        "y2": 2.2,
+        "z2": 0,
+        "radius": 2.16
+      },
+      {
+        "bone_index": 62,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0.9,
+        "z1": 0.1,
+        "x2": 0,
+        "y2": 0.9,
+        "z2": 0.1,
+        "radius": 1.68
+      },
+      {
+        "bone_index": 72,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 30,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 73,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 31,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.7,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.96
+      },
+      {
+        "bone_index": 14,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 6,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 3,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 15,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 7,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 4.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 11,
+    "hurtbox_max_bone_index": 73,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyEmblem5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 184704,
+          "animation_size_bytes": 9170
+        },
+        {
+          "index": 37,
+          "name": "PlyEmblem5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 224320,
+          "animation_size_bytes": 6470
+        },
+        {
+          "index": 38,
+          "name": "PlyEmblem5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 230816,
+          "animation_size_bytes": 7376
+        },
+        {
+          "index": 39,
+          "name": "PlyEmblem5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 217088,
+          "animation_size_bytes": 7231
+        },
+        {
+          "index": 40,
+          "name": "PlyEmblem5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 238208,
+          "animation_size_bytes": 5410
+        },
+        {
+          "index": 41,
+          "name": "PlyEmblem5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 274496,
+          "animation_size_bytes": 9298
+        },
+        {
+          "index": 42,
+          "name": "PlyEmblem5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 263936,
+          "animation_size_bytes": 10530
+        }
+      ],
+      "total_action_count": 327,
+      "entry_38_name": "PlyEmblem5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 230816,
+      "entry_38_animation_size_bytes": 7376,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyEmblem5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "Roy"
+  },
+  "Dr": {
+    "root_symbol": "ftDataDrmario",
+    "root_type": "SBM_FighterData",
+    "shield_bone_index": 84,
+    "shield_bone_joint_name": null,
+    "initial_shield_size": 10.75,
+    "shield_pose_container": {
+      "raw_struct_length_bytes": 4,
+      "raw_pointer_count": 1,
+      "shield_pose_jobj_present": true,
+      "jobj_next_chain_count": 1,
+      "root_child_count": 2,
+      "total_joints_root_plus_children": 3,
+      "note": "FighterData\u002B0x20 (SBM_ShieldModelContainer) has exactly ONE pointer field (TrimmedSize=4) pointing to a single root JOBJ. The decomp runtime struct ftData_x20 { HSD_Joint** x0; f32 x8; } is built at fighter-load time by flattening this JOBJ\u0027s tree (root \u002B Child-list, depth-first) into a pointer array; x0[2] is therefore the 3rd joint in that flattened order (root=0, first child=1, second child=2), used by ftCo_80091E78 as the FtPart_TransN blend-target joint for the translucent/lightshield-fade shield model, NOT the shield bubble scale target (that is ModelLookupTables.ShieldBone applied to fp-\u003Eparts[...] instead)."
+    },
+    "hurtboxes": [
+      {
+        "bone_index": 5,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1,
+        "z2": 0,
+        "radius": 2.6
+      },
+      {
+        "bone_index": 23,
+        "joint_name": null,
+        "type": "High",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 2,
+        "z1": 0,
+        "x2": 0,
+        "y2": 1.2,
+        "z2": 0,
+        "radius": 2.4
+      },
+      {
+        "bone_index": 31,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.8
+      },
+      {
+        "bone_index": 8,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 1,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.8
+      },
+      {
+        "bone_index": 32,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.92
+      },
+      {
+        "bone_index": 9,
+        "joint_name": null,
+        "type": "Mid",
+        "grabbable": 0,
+        "x1": 0.2,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2.2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 0.92
+      },
+      {
+        "bone_index": 69,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 53,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 1,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 70,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      },
+      {
+        "bone_index": 54,
+        "joint_name": null,
+        "type": "Low",
+        "grabbable": 0,
+        "x1": 0,
+        "y1": 0,
+        "z1": 0,
+        "x2": 2,
+        "y2": 0,
+        "z2": 0,
+        "radius": 1.2
+      }
+    ],
+    "hurtbox_count": 10,
+    "hurtbox_max_bone_index": 70,
+    "actions": {
+      "entries_36_to_42": [
+        {
+          "index": 36,
+          "name": "PlyDrmario5K_Share_ACTION_Landing_figatree",
+          "animation_offset_in_AJ": 124576,
+          "animation_size_bytes": 6691
+        },
+        {
+          "index": 37,
+          "name": "PlyDrmario5K_Share_ACTION_GuardOn_figatree",
+          "animation_offset_in_AJ": 158272,
+          "animation_size_bytes": 3763
+        },
+        {
+          "index": 38,
+          "name": "PlyDrmario5K_Share_ACTION_Guard_figatree",
+          "animation_offset_in_AJ": 162048,
+          "animation_size_bytes": 6153
+        },
+        {
+          "index": 39,
+          "name": "PlyDrmario5K_Share_ACTION_GuardOff_figatree",
+          "animation_offset_in_AJ": 152128,
+          "animation_size_bytes": 6124
+        },
+        {
+          "index": 40,
+          "name": "PlyDrmario5K_Share_ACTION_GuardDamage_figatree",
+          "animation_offset_in_AJ": 168224,
+          "animation_size_bytes": 3531
+        },
+        {
+          "index": 41,
+          "name": "PlyDrmario5K_Share_ACTION_EscapeN_figatree",
+          "animation_offset_in_AJ": 195872,
+          "animation_size_bytes": 7439
+        },
+        {
+          "index": 42,
+          "name": "PlyDrmario5K_Share_ACTION_EscapeF_figatree",
+          "animation_offset_in_AJ": 186016,
+          "animation_size_bytes": 9827
+        }
+      ],
+      "total_action_count": 303,
+      "entry_38_name": "PlyDrmario5K_Share_ACTION_Guard_figatree",
+      "entry_38_animation_offset_in_AJ": 162048,
+      "entry_38_animation_size_bytes": 6153,
+      "entry_38_name_contains_guard": true,
+      "entry_38_anim_symbol": "PlyDrmario5K_Share_ACTION_Guard_figatree",
+      "entry_38_frame_count": 370
+    },
+    "name": "DrMario"
+  }
+}
