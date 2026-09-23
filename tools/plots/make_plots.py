@@ -22,9 +22,9 @@ from matplotlib import font_manager
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 from common import (
     REPO, DATA, PLOTS, SURFACE, PAGE, INK_PRIMARY, INK_SECONDARY, INK_MUTED,
-    GRIDLINE, BASELINE, ACCENT, ACCENT_SEQ, ORANGE, STATUS_GOOD, VALIDATED,
-    DIRECTIONS, FONT, all_codes, char_meta, display_name, load_main,
-    load_hurtbox_poses,
+    GRIDLINE, BASELINE, ACCENT, ACCENT_SEQ, ORANGE, STATUS_GOOD,
+    VALIDATION_NOTE, NANA_VALIDATION_NOTE, HYSTERESIS_EPS, DIRECTIONS, FONT,
+    all_codes, char_meta, display_name, load_main, load_hurtbox_poses,
 )
 
 plt.rcParams.update({
@@ -76,6 +76,12 @@ def char_geometry(code):
     untilted = df[(df.sweep == "polar") & (df.mag == 0)].iloc[0]
     ux, uy = untilted.bone_x, untilted.bone_y
 
+    # angle now runs 0..360 inclusive (commit 75f3ac7): a stick at exactly
+    # 0deg has two history-dependent settled poses (frame 10 = angle 0,
+    # frame 370 = angle 360). Sorting ascending and NOT wrapping 360 back to
+    # 0 means the full-tilt ring closes through the real angle=360 sample
+    # (matplotlib's fill()/plot() already connects last->first automatically,
+    # so if the two differ this draws the true cusp instead of a fake wrap).
     ring_full = polar[np.isclose(polar.mag, 1.0)].sort_values("angle")
     rings_inner = {
         m: polar[np.isclose(polar.mag, m)].sort_values("angle")
@@ -86,6 +92,18 @@ def char_geometry(code):
         row = ring_full[ring_full.angle == ang]
         if not row.empty:
             extremes[label] = (float(row.bone_x.iloc[0]), float(row.bone_y.iloc[0]))
+
+    # forward (angle 0) hysteresis: compare the frame-10 and frame-370 poses
+    # in full 3D (bone_z included) even though the chart only plots x/y.
+    fwd_alt = None
+    r0 = ring_full[ring_full.angle == 0]
+    r360 = ring_full[ring_full.angle == 360]
+    if not r0.empty and not r360.empty:
+        d = float(np.sqrt((r0.bone_x.iloc[0] - r360.bone_x.iloc[0]) ** 2 +
+                           (r0.bone_y.iloc[0] - r360.bone_y.iloc[0]) ** 2 +
+                           (r0.bone_z.iloc[0] - r360.bone_z.iloc[0]) ** 2))
+        if d > HYSTERESIS_EPS:
+            fwd_alt = (float(r360.bone_x.iloc[0]), float(r360.bone_y.iloc[0]), d)
 
     grid = df[df.sweep == "grid"]
     all_x = np.concatenate([grid.bone_x.values, ring_full.bone_x.values])
@@ -109,7 +127,7 @@ def char_geometry(code):
     return dict(
         code=code, meta=meta, r_full=r_full, r_min=r_min, has_tilt=has_tilt,
         ux=ux, uy=uy, ring_full=ring_full, rings_inner=rings_inner,
-        extremes=extremes, all_x=all_x, all_y=all_y,
+        extremes=extremes, fwd_alt=fwd_alt, all_x=all_x, all_y=all_y,
         max_up=float(all_y.max() - uy), max_down=float(uy - all_y.min()),
         max_fwd=float(all_x.max() - ux), max_back=float(ux - all_x.min()),
         x_reach=(xlo, xhi), y_reach=(ylo, yhi),
@@ -173,6 +191,14 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
                 ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
                         va="center", zorder=7)
 
+    # forward hysteresis: draw the second (frame-370) resting point + note
+    if show_labels and geo["fwd_alt"] is not None:
+        fx, fy, fd = geo["fwd_alt"]
+        ax.plot([fx], [fy], marker="D", ms=5, mfc=ORANGE, mec=ORANGE, zorder=7)
+        ax.annotate("forward: 2 resting states\n(history-dependent)",
+                    xy=(fx, fy), xytext=(8, -10), textcoords="offset points",
+                    fontsize=6.5, color=ORANGE, ha="left", va="top", zorder=7)
+
     ax.set_aspect("equal", adjustable="box")
     if lim is not None:
         ax.set_xlim(*lim[0]); ax.set_ylim(*lim[1])
@@ -184,23 +210,21 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
         ax.spines[spine].set_visible(False)
 
     name = display_name(code, meta)
-    tag = ""
-    if code in VALIDATED:
-        tag = "  validated in emulator"
-    if not meta.get("has_tilt", True):
-        tag = "  fixed bubble (no tilt)"
+    fixed_tag = "  fixed bubble (no tilt)" if not meta.get("has_tilt", True) else ""
     if title:
         ax.set_title(f"{name}", fontsize=13, color=INK_PRIMARY, loc="left",
                      fontweight="bold")
-        if tag:
-            color = STATUS_GOOD if "validated" in tag else INK_MUTED
-            ax.text(0.99, 1.01, tag.strip(), transform=ax.transAxes, ha="right",
-                    va="bottom", fontsize=8, color=color)
+        if fixed_tag:
+            ax.text(0.99, 1.01, fixed_tag.strip(), transform=ax.transAxes,
+                    ha="right", va="bottom", fontsize=8, color=INK_MUTED)
     else:
         ax.set_title(name, fontsize=9, color=INK_PRIMARY)
-        if tag:
-            ax.text(0.5, -0.06, tag.strip(), transform=ax.transAxes, ha="center",
-                    va="top", fontsize=6.5, color=STATUS_GOOD if "validated" in tag else INK_MUTED)
+        if fixed_tag:
+            # inside the panel (top-right corner), not below it - text placed
+            # below a small subplot bleeds into the panel underneath once
+            # tight_layout packs the grid tightly (see commit 75f3ac7 review)
+            ax.text(0.97, 0.94, fixed_tag.strip(), transform=ax.transAxes,
+                    ha="right", va="top", fontsize=6, color=INK_MUTED)
 
     if standalone:
         from matplotlib.lines import Line2D
@@ -217,11 +241,13 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
                  labelcolor=INK_SECONDARY)
         ax.set_xlabel("forward →  (game units, relative to TopN)")
         ax.set_ylabel("up →")
-        fig.text(0.01, 0.01,
+        fig.text(0.01, 0.025,
                  "Shield-centre position from the offline pose solver (Phase 3); "
                  "faint rings/bubbles = stick extremes, hurtboxes shown in the "
                  "tilted pose.", fontsize=6.5, color=INK_MUTED)
-        fig.tight_layout(rect=(0, 0.02, 1, 1))
+        note = NANA_VALIDATION_NOTE if code == "Nn" else VALIDATION_NOTE
+        fig.text(0.01, 0.005, note, fontsize=6.5, color=INK_MUTED)
+        fig.tight_layout(rect=(0, 0.04, 1, 1))
         return fig
     return None
 
@@ -267,13 +293,14 @@ def make_comparison_grid(codes):
         axes[r][c].axis("off")
 
     fig.suptitle("Shield-centre reach by character (shared scale)", fontsize=15,
-                 color=INK_PRIMARY, x=0.02, ha="left", fontweight="bold")
-    fig.text(0.02, 0.985,
+                 color=INK_PRIMARY, x=0.02, y=0.995, ha="left", va="top",
+                 fontweight="bold")
+    fig.text(0.02, 0.975,
              "Dark circle = untilted bubble; blue ring = full-tilt centre path; "
-             "faint rings = the 8 stick extremes. Nana matches Popo exactly and "
-             "is omitted. Yoshi's shield does not tilt (fixed bubble).",
-             fontsize=8.5, color=INK_SECONDARY)
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+             "faint rings = the 8 stick extremes. Nana matches Popo exactly and\n"
+             "is omitted. Yoshi's shield does not tilt (fixed bubble). " + VALIDATION_NOTE,
+             fontsize=8.5, color=INK_SECONDARY, va="top", linespacing=1.6)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
     fig.savefig(PLOTS / "all_characters.png", dpi=150)
     plt.close(fig)
     print("  all_characters.png done")
@@ -297,8 +324,8 @@ def make_reach_summary(codes):
             max_up=geo["max_up"], max_down=geo["max_down"],
             max_forward=geo["max_fwd"], max_back=geo["max_back"],
             centre_reach_area=area, shield_radius_full=geo["r_full"],
-            validated=code in VALIDATED,
             has_tilt=geo["meta"].get("has_tilt", True),
+            forward_hysteresis_gap=(geo["fwd_alt"][2] if geo["fwd_alt"] else 0.0),
         ))
 
     rows.sort(key=lambda r: r["centre_reach_area"], reverse=True)
@@ -327,11 +354,7 @@ def make_reach_summary(codes):
     ax.set_yticks(ypos)
     labels = []
     for r in rows:
-        tag = ""
-        if not r["has_tilt"]:
-            tag = "  (fixed)"
-        elif r["validated"]:
-            tag = "  (validated)"
+        tag = "  (fixed)" if not r["has_tilt"] else ""
         labels.append(r["name"] + tag)
     ax.set_yticklabels(labels, fontsize=8.5)
     ax.invert_yaxis()
@@ -343,11 +366,11 @@ def make_reach_summary(codes):
     ax.set_axisbelow(True)
     for spine in ("top", "right", "left"):
         ax.spines[spine].set_visible(False)
-    fig.text(0.01, 0.005,
-             "(validated) = matched the emulator exactly in Phase-4 validation. "
-             "'(fixed)' = Yoshi's shield does not tilt.",
+    fig.text(0.01, 0.02, "'(fixed)' = Yoshi's shield does not tilt.",
              fontsize=7.5, color=INK_MUTED)
-    fig.tight_layout(rect=(0, 0.02, 1, 1))
+    fig.text(0.01, 0.005, VALIDATION_NOTE + " (Nana excluded; identical to Popo.)",
+             fontsize=7.5, color=INK_MUTED)
+    fig.tight_layout(rect=(0, 0.035, 1, 1))
     fig.savefig(PLOTS / "reach_summary.png", dpi=150)
     fig.savefig(PLOTS / "reach_summary.svg")
     plt.close(fig)

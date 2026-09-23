@@ -3,8 +3,7 @@
 Palette and mark conventions follow the project's dataviz skill
 (references/palette.md): categorical slot 1 (blue) as the single accent hue
 for "reachable region" geometry, chart-chrome ink/gridline roles for
-everything else, and the status "good" green reserved for the
-emulator-validated tag (never reused as a series color).
+everything else.
 """
 import json
 from pathlib import Path
@@ -30,15 +29,30 @@ BORDER = "rgba(11,11,11,0.10)"
 ACCENT = "#2a78d6"       # categorical slot 1 (blue) - reachable-region geometry
 ACCENT_SEQ = ["#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#184f95"]  # light->dark
 ORANGE = "#eb6834"       # categorical slot 2 - used only for the min-shield ring
-STATUS_GOOD = "#0ca30c"  # reserved status color: emulator-validated tag only
+STATUS_GOOD = "#0ca30c"  # reserved status color (unused on charts; kept for parity)
 
-VALIDATED = {"Fx", "Kp", "Gw"}  # data/validation/PROGRESS.md at time of writing
+# All 26 selectable characters (everyone but Nana, whose pose is identical to
+# Popo's) now match the emulator exactly - see data/validation/PROGRESS.md
+# and commit 75f3ac7. One line, once per chart, rather than a per-panel tag.
+VALIDATION_NOTE = ("All characters validated against Dolphin (vanilla NTSC "
+                    "1.02), max error < 1e-5 units.")
+# Nana isn't independently selectable/validated (no 1v1 slot for her alone);
+# her pose is identical to Popo's, which is one of the validated 26.
+NANA_VALIDATION_NOTE = ("Nana's pose is identical to Popo's (not independently "
+                         "selectable in-game); Popo is validated against "
+                         "Dolphin (vanilla NTSC 1.02), max error < 1e-5 units.")
 
 # 8 cardinal/diagonal stick directions, angle=0 is forward (+x), 90 is up.
 DIRECTIONS = [
     (0, "Forward"), (45, "Fwd+Up"), (90, "Up"), (135, "Back+Up"),
     (180, "Back"), (225, "Back+Down"), (270, "Down"), (315, "Fwd+Down"),
 ]
+
+# A grid/polar stick at exactly 0deg (straight forward) settles to one of two
+# history-dependent poses (frame 10 = angle 0, or frame 370 = angle 360;
+# docs/MECHANICS.md 1.2). Below this 3D game-unit gap between the two we
+# treat them as the same point and don't clutter the chart.
+HYSTERESIS_EPS = 0.05
 
 FONT = "system-ui, -apple-system, Segoe UI, sans-serif"
 
@@ -65,7 +79,9 @@ def load_main(code):
 def load_hurtbox_poses(code, angles=(0, 45, 90, 135, 180, 225, 270, 315)):
     """Return {pose_label: DataFrame(hurtbox rows)} for untilted + each
     full-magnitude cardinal/diagonal extreme, taken from the polar sweep
-    (exact angle/mag=1 samples, no nearest-match needed)."""
+    (exact angle/mag=1 samples, no nearest-match needed). Missing rows (e.g.
+    a character's hurtbox export predates the angle=360 rows added in
+    commit 75f3ac7) are silently skipped rather than guessed at."""
     path = DATA / f"{code}_hurtboxes.csv"
     if not path.exists():
         return {}
@@ -79,7 +95,8 @@ def load_hurtbox_poses(code, angles=(0, 45, 90, 135, 180, 225, 270, 315)):
         a0 = untilted.angle.iloc[0]
         poses["untilted"] = untilted[untilted.angle == a0]
     full = df[(df.sweep == "polar") & (df.mag == 1.0)]
-    for ang, label in DIRECTIONS:
+    for ang in angles:
+        label = dict(DIRECTIONS).get(ang, f"angle={ang}")
         sub = full[full.angle == ang]
         if not sub.empty:
             poses[label] = sub

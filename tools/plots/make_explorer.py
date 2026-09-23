@@ -8,6 +8,11 @@ the ~3-4 MB plotly.js locally, per technospider's "keep it under ~15 MB"
 note. Run with the project venv:
 
     .venv/Scripts/python.exe tools/plots/make_explorer.py
+
+Angle now runs 0..360 inclusive (commit 75f3ac7): a stick held exactly
+forward (0deg) has two history-dependent settled poses (frame 10 = angle 0,
+frame 370 = angle 360), so 360 is a real, distinct sample, not a
+duplicate of 0.
 """
 import json
 import sys
@@ -17,9 +22,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import DATA, PLOTS, all_codes, char_meta, display_name, VALIDATED
+from common import DATA, PLOTS, all_codes, char_meta, display_name, VALIDATION_NOTE
 
-ANGLES = list(range(0, 360, 5))
+ANGLES = list(range(0, 361, 5))  # 0, 5, ..., 360
 MAGS = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
 
 
@@ -34,6 +39,16 @@ def build_char_payload(code):
     # centers[a][m] = [x, y]; angle 0 row for mag 0 stands for every angle
     a0 = polar[np.isclose(polar.mag, 0)]
     ux, uy = float(a0.bone_x.iloc[0]), float(a0.bone_y.iloc[0])
+
+    # forward (angle 0) hysteresis, in full 3D like the static charts
+    fwd_gap = 0.0
+    r0 = polar[(polar.angle == 0) & np.isclose(polar.mag, 1.0)]
+    r360 = polar[(polar.angle == 360) & np.isclose(polar.mag, 1.0)]
+    if not r0.empty and not r360.empty:
+        fwd_gap = float(np.sqrt(
+            (r0.bone_x.iloc[0] - r360.bone_x.iloc[0]) ** 2 +
+            (r0.bone_y.iloc[0] - r360.bone_y.iloc[0]) ** 2 +
+            (r0.bone_z.iloc[0] - r360.bone_z.iloc[0]) ** 2))
 
     centers = []
     for ang in ANGLES:
@@ -84,7 +99,7 @@ def build_char_payload(code):
         "r_full": round(r_full, 4),
         "r_min": round(r_min, 4),
         "has_tilt": has_tilt,
-        "validated": code in VALIDATED,
+        "fwd_gap": round(fwd_gap, 3),
         "angles": ANGLES,
         "mags": MAGS,
         "centers": [[[round(v, 3) for v in c] for c in row] for row in centers],
@@ -116,6 +131,7 @@ HTML_TEMPLATE = """<!doctype html>
   header { padding: 16px 20px 8px; }
   h1 { font-size: 18px; margin: 0 0 4px; }
   p.sub { color: var(--ink-2); font-size: 13px; margin: 0; max-width: 720px; }
+  p.validation { color: var(--ink-2); font-size: 12px; margin: 4px 0 0; max-width: 720px; }
   .layout {
     display: flex; flex-wrap: wrap; gap: 16px; padding: 12px 20px 24px;
     align-items: flex-start;
@@ -132,8 +148,8 @@ HTML_TEMPLATE = """<!doctype html>
   #plot { flex: 1 1 520px; min-width: 300px; max-width: 720px; }
   .tag { display: inline-block; margin-top: 10px; font-size: 11px;
     padding: 2px 8px; border-radius: 10px; }
-  .tag.validated { color: var(--good); background: rgba(12,163,12,0.1); }
   .tag.fixed { color: var(--ink-muted); background: rgba(137,135,129,0.15); }
+  .tag.hysteresis { color: var(--orange); background: rgba(235,104,52,0.1); }
   footer { padding: 0 20px 24px; font-size: 11px; color: var(--ink-muted);
     max-width: 720px; }
 </style>
@@ -145,6 +161,7 @@ HTML_TEMPLATE = """<!doctype html>
   and magnitude, from the offline pose solver (Phase 3). Side view: x =
   forward, y = up, in game units relative to the character's root
   position.</p>
+  <p class="validation">__VALIDATION_NOTE__</p>
 </header>
 <div class="layout">
   <div class="controls">
@@ -153,8 +170,9 @@ HTML_TEMPLATE = """<!doctype html>
     <div id="tagbox"></div>
 
     <label for="angle">Stick angle: <span id="angleval"></span>&deg;
-      (0 = forward, 90 = up)</label>
-    <input type="range" id="angle" min="0" max="355" step="5" value="0">
+      (0 = forward/fresh, 90 = up, 360 = forward/absorbing &mdash; see the
+      hysteresis note below when it appears)</label>
+    <input type="range" id="angle" min="0" max="360" step="5" value="0">
 
     <label for="mag">Stick magnitude: <span id="magval"></span></label>
     <input type="range" id="mag" min="0" max="5" step="1" value="0">
@@ -164,10 +182,10 @@ HTML_TEMPLATE = """<!doctype html>
 <footer>
   Downsampled to angle step 5&deg; and magnitude steps of 0.2 to keep this
   page small; the static per-character PNGs in <code>plots/</code> use the
-  full-resolution sweep. "Validated in emulator" = matched Slippi Dolphin
-  exactly in Phase-4 validation (Fox, Bowser, Game &amp; Watch at time of
-  writing). Yoshi's shield does not tilt (fixed bubble) &mdash; a pose-level
-  finding, separate from validation status.
+  full-resolution sweep. Yoshi's shield does not tilt (fixed bubble). A
+  stick held exactly forward (angle 0/360) can settle to either of two
+  history-dependent poses; where they differ noticeably, dragging the angle
+  slider between 0 and 360 shows the gap.
 </footer>
 <script>
 const DATA = __DATA_JSON__;
@@ -219,14 +237,15 @@ function draw() {
   angleInput.disabled = !d.has_tilt;
 
   tagbox.innerHTML = '';
-  if (d.validated) {
-    const t = document.createElement('span');
-    t.className = 'tag validated'; t.textContent = 'validated in emulator';
-    tagbox.appendChild(t);
-  }
   if (!d.has_tilt) {
     const t = document.createElement('span');
     t.className = 'tag fixed'; t.textContent = 'fixed bubble (no tilt)';
+    tagbox.appendChild(t);
+  }
+  if (d.fwd_gap > 0.05) {
+    const t = document.createElement('span');
+    t.className = 'tag hysteresis';
+    t.textContent = `forward: 2 resting states, ${d.fwd_gap.toFixed(2)} units apart`;
     tagbox.appendChild(t);
   }
 
@@ -298,7 +317,9 @@ def main():
     for i, code in enumerate(codes):
         payload[code] = build_char_payload(code)
         print(f"  [{i+1}/{len(codes)}] {code} done")
-    out = HTML_TEMPLATE.replace("__DATA_JSON__", json.dumps(payload, separators=(",", ":")))
+    note = VALIDATION_NOTE + " Nana is covered by Popo (identical pose, not independently selectable)."
+    out = HTML_TEMPLATE.replace("__VALIDATION_NOTE__", note)
+    out = out.replace("__DATA_JSON__", json.dumps(payload, separators=(",", ":")))
     out_path = PLOTS / "shield_tilt_explorer.html"
     out_path.write_text(out, encoding="utf-8")
     size_mb = out_path.stat().st_size / 1e6
