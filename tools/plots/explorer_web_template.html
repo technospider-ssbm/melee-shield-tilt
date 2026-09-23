@@ -1,0 +1,326 @@
+<title>Melee Shield-Tilt Explorer</title>
+<style>
+  :root {
+    /* Colour-blind-safe set (Okabe-Ito): sky blue / orange / bluish green / charcoal */
+    --surface-1: #fcfcfb; --page: #f6f6f3; --ink: #333333; --ink-2: #555555;
+    --ink-muted: #7a7a7a; --grid: #e3e3e0; --baseline: #c9c9c4;
+    --accent: #009E73; --orange: #E69F00;
+    --safe: #56B4E9; --exposed: #E69F00;
+    --ghost: rgba(128,126,120,0.55);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-1: #1a1b1e; --page: #121315; --ink: #ecebe6; --ink-2: #b4b2ab;
+      --ink-muted: #8a8882; --grid: #2e3034; --baseline: #3c3e43;
+      --accent: #2BC39A; --orange: #F0B030;
+      --safe: #7CC7F0; --exposed: #F0B030;
+      --ghost: rgba(170,168,160,0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1b1e; --page: #121315; --ink: #ecebe6; --ink-2: #b4b2ab;
+    --ink-muted: #8a8882; --grid: #2e3034; --baseline: #3c3e43;
+    --accent: #2BC39A; --orange: #F0B030;
+    --safe: #7CC7F0; --exposed: #F0B030;
+    --ghost: rgba(170,168,160,0.45);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-inline: 16px; padding-block: 16px 24px;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 14px; }
+  h1 { font-size: 20px; margin: 0; text-wrap: balance; }
+  h2 { font-size: 13px; margin: 0; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+  p { margin: 0; max-width: 72ch; line-height: 1.5; }
+  .sub { color: var(--ink-2); font-size: 13.5px; }
+  .note { color: var(--ink-muted); font-size: 12px; }
+  .layout { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .panel {
+    background: var(--surface-1); border: 1px solid var(--baseline);
+    border-radius: 8px; padding: 14px 16px;
+  }
+  .controls { flex: 1 1 240px; max-width: 290px; display: grid; gap: 4px; }
+  .controls label { font-size: 12px; color: var(--ink-2); margin-top: 10px; display: flex; justify-content: space-between; gap: 8px; }
+  .controls h2 { margin-top: 14px; }
+  .controls h2:first-child { margin-top: 0; }
+  .hint { font-size: 11px; color: var(--ink-muted); line-height: 1.4; }
+  .controls select, .controls input[type=range] { width: 100%; accent-color: var(--accent); }
+  .controls select { font: inherit; padding: 4px 6px; background: var(--surface-1); color: var(--ink);
+    border: 1px solid var(--baseline); border-radius: 6px; }
+  .check { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+  .val { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #plot { flex: 3 1 380px; min-width: 0; padding: 0; overflow: hidden; }
+  .results { flex: 1 1 250px; max-width: 320px; display: grid; gap: 10px; }
+  .big { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .big small { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+  .stat { display: grid; gap: 2px; }
+  .tag { display: inline-block; margin-top: 6px; font-size: 11px; padding: 2px 8px; border-radius: 10px;
+    color: var(--ink-2); border: 1px solid var(--baseline); }
+  .tag.warn { color: var(--orange); border-color: var(--orange); }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+  th { text-align: left; font-weight: 500; color: var(--ink-muted); padding: 2px 4px; border-bottom: 1px solid var(--baseline); }
+  td { padding: 3px 4px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+  td.num, th.num { text-align: right; }
+  .bar { height: 6px; border-radius: 3px; background: var(--grid); position: relative; min-width: 50px; }
+  .bar > span { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
+  .tablewrap { max-height: 360px; overflow: auto; }
+</style>
+<div class="wrap">
+  <header style="display:grid; gap:6px">
+    <h1>Melee Shield-Tilt Explorer</h1>
+    <p class="sub">Where each character's shield bubble sits for any stick angle and strength, with the
+    hurtboxes in that tilted pose, and how much of the body is left outside the shield (open to shield pokes).
+    Side view in game units, facing right (x = forward, y = up).</p>
+    <p class="note">Computed from vanilla NTSC 1.02 game data and the decompiled engine logic. Every character's
+    bubble position was checked against Dolphin, with a maximum error under 0.00001 units. Nana is identical to Popo.</p>
+  </header>
+  <div class="layout">
+    <div class="panel controls">
+      <h2>Character</h2>
+      <select id="char" aria-label="Character"></select>
+      <div id="tagbox"></div>
+
+      <h2>Stick</h2>
+      <label for="angle">Angle <span class="val" id="angleval"></span></label>
+      <input type="range" id="angle" min="0" max="360" step="5" value="0">
+      <div class="hint">0° = forward, 90° = up, 180° = back, 270° = down. 360° = forward, reached by sweeping in from below.</div>
+      <label for="mag">Strength <span class="val" id="magval"></span></label>
+      <input type="range" id="mag" min="0" max="5" step="1" value="5">
+      <div class="hint">0 = untilted, 1 = full tilt.</div>
+
+      <h2>Shield size</h2>
+      <label for="health">Shield health <span class="val" id="healthval"></span></label>
+      <input type="range" id="health" min="0" max="60" step="1" value="60">
+      <label for="press">Trigger press <span class="val" id="pressval"></span></label>
+      <input type="range" id="press" min="0" max="100" step="1" value="100">
+      <div class="hint">Right end = hard press (digital, or analog all the way in). Left end = lightest analog shield,
+      which is larger. Radius = size × (0.15 + 0.85 × health/60 × (1 − 0.5 × press)).</div>
+      <label class="check"><input type="checkbox" id="ghost" checked> Show the untilted body</label>
+    </div>
+
+    <div class="panel" id="plot"></div>
+
+    <div class="panel results" aria-live="polite">
+      <h2>Outside the shield</h2>
+      <div class="stat">
+        <div class="big" id="pctOut">–</div>
+        <div class="hint">of total hurtbox volume sits outside the bubble (measured in 3D)</div>
+      </div>
+      <div class="stat">
+        <div class="big" id="protrude">–</div>
+        <div class="hint" id="protrudeNote">furthest any hurtbox sticks out past the bubble surface</div>
+      </div>
+      <div class="stat">
+        <div class="hint">Bubble radius <span class="val" id="radval"></span> · hurtboxes partly outside
+        <span class="val" id="countOut"></span></div>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Hurtbox</th><th>Outside</th><th class="num">%</th><th class="num">Sticks out</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <p class="note">Hurtboxes are coloured from blue (fully inside the bubble) to orange (fully outside). Orange dots mark the parts
+  outside the bubble, seen from the side; because they are measured in 3D, a dot can appear over the bubble when that part
+  sticks out towards or away from the camera. Sampled every 5° and every 0.2 of stick strength. Kirby's and Jigglypuff's
+  bubbles are slightly oval in game; here they are drawn as spheres of the average radius. Hurtboxes marked ≈ sit on
+  physics-driven bones and use the rest pose, so they are approximate. Yoshi's shield neither tilts nor changes size.</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script>
+const DATA = /*__DATA__*/{};
+const MAGS = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+const codes = Object.keys(DATA);
+const $ = id => document.getElementById(id);
+const sel = $('char');
+for (const c of codes) {
+  const o = document.createElement('option');
+  o.value = c; o.textContent = DATA[c].name; sel.appendChild(o);
+}
+sel.value = codes.includes('Fx') ? 'Fx' : codes[0];
+
+function tok(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function rgb(hex) { hex = hex.replace('#', ''); return [0, 2, 4].map(i => parseInt(hex.substr(i, 2), 16)); }
+function mix(a, b, t, alpha) {
+  const A = rgb(a), B = rgb(b);
+  const c = A.map((v, i) => Math.round(v + (B[i] - v) * t));
+  return `rgba(${c[0]},${c[1]},${c[2]},${alpha})`;
+}
+
+// Fixed quasi-random points (Halton 2,3,5) so the measurement doesn't flicker between redraws.
+function halton(i, b) { let f = 1, r = 0; while (i > 0) { f /= b; r += f * (i % b); i = Math.floor(i / b); } return r; }
+const Q = []; for (let i = 1; i <= 1600; i++) Q.push([halton(i, 2), halton(i, 3), halton(i, 5)]);
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const len = v => Math.hypot(v[0], v[1], v[2]);
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = v => { const l = len(v); return [v[0] / l, v[1] / l, v[2] / l]; };
+
+// Sample points uniformly inside capsule b = [x1,y1,z1,x2,y2,z2,r].
+const sampleCache = new Map();
+function capsulePoints(b) {
+  const key = b.join(',');
+  if (sampleCache.has(key)) return sampleCache.get(key);
+  const A = [b[0], b[1], b[2]], B = [b[3], b[4], b[5]], r = b[6];
+  let d = sub(B, A); const L = len(d);
+  d = L < 1e-6 ? [1, 0, 0] : [d[0] / L, d[1] / L, d[2] / L];
+  const e1 = norm(cross(d, Math.abs(d[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0]));
+  const e2 = cross(d, e1);
+  const pts = [];
+  for (const q of Q) {
+    const u = -r + q[0] * (L + 2 * r), v = (2 * q[1] - 1) * r, w = (2 * q[2] - 1) * r;
+    const du = u - Math.min(Math.max(u, 0), L);
+    if (du * du + v * v + w * w > r * r) continue;
+    pts.push([A[0] + d[0] * u + e1[0] * v + e2[0] * w,
+              A[1] + d[1] * u + e1[1] * v + e2[1] * w,
+              A[2] + d[2] * u + e1[2] * v + e2[2] * w]);
+  }
+  if (sampleCache.size > 4000) sampleCache.clear();
+  sampleCache.set(key, pts);
+  return pts;
+}
+
+function stadiumPath(x1, y1, x2, y2, r) {
+  const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy);
+  const nx = l < 1e-9 ? 1 : -dy / l, ny = l < 1e-9 ? 0 : dx / l;
+  if (l < 1e-9) return circlePath(x1, y1, r);
+  return `M ${x1 + nx * r},${y1 + ny * r} L ${x2 + nx * r},${y2 + ny * r} ` +
+    `A ${r},${r} 0 1,1 ${x2 - nx * r},${y2 - ny * r} L ${x1 - nx * r},${y1 - ny * r} ` +
+    `A ${r},${r} 0 1,1 ${x1 + nx * r},${y1 + ny * r} Z`;
+}
+function circlePath(cx, cy, r) {
+  return `M ${cx - r},${cy} A ${r},${r} 0 1,1 ${cx + r},${cy} A ${r},${r} 0 1,1 ${cx - r},${cy} Z`;
+}
+
+function radius(d) {
+  if (d.fixed_r) return d.r_full;
+  const h = +$('health').value / 60, ls = +$('press').value / 100;
+  return d.size_chain * (0.15 + 0.85 * h * (1 - 0.5 * ls));
+}
+
+// Axis ranges per character: fixed across stick/size so motion is visible.
+const rangeCache = {};
+function ranges(code) {
+  if (rangeCache[code]) return rangeCache[code];
+  const d = DATA[code]; const R = d.fixed_r ? d.r_full : d.size_chain; // lightest shield = largest
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  d.centers.forEach((row, ai) => row.forEach((c, mi) => {
+    x0 = Math.min(x0, c[0] - R); x1 = Math.max(x1, c[0] + R); y0 = Math.min(y0, c[1] - R); y1 = Math.max(y1, c[1] + R);
+    for (const b of d.boxes[ai][mi]) for (const [x, y] of [[b[0], b[1]], [b[3], b[4]]]) {
+      x0 = Math.min(x0, x - b[6]); x1 = Math.max(x1, x + b[6]); y0 = Math.min(y0, y - b[6]); y1 = Math.max(y1, y + b[6]);
+    }
+  }));
+  const pad = 0.5, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, half = Math.max(x1 - x0, y1 - y0) / 2 + pad;
+  return (rangeCache[code] = { x: [cx - half, cx + half], y: [cy - half, cy + half] });
+}
+
+let firstDraw = true;
+function draw() {
+  const code = sel.value, d = DATA[code];
+  const ai = Math.round(+$('angle').value / 5), mi = +$('mag').value;
+  const C = { ink: tok('--ink'), ink2: tok('--ink-2'), grid: tok('--grid'), surf: tok('--surface-1'), acc: tok('--accent'),
+    org: tok('--orange'), safe: tok('--safe'), bad: tok('--exposed'), ghost: tok('--ghost') };
+  $('angleval').textContent = (ai * 5) + '°';
+  $('magval').textContent = MAGS[mi].toFixed(1);
+  $('healthval').textContent = $('health').value + ' / 60';
+  const p = +$('press').value;
+  $('pressval').textContent = p === 100 ? 'hard' : p === 0 ? 'lightest' : p + '%';
+  for (const id of ['angle', 'mag']) $(id).disabled = !d.has_tilt;
+  for (const id of ['health', 'press']) $(id).disabled = d.fixed_r;
+
+  const tags = [];
+  if (!d.has_tilt) tags.push('<span class="tag">Shield does not tilt</span>');
+  if (d.fixed_r) tags.push('<span class="tag">Bubble size is fixed</span>');
+  if (d.hinfo.some(h => h.approx)) tags.push('<span class="tag warn">≈ some hurtboxes approximate</span>');
+  $('tagbox').innerHTML = tags.join(' ');
+
+  const c = d.centers[ai][mi], R = radius(d), R2 = R * R;
+  const boxes = d.boxes[ai][mi];
+  const shapes = [];
+  if ($('ghost').checked) {
+    for (const b of d.boxes[0][0]) shapes.push({ type: 'path', path: stadiumPath(b[0], b[1], b[3], b[4], b[6]),
+      fillcolor: 'rgba(0,0,0,0)', line: { color: C.ghost, width: 1, dash: 'dot' }, layer: 'below' });
+  }
+
+  // Measure exposure per hurtbox.
+  let volAll = 0, volOut = 0, maxOut = -Infinity, maxIdx = -1, nOut = 0;
+  const outX = [], outY = [], rows = [];
+  boxes.forEach((b, k) => {
+    const pts = capsulePoints(b);
+    let out = 0;
+    pts.forEach((q, j) => {
+      const dx = q[0] - c[0], dy = q[1] - c[1], dz = q[2] - c[2];
+      if (dx * dx + dy * dy + dz * dz > R2) { out++; if (j % 2 === 0) { outX.push(q[0]); outY.push(q[1]); } }
+    });
+    const frac = pts.length ? out / pts.length : 0;
+    const L = len(sub([b[3], b[4], b[5]], [b[0], b[1], b[2]])), r = b[6];
+    const vol = Math.PI * r * r * L + 4 / 3 * Math.PI * r ** 3;
+    volAll += vol; volOut += vol * frac;
+    const far = Math.max(len(sub([b[0], b[1], b[2]], c)), len(sub([b[3], b[4], b[5]], c))) + r - R;
+    if (far > maxOut) { maxOut = far; maxIdx = k; }
+    if (far > 0) nOut++;
+    rows.push({ k, frac, far, info: d.hinfo[k] || { i: k, type: '?', approx: false } });
+    shapes.push({ type: 'path', path: stadiumPath(b[0], b[1], b[3], b[4], r),
+      fillcolor: mix(C.safe, C.bad, frac, 0.28), line: { color: mix(C.safe, C.bad, frac, 0.9), width: 1 } });
+  });
+
+  // Bubble outlines.
+  shapes.push({ type: 'path', path: circlePath(d.centers[0][0][0], d.centers[0][0][1], R), fillcolor: 'rgba(0,0,0,0)',
+    line: { color: C.ink2, width: 1, dash: 'dot' } });
+  shapes.push({ type: 'path', path: circlePath(c[0], c[1], R), fillcolor: 'rgba(0,0,0,0)', line: { color: C.acc, width: 2.5 } });
+
+  const traces = [
+    { type: 'scattergl', x: outX, y: outY, mode: 'markers', name: 'outside the bubble',
+      marker: { color: C.bad, size: 3, opacity: 0.7 }, hoverinfo: 'skip' },
+    { x: [c[0]], y: [c[1]], mode: 'markers', name: 'shield centre', marker: { color: C.acc, size: 8 },
+      hovertemplate: 'shield centre<br>x=%{x:.2f} y=%{y:.2f}<extra></extra>' },
+  ];
+  const rg = ranges(code);
+  const layout = {
+    shapes, xaxis: { range: rg.x, title: 'forward → (game units)', zeroline: false, gridcolor: C.grid,
+      scaleanchor: 'y', scaleratio: 1, color: C.ink2 },
+    yaxis: { range: rg.y, title: 'up →', zeroline: false, gridcolor: C.grid, color: C.ink2 },
+    plot_bgcolor: C.surf, paper_bgcolor: C.surf, margin: { l: 50, r: 16, t: 36, b: 44 },
+    title: { text: d.name, x: 0.02, font: { size: 16 } }, showlegend: true,
+    legend: { orientation: 'h', y: -0.14, font: { color: C.ink2 } },
+    font: { family: 'system-ui, -apple-system, Segoe UI, sans-serif', color: C.ink }, height: 600,
+  };
+  const cfg = { displayModeBar: false, responsive: true };
+  if (firstDraw) { Plotly.newPlot('plot', traces, layout, cfg); firstDraw = false; }
+  else Plotly.react('plot', traces, layout, cfg);
+
+  // Results panel.
+  $('pctOut').innerHTML = `${(100 * volOut / volAll).toFixed(1)}<small> %</small>`;
+  if (maxOut > 0) {
+    const h = d.hinfo[maxIdx] || { i: maxIdx, type: '?' };
+    $('protrude').innerHTML = `${maxOut.toFixed(2)}<small> units</small>`;
+    $('protrudeNote').textContent = `furthest any hurtbox sticks out past the bubble surface (#${h.i}, ${h.type})`;
+  } else {
+    $('protrude').innerHTML = `0<small> units</small>`;
+    $('protrudeNote').textContent = 'every hurtbox is fully inside the bubble';
+  }
+  $('radval').textContent = R.toFixed(2);
+  $('countOut').textContent = `${nOut} of ${boxes.length}`;
+  rows.sort((a, b) => b.frac - a.frac || b.far - a.far);
+  $('rows').innerHTML = rows.map(rw => {
+    const col = mix(C.safe, C.bad, rw.frac, 1);
+    return `<tr><td>#${rw.info.i} ${rw.info.type}${rw.info.approx ? ' ≈' : ''}</td>` +
+      `<td><div class="bar"><span style="width:${(100 * rw.frac).toFixed(1)}%;background:${col}"></span></div></td>` +
+      `<td class="num">${(100 * rw.frac).toFixed(0)}</td>` +
+      `<td class="num">${rw.far > 0 ? '+' + rw.far.toFixed(2) : '–'}</td></tr>`;
+  }).join('');
+}
+
+sel.addEventListener('change', draw);
+for (const id of ['angle', 'mag', 'health', 'press']) $(id).addEventListener('input', draw);
+$('ghost').addEventListener('change', draw);
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw); } catch (e) {}
+new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+draw();
+</script>
