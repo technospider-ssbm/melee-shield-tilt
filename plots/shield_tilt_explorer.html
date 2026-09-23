@@ -141,15 +141,16 @@ function draw() {
   const [cx, cy] = d.centers[ai][mi];
   const [ux, uy] = d.centers[0][0];
   const shapes = [];
-  // untilted body hurtboxes, neutral ink, always shown for reference
+  // untilted body hurtboxes: light fill + a visible mid-grey outline, at the
+  // back, so bubbles/markers drawn after this never get hidden underneath
   for (const b of d.boxes[0][0]) {
-    shapes.push({ type: 'path', path: stadiumPath(...b), fillcolor: 'rgba(82,81,78,0.35)',
-      line: { color: 'rgba(82,81,78,0.5)', width: 0.5 }, layer: 'below' });
+    shapes.push({ type: 'path', path: stadiumPath(...b), fillcolor: 'rgba(137,135,129,0.22)',
+      line: { color: 'rgba(137,135,129,0.7)', width: 0.6 }, layer: 'below' });
   }
-  // posed hurtboxes at the current stick position, accent tint
+  // posed hurtboxes at the current stick position, very faint accent tint
   for (const b of (d.boxes[ai] ? d.boxes[ai][mi] : [])) {
-    shapes.push({ type: 'path', path: stadiumPath(...b), fillcolor: 'rgba(42,120,214,0.25)',
-      line: { color: 'rgba(42,120,214,0.6)', width: 0.6 }, layer: 'below' });
+    shapes.push({ type: 'path', path: stadiumPath(...b), fillcolor: 'rgba(42,120,214,0.1)',
+      line: { color: 'rgba(42,120,214,0.35)', width: 0.4 }, layer: 'below' });
   }
   // untilted bubble outline
   shapes.push({ type: 'path', path: circlePath(ux, uy, d.r_full), fillcolor: 'rgba(0,0,0,0)',

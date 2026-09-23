@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from matplotlib.patches import Circle, Polygon
 from matplotlib import font_manager
 
@@ -58,11 +59,17 @@ def stadium_polygon(x1, y1, x2, y2, r, n=20):
     return np.concatenate([arc2, arc1], axis=0)
 
 
-def draw_hurtboxes(ax, df, color, alpha, lw=0.6, zorder=2):
+def draw_hurtboxes(ax, df, color, alpha, lw=0.6, zorder=2, edgecolor=None,
+                    edge_alpha=None):
+    """edge_alpha defaults to alpha; pass a higher value for a visible thin
+    outline over a very light fill (e.g. the untilted-pose body)."""
+    face_rgba = mcolors.to_rgba(color, alpha)
+    edge_rgba = mcolors.to_rgba(edgecolor or color,
+                                 edge_alpha if edge_alpha is not None else alpha)
     for _, row in df.iterrows():
         poly = stadium_polygon(row.x1, row.y1, row.x2, row.y2, row.radius)
-        ax.add_patch(Polygon(poly, closed=True, facecolor=color, edgecolor=color,
-                              alpha=alpha, linewidth=lw, zorder=zorder))
+        ax.add_patch(Polygon(poly, closed=True, facecolor=face_rgba,
+                              edgecolor=edge_rgba, linewidth=lw, zorder=zorder))
 
 
 def char_geometry(code):
@@ -145,59 +152,76 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
 
     ux, uy, r_full, r_min = geo["ux"], geo["uy"], geo["r_full"], geo["r_min"]
 
-    # reachable-region fill + rings (accent hue, light -> dark = m 0.25 -> 1.0)
+    # Draw order (back to front): untilted hurtboxes -> extreme-tilt
+    # hurtboxes -> bubbles -> centre path/rings/markers/labels. Hurtboxes
+    # used to be opaque and on top, hiding the path entirely (e.g. Dk.png).
     rf = geo["ring_full"]
-    ax.fill(rf.bone_x, rf.bone_y, color=ACCENT_SEQ[3], alpha=0.08, zorder=1)
+
+    # 1. untilted hurtboxes: light fill, thin mid-grey outline, at the back
+    if show_hurtboxes:
+        poses = load_hurtbox_poses(code, angles=() if not geo["has_tilt"] else
+                                    (0, 45, 90, 135, 180, 225, 270, 315))
+        body = poses.get("untilted")
+        if body is not None:
+            draw_hurtboxes(ax, body, INK_SECONDARY, alpha=0.2, lw=0.6, zorder=1,
+                            edgecolor=INK_MUTED, edge_alpha=0.7)
+
+        # 2. extreme-tilt hurtboxes: very faint, still behind the bubbles/path
+        for label, sub in poses.items():
+            if label != "untilted":
+                draw_hurtboxes(ax, sub, ACCENT, alpha=0.08, lw=0.3, zorder=2)
+
+    # 3. bubbles
+    if geo["has_tilt"]:
+        for label, (ex, ey) in geo["extremes"].items():
+            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=ACCENT,
+                                 lw=0.7, alpha=0.35, zorder=3))
+    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=INK_PRIMARY,
+                         lw=1.4, zorder=4))
+    ax.add_patch(Circle((ux, uy), r_min, fill=False, edgecolor=ORANGE,
+                         lw=1.0, ls=(0, (3, 2)), alpha=0.9, zorder=4,
+                         label="min-size bubble"))
+
+    # 4. centre path, partial rings, markers and labels - always on top
+    ax.fill(rf.bone_x, rf.bone_y, color=ACCENT_SEQ[3], alpha=0.08, zorder=5)
     for i, m in enumerate((0.25, 0.5, 0.75)):
         r = geo["rings_inner"][m]
         if not r.empty:
             ax.plot(r.bone_x, r.bone_y, color=ACCENT_SEQ[1 + i], lw=1.0,
-                    alpha=0.8, zorder=2)
-    ax.plot(rf.bone_x, rf.bone_y, color=ACCENT, lw=1.8, zorder=3,
+                    alpha=0.9, zorder=6)
+    ax.plot(rf.bone_x, rf.bone_y, color=ACCENT, lw=1.8, zorder=7,
             label="full tilt (m=1)")
+    ax.plot([ux], [uy], marker="o", ms=4, color=INK_PRIMARY, zorder=9)
 
-    # hurtboxes: untilted (opaque, secondary ink) + extremes (faint accent)
-    if show_hurtboxes:
-        poses = load_hurtbox_poses(code, angles=() if not geo["has_tilt"] else
-                                    (0, 45, 90, 135, 180, 225, 270, 315))
-        for label, sub in poses.items():
-            if label == "untilted":
-                draw_hurtboxes(ax, sub, INK_SECONDARY, alpha=0.55, lw=0.5, zorder=4)
-            else:
-                draw_hurtboxes(ax, sub, ACCENT, alpha=0.10, lw=0.4, zorder=2)
-
-    # bubbles: untilted (solid) + 8 extremes (faint), + min-size at untilted
-    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=INK_PRIMARY,
-                         lw=1.4, zorder=5))
-    ax.add_patch(Circle((ux, uy), r_min, fill=False, edgecolor=ORANGE,
-                         lw=1.0, ls=(0, (3, 2)), alpha=0.9, zorder=5,
-                         label="min-size bubble"))
-    ax.plot([ux], [uy], marker="o", ms=4, color=INK_PRIMARY, zorder=6)
-
-    if not geo["has_tilt"]:
-        # fixed bubble: every stick direction gives the same centre, so draw
-        # nothing extra (the untilted bubble already shows the whole story)
-        pass
-    else:
+    if geo["has_tilt"] and show_labels:
         for label, (ex, ey) in geo["extremes"].items():
-            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=ACCENT,
-                                 lw=0.7, alpha=0.35, zorder=3))
-            if show_labels:
-                # place label just outside the bubble, along the radial direction
-                dx, dy = ex - ux, ey - uy
-                norm = np.hypot(dx, dy) or 1
-                lx = ex + dx / norm * (r_full * 0.35 + 1.0)
-                ly = ey + dy / norm * (r_full * 0.35 + 1.0)
-                ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
-                        va="center", zorder=7)
+            # place label just outside the bubble, along the radial direction
+            dx, dy = ex - ux, ey - uy
+            norm = np.hypot(dx, dy) or 1
+            lx = ex + dx / norm * (r_full * 0.35 + 1.0)
+            ly = ey + dy / norm * (r_full * 0.35 + 1.0)
+            ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
+                    va="center", zorder=9)
 
-    # forward hysteresis: draw the second (frame-370) resting point + note
+    # forward hysteresis: draw the second (frame-370) resting point, a thin
+    # connector back to the normal (frame-10) forward point, and a note
     if show_labels and geo["fwd_alt"] is not None:
         fx, fy, fd = geo["fwd_alt"]
-        ax.plot([fx], [fy], marker="D", ms=5, mfc=ORANGE, mec=ORANGE, zorder=7)
-        ax.annotate("forward: 2 resting states\n(history-dependent)",
-                    xy=(fx, fy), xytext=(8, -10), textcoords="offset points",
-                    fontsize=6.5, color=ORANGE, ha="left", va="top", zorder=7)
+        fwd0 = geo["extremes"].get("Forward")
+        if fwd0 is not None:
+            ax.plot([fwd0[0], fx], [fwd0[1], fy], color=ORANGE, lw=0.8,
+                    alpha=0.7, zorder=8)
+        ax.plot([fx], [fy], marker="D", ms=5, mfc=ORANGE, mec=ORANGE, zorder=9)
+        # anchor the note in a fixed corner with a leader line, rather than a
+        # fixed data-space offset - for small gaps (e.g. Link) the marker
+        # sits right against the min-size ring and any nearby offset collides
+        ax.annotate(
+            f"forward, if swept in from below (frame 370):\n"
+            f"centre at ({fx:.2f}, {fy:.2f})", xy=(fx, fy), xycoords="data",
+            xytext=(0.99, 0.20), textcoords="axes fraction", fontsize=6.5,
+            color=ORANGE, ha="right", va="center", zorder=9,
+            arrowprops=dict(arrowstyle="-", color=ORANGE, lw=0.7, alpha=0.7,
+                            shrinkA=0, shrinkB=3))
 
     ax.set_aspect("equal", adjustable="box")
     if lim is not None:
@@ -235,7 +259,7 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
             Line2D([0], [0], color=ACCENT_SEQ[1], lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
             Line2D([0], [0], color=ORANGE, lw=1.0, ls=(0, (3, 2)), label="min-size bubble"),
             Line2D([0], [0], color=ACCENT, lw=0.7, alpha=0.5, label="bubble at stick extreme"),
-            Patch(facecolor=INK_SECONDARY, edgecolor="none", alpha=0.55, label="hurtboxes (untilted)"),
+            Patch(facecolor=INK_SECONDARY, edgecolor=INK_MUTED, alpha=0.35, label="hurtboxes (untilted)"),
         ]
         ax.legend(handles=handles, loc="lower right", fontsize=6.5, frameon=False,
                  labelcolor=INK_SECONDARY)
