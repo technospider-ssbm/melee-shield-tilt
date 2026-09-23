@@ -17,13 +17,15 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from matplotlib.patches import Circle, Polygon
+import matplotlib.patheffects as pe
+from matplotlib.lines import Line2D
+from matplotlib.patches import Circle, Polygon, Patch
 from matplotlib import font_manager
 
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 from common import (
     REPO, DATA, PLOTS, SURFACE, PAGE, INK_PRIMARY, INK_SECONDARY, INK_MUTED,
-    GRIDLINE, BASELINE, ACCENT, ACCENT_SEQ, ORANGE, STATUS_GOOD,
+    GRIDLINE, BASELINE, ACCENT, ACCENT_SEQ, ORANGE, STATUS_GOOD, PATH_NAVY,
     VALIDATION_NOTE, NANA_VALIDATION_NOTE, HYSTERESIS_EPS, DIRECTIONS, FONT,
     all_codes, char_meta, display_name, load_main, load_hurtbox_poses,
 )
@@ -60,10 +62,11 @@ def stadium_polygon(x1, y1, x2, y2, r, n=20):
 
 
 def draw_hurtboxes(ax, df, color, alpha, lw=0.6, zorder=2, edgecolor=None,
-                    edge_alpha=None):
+                    edge_alpha=None, edge_only=False):
     """edge_alpha defaults to alpha; pass a higher value for a visible thin
-    outline over a very light fill (e.g. the untilted-pose body)."""
-    face_rgba = mcolors.to_rgba(color, alpha)
+    outline over a very light fill (e.g. the untilted-pose body).
+    edge_only=True draws no fill at all (a silhouette outline)."""
+    face_rgba = "none" if edge_only else mcolors.to_rgba(color, alpha)
     edge_rgba = mcolors.to_rgba(edgecolor or color,
                                  edge_alpha if edge_alpha is not None else alpha)
     for _, row in df.iterrows():
@@ -276,10 +279,177 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
     return None
 
 
+# 3x3 compass layout for the "body at each extreme" panel: (row, col), row 0
+# = top, col 0 = back (matches the "up = away from forward" reading of the
+# stick that the left panel's direction labels already use).
+COMPASS_CELLS = {
+    "Back+Up": (0, 0), "Up": (0, 1), "Fwd+Up": (0, 2),
+    "Back": (1, 0), "untilted": (1, 1), "Forward": (1, 2),
+    "Back+Down": (2, 0), "Down": (2, 1), "Fwd+Down": (2, 2),
+}
+
+
+def draw_left_panel(ax, geo):
+    """'Where the shield can go': the centre path, no per-pose hurtbox
+    fills at all (those are what made Dk.png unreadable) - just a faint
+    outline of the untilted body for scale."""
+    code = geo["code"]
+    ux, uy, r_full, r_min = geo["ux"], geo["uy"], geo["r_full"], geo["r_min"]
+    rf = geo["ring_full"]
+
+    # faint untilted body silhouette: outline only, no fill
+    poses = load_hurtbox_poses(code, angles=())
+    body = poses.get("untilted")
+    if body is not None and not body.empty:
+        draw_hurtboxes(ax, body, BASELINE, alpha=0, lw=0.5, zorder=1,
+                        edgecolor=BASELINE, edge_alpha=0.7, edge_only=True)
+
+    # partial rings: thin and light
+    for i, m in enumerate((0.25, 0.5, 0.75)):
+        r = geo["rings_inner"][m]
+        if not r.empty:
+            ax.plot(r.bone_x, r.bone_y, color=ACCENT_SEQ[1 + i], lw=0.8,
+                    alpha=0.55, zorder=3)
+
+    # full-tilt centre path: thick, dark, high-contrast, white halo so it
+    # reads over the body outline/bubbles regardless of what's underneath
+    ax.plot(rf.bone_x, rf.bone_y, color=PATH_NAVY, lw=2.5, zorder=6,
+            solid_capstyle="round",
+            path_effects=[pe.Stroke(linewidth=4.5, foreground=SURFACE), pe.Normal()],
+            label="full tilt (m=1)")
+
+    # bubbles: untilted (black), min-size (dashed), 8 extremes (thin outline)
+    if geo["has_tilt"]:
+        for label, (ex, ey) in geo["extremes"].items():
+            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=ACCENT,
+                                 lw=0.6, alpha=0.45, zorder=4))
+            dx, dy = ex - ux, ey - uy
+            norm = np.hypot(dx, dy) or 1
+            lx = ex + dx / norm * (r_full * 0.35 + 1.0)
+            ly = ey + dy / norm * (r_full * 0.35 + 1.0)
+            ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
+                    va="center", zorder=7)
+    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=INK_PRIMARY,
+                         lw=1.4, zorder=5))
+    ax.add_patch(Circle((ux, uy), r_min, fill=False, edgecolor=ORANGE,
+                         lw=1.0, ls=(0, (3, 2)), alpha=0.9, zorder=5,
+                         label="min-size bubble"))
+    ax.plot([ux], [uy], marker="o", ms=4, color=INK_PRIMARY, zorder=8)
+
+    # forward hysteresis (DK, Young Link, Link): second resting point
+    if geo["fwd_alt"] is not None:
+        fx, fy, fd = geo["fwd_alt"]
+        fwd0 = geo["extremes"].get("Forward")
+        if fwd0 is not None:
+            ax.plot([fwd0[0], fx], [fwd0[1], fy], color=ORANGE, lw=0.8,
+                    alpha=0.7, zorder=7)
+        ax.plot([fx], [fy], marker="D", ms=5, mfc=ORANGE, mec=ORANGE, zorder=8)
+        ax.annotate(
+            f"forward, if swept in from below (frame 370):\n"
+            f"centre at ({fx:.2f}, {fy:.2f})", xy=(fx, fy), xycoords="data",
+            xytext=(0.99, 0.20), textcoords="axes fraction", fontsize=6.5,
+            color=ORANGE, ha="right", va="center", zorder=8,
+            arrowprops=dict(arrowstyle="-", color=ORANGE, lw=0.7, alpha=0.7,
+                            shrinkA=0, shrinkB=3))
+
+    ax.set_aspect("equal", adjustable="box")
+    ax.set_xlim(*geo["x_reach"]); ax.set_ylim(*geo["y_reach"])
+    ax.grid(True, color=GRIDLINE, lw=0.6, zorder=0)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+    ax.set_title("Where the shield can go", fontsize=11, color=INK_PRIMARY,
+                 loc="left")
+    ax.set_xlabel("forward →  (game units, relative to TopN)")
+    ax.set_ylabel("up →")
+
+    handles = [
+        Line2D([0], [0], color=INK_PRIMARY, lw=1.4, label="untilted bubble"),
+        Line2D([0], [0], color=PATH_NAVY, lw=2.5, label="full-tilt centre path (m=1)"),
+        Line2D([0], [0], color=ACCENT_SEQ[1], lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
+        Line2D([0], [0], color=ORANGE, lw=1.0, ls=(0, (3, 2)), label="min-size bubble"),
+        Line2D([0], [0], color=ACCENT, lw=0.6, alpha=0.6, label="bubble at stick extreme"),
+        Line2D([0], [0], color=BASELINE, lw=0.5, label="untilted body outline"),
+    ]
+    ax.legend(handles=handles, loc="lower right", fontsize=6.3, frameon=False,
+             labelcolor=INK_SECONDARY)
+
+
+def draw_body_grid(fig, gs_cell, geo):
+    """'Body at each extreme': a 3x3 small-multiples grid (compass layout),
+    each cell showing that pose's tilted hurtboxes + bubble outline on
+    shared limits."""
+    code = geo["code"]
+    r_full = geo["r_full"]
+    inner_gs = gs_cell.subgridspec(3, 3, wspace=0.04, hspace=0.08)
+    lim = (geo["x_reach"], geo["y_reach"])
+
+    poses = load_hurtbox_poses(code, angles=() if not geo["has_tilt"] else
+                                (0, 45, 90, 135, 180, 225, 270, 315))
+    axes = {}
+    for label, (row, col) in COMPASS_CELLS.items():
+        ax = fig.add_subplot(inner_gs[row, col])
+        axes[label] = ax
+        if label == "untilted":
+            centre = (geo["ux"], geo["uy"])
+        elif geo["has_tilt"]:
+            centre = geo["extremes"].get(label)
+        else:
+            centre = (geo["ux"], geo["uy"])  # fixed bubble: same everywhere
+
+        sub = poses.get(label)
+        if sub is not None and not sub.empty:
+            draw_hurtboxes(ax, sub, INK_SECONDARY, alpha=0.3, lw=0.5, zorder=1,
+                            edgecolor=INK_MUTED, edge_alpha=0.7)
+        if centre is not None:
+            ax.add_patch(Circle(centre, r_full, fill=False, edgecolor=ACCENT,
+                                 lw=1.0, zorder=2))
+        ax.set_xlim(*lim[0]); ax.set_ylim(*lim[1])
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_xticks([]); ax.set_yticks([])
+        for spine in ax.spines.values():
+            spine.set_color(GRIDLINE)
+        title = "neutral" if label == "untilted" else label
+        ax.text(0.03, 0.95, title, transform=ax.transAxes, fontsize=6.2,
+                color=INK_MUTED, ha="left", va="top")
+    return axes
+
+
+def render_char_detail(geo):
+    """Two panels, same axis limits: left = shield-centre reach, right =
+    a 3x3 compass grid of the posed body/hurtboxes at each stick extreme.
+    Keeps hurtboxes in the tilted pose without 8-way alpha stacking hiding
+    the centre path (the original single-panel design's failure mode)."""
+    code, meta = geo["code"], geo["meta"]
+    fig = plt.figure(figsize=(13.5, 7.2), dpi=150)
+    gs = fig.add_gridspec(1, 2, width_ratios=(1.3, 1), wspace=0.08)
+
+    axL = fig.add_subplot(gs[0, 0])
+    draw_left_panel(axL, geo)
+
+    draw_body_grid(fig, gs[0, 1], geo)
+    fig.text(gs[0, 1].get_position(fig).x0, 0.965, "Body at each extreme",
+              fontsize=11, color=INK_PRIMARY)
+
+    name = display_name(code, meta)
+    fixed_tag = "  — fixed bubble (no tilt)" if not meta.get("has_tilt", True) else ""
+    fig.suptitle(f"{name}{fixed_tag}", fontsize=15, color=INK_PRIMARY, x=0.01,
+                 y=0.995, ha="left", va="top", fontweight="bold")
+
+    fig.text(0.01, 0.028,
+             "Shield-centre position from the offline pose solver (Phase 3); "
+             "hurtboxes shown in the tilted pose (right).", fontsize=6.5,
+             color=INK_MUTED)
+    note = NANA_VALIDATION_NOTE if code == "Nn" else VALIDATION_NOTE
+    fig.text(0.01, 0.008, note, fontsize=6.5, color=INK_MUTED)
+    fig.tight_layout(rect=(0, 0.045, 1, 0.94))
+    return fig
+
+
 def make_per_character_plots(codes):
     for code in codes:
         geo = char_geometry(code)
-        fig = plot_character(geo)
+        fig = render_char_detail(geo)
         fig.savefig(PLOTS / f"{code}.png", dpi=150)
         fig.savefig(PLOTS / f"{code}.svg")
         plt.close(fig)

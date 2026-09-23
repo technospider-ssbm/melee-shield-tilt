@@ -30,6 +30,9 @@ ACCENT = "#2a78d6"       # categorical slot 1 (blue) - reachable-region geometry
 ACCENT_SEQ = ["#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#184f95"]  # light->dark
 ORANGE = "#eb6834"       # categorical slot 2 - used only for the min-shield ring
 STATUS_GOOD = "#0ca30c"  # reserved status color (unused on charts; kept for parity)
+# High-contrast path colour for the "where the shield can go" panel - darker
+# than ACCENT so it survives a white halo (path_effects) over any fill.
+PATH_NAVY = "#0d2b52"
 
 # All 26 selectable characters (everyone but Nana, whose pose is identical to
 # Popo's) now match the emulator exactly - see data/validation/PROGRESS.md
