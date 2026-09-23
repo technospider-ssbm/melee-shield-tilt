@@ -213,6 +213,51 @@ were affected that a full clean rerun was simpler than partial-resume logic.
 | Marth | Ms | 49 | 49/49 | 0.0000 | 0.0000 |
 | Popo | Pp | 49 | 49/49 | 0.0074 | 0.0002 |
 | Yoshi | Ys | 49 | 49/49 | 0.0000 | 0.0000 |
+| Mario | Mr | 49 | 49/49 | 0.0000 | 0.0000 |
+| Captain Falcon | Ca | 49 | 49/49 | 0.0000 | 0.0000 |
+| Donkey Kong | Dk | 49 | 49/49 | 1.8375 | 0.0559 |
+| Link | Lk | 49 | 49/49 | 0.1491 | 0.0045 |
+| Sheik | Sk | 49 | 49/49 | 0.0000 | 0.0000 |
+| Ness | Ns | 49 | 49/49 | 0.0000 | 0.0000 |
+| Peach | Pe | 49 | 49/49 | 0.0000 | 0.0000 |
+| Pikachu | Pk | 49 | 49/49 | 0.0000 | 0.0000 |
+| Samus | Ss | 49 | 49/49 | 0.0000 | 0.0000 |
+| Luigi | Lg | 49 | 49/49 | 0.0000 | 0.0000 |
+| Zelda | Zd | 49 | 49/49 | 0.0000 | 0.0000 |
+| Young Link | Cl | 49 | 49/49 | 0.9183 | 0.0279 |
+| Dr. Mario | Dr | 49 | 49/49 | 0.0000 | 0.0000 |
+| Falco | Fc | 49 | 49/49 | 0.0000 | 0.0000 |
+| Pichu | Pc | 49 | 49/49 | 0.0000 | 0.0000 |
+| Ganondorf | Gn | 49 | 49/49 | 0.0000 | 0.0000 |
+| Roy | Fe | 49 | 49/49 | 0.0000 | 0.0000 |
+| Jigglypuff | Pr | 49 | 49/49 | 0.0000 | 0.0000 |
+| Mewtwo | Mt | 49 | 49/49 | 0.0000 | 0.0000 |
+
+**23/23 attempted characters: all 49/49 samples reachable, no capture
+failures.** Nana was skipped (can't be picked alone in a 1v1 setup; her
+pose reuses Popo's, already covered). 19/23 match the pose-solver exactly
+(0.0000). Batch driven by `scratchpad/batch_all.sh` (not committed, session
+scratch only), one character per Dolphin instance, ~80s/character.
+
+### A real, reproducible pose-solver discrepancy (not a harness/RAM issue)
+
+Every non-zero-error character in this session — **Donkey Kong (1.8375),
+Young Link (0.9183), Link (0.1491), and Popo (0.0074, from the earlier
+session)** — mismatches at **exactly the same two samples: angle=337.5°
+(i.e. -22.5°) at mag=0.33 and mag=0.66**, and nowhere else (mag=1.0 at the
+same angle is exact for all four). This is not the Kirby-style part/joint
+indexing concern (Popo and DK don't have optional part slots at all; Link
+and Young Link do, but the error only appears near one specific angle, not
+across the board, which a systematic index bug would produce). It looks
+like a genuine offline pose-solver edge case in the blend math right at/near
+the point where the settled animation frame wraps toward 0°/360°
+(angle=337.5, mag<1 exercises the `x4<1` ShieldPose<->Guard-anim slerp
+blend path; mag=1.0 skips that blend entirely per `docs/MECHANICS.md`
+section 3.2, which is exactly the case that's always exact). Likely a
+quaternion-slerp hemisphere-flip or antipodal-branch edge case near the
+frame-370/frame-10 wraparound. Flagging for the pose-solver
+(`tools/ShieldPose`) rather than fixing here — this session's tools are
+read/compare-only by design (Phase 4 scope).
 
 All three characters match the pose-solver's `data/<code>.csv` exactly
 (to displayed float precision) once the harness bugs (JObj mtx offset,

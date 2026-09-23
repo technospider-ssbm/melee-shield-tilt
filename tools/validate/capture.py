@@ -33,6 +33,24 @@ CODE_TO_MELEE_CHAR = {
     "Ms": "MARTH",  # characters.json: Ms=Marth, Mt=Mewtwo (fixed in Phase 2)
     "Mt": "MEWTWO",
     "Pp": "POPO",
+    "Mr": "MARIO",
+    "Ca": "CPTFALCON",
+    "Dk": "DK",
+    "Lk": "LINK",
+    "Sk": "SHEIK",  # menu_helper picks Zelda then transforms via A after stage select
+    "Ns": "NESS",
+    "Pe": "PEACH",
+    "Pk": "PIKACHU",
+    "Ss": "SAMUS",
+    "Lg": "LUIGI",
+    "Zd": "ZELDA",
+    "Cl": "YLINK",
+    "Dr": "DOC",
+    "Fc": "FALCO",
+    "Pc": "PICHU",
+    "Gn": "GANONDORF",
+    "Fe": "ROY",
+    "Pr": "JIGGLYPUFF",
 }
 
 SETTLE_FRAMES = 75  # ~60 for eased x4/x8 to converge + margin
