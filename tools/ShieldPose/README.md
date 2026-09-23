@@ -22,7 +22,9 @@ SRT (Euler or quaternion). It also has the world translation, so you can compare
 ## Outputs
 * `data/<code>.csv`: `sweep,stick_x,stick_y,angle,mag,bone_x,bone_y,bone_z,shield_radius_full,shield_radius_min`.
   `grid` rows cover every lstick value the engine can hold (8153 after clamp, /80 and per-axis deadzone), given in integer
-  stick units. `polar` rows cover θ = 0..359 in steps of 1 and m = 0..1 in steps of 0.05. The fighter faces right and +x is forward. Positions are relative to
+  stick units. `polar` rows cover θ = 0..360 in steps of 1 and m = 0..1 in steps of 0.05. `angle` is the settled eased angle g = x8 − 10.
+  A stick at exactly 0° has two settled states, g = 0 (frame 10) and g = 360 (frame 370), depending on approach direction
+  (MECHANICS 1.2). Each such grid stick with m > 0 therefore gets two rows, 58 extra per tilting character. The fighter faces right and +x is forward. Positions are relative to
   TopN (cur_pos) and include model scale.
 * `data/<code>_hurtboxes.csv`: the same sample keys, plus the hurtbox index, part, joint, type, grabbable, the world capsule
   endpoints and the scaled radius. This file is not committed (about 500 MB in total). Regenerate it with the command above.
@@ -50,7 +52,7 @@ HSD_MtxSRT/SRTQuat, and the stick clamp, atan2 and deadzone. Known deviations:
 * `MTXMultVec` (hurtbox endpoints) is a plain float dot product.
 * Doubles appear only where the source uses them: `1.0/fterm`, `1.0/scale` in MtxSRT, `M_PI_2*facing`, and `pi - atanf`
   in lb_8000D008. Doubles are also used for diagnostics: the radius chain scale `cbrt(|det|)`, singular values, and check distances.
-* Settled state: frame = `10 + deg` and x4 = `min(1, |ls|)`. MECHANICS 1.1 says these are exact to about 1e-4 deg. The easing loop is not iterated.
+* Settled state: frame = `10 + deg` (plus the 370 variant at 0°, see above) and x4 = `min(1, |ls|)`. MECHANICS 1.1 says these are exact to about 1e-4 deg. The easing loop is not iterated.
 
 Measured effect: the FObj port matches HSDLib's FOBJ_Player to 3e-6 on every Guard track (`--selftest`). The facing-left
 mirror is exact to within 1e-6, which is the residual of cosf(π/2).

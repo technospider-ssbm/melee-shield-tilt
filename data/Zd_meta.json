@@ -311,15 +311,15 @@
   },
   "notes": [],
   "columns": {
-    "sweep": "grid = every lstick value the engine can hold (MECHANICS 5); polar = theta 0..359 step 1 x mag 0..1 step 0.05",
+    "sweep": "grid = every lstick value the engine can hold (MECHANICS 5); polar = angle 0..360 step 1 x mag 0..1 step 0.05",
     "stick_x/stick_y": "grid only: integer stick units after HSD_PadClamp (radius 80) and the 0.28 per-axis deadzone; lstick = k/80. Fighter faces right, \u002Bx = forward.",
-    "angle": "settled tilt angle in degrees (0 = forward, 90 = up); Guard figatree frame = 10 \u002B angle",
+    "angle": "settled eased tilt angle g = x8 - 10 in degrees (0 = forward, 90 = up); Guard figatree frame = 10 \u002B angle. Grid sticks at exactly 0 deg (y = 0, x \u003E= 0) with mag \u003E 0 get two rows: angle 0 (frame 10, fresh shield or approached from above) and angle 360 (frame 370, approached from below; absorbing). MECHANICS 1.2.",
     "mag": "settled blend weight x4 = min(1, |lstick|)",
     "bone_x/y/z": "shield bone world translation minus TopN translation (cur_pos), world axes, facing right, including TopN model scale",
     "shield_radius_full/min": "see shield_radius"
   },
   "grid_samples": 8153,
-  "polar_samples": 7560,
+  "polar_samples": 7581,
   "hurtboxes": {
     "exported": true,
     "file": "data/Zd_hurtboxes.csv",
@@ -496,6 +496,14 @@
           }
         }
       ],
+      "pass": true
+    },
+    "zero_angle_two_fixed_points": {
+      "x8_fresh_then_(0.3,0)": 10,
+      "x8_from_270deg_then_(0.3,0)": 370,
+      "x8_from_315deg_then_neutral": 370,
+      "x8_from_90deg_then_(0.3,0)": 10,
+      "x8_facing_left_from_270deg_then_(-0.3,0)": 370,
       "pass": true
     },
     "facing_left_mirror": {

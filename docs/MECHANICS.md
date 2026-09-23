@@ -59,8 +59,9 @@ angle error = D0 * 0.5^n and `x4 = x4_0 + (m - x4_0)(1 - 0.5^n)`.
 
 ### 1.1 Does x8 settle exactly, and is frame = angle+10 exact?
 * The frame the pose code uses is literally `x8 = 10 + g`, where g is the eased angle in degrees
-  (1 animation frame per degree). The range of `x8` is [10, 370]. Frame 10 is 0 deg. Frame 370 is 360 deg,
-  which can only occur transiently, for example while easing across 0 deg from below.
+  (1 animation frame per degree). The range of `x8` is [10, 370]. Frame 10 is 0 deg. Frame 370 is 360 deg.
+  It is **not** only transient: it is a stable settled state for a stick at exactly 0 deg (section 1.2).
+  The `[0, 359]` clamp applies to the *stick* angle `deg`, not to g.
 * The settled value is a fixed point of `g <- g + 0.5(s - g)`. In float arithmetic it converges to
   within a few ULP of `deg` (about 3e-5 deg near 300) and then stays there. The -10/+10 round-trip each
   frame is also ULP-level. **For the solver, settled `x8 = 10 + deg` is exact to about 1e-4 deg.**
@@ -74,6 +75,24 @@ angle error = D0 * 0.5^n and `x4 = x4_0 + (m - x4_0)(1 - 0.5^n)`.
   magnitude, not 1.** With the stick released, x4 halves each frame and reaches exactly 0 only
   after about 150 frames (denormal underflow, or flush-to-zero if Gekko NI mode is set: **UNKNOWN**,
   harmless).
+
+### 1.2 A stick at exactly 0 deg has two fixed points: x8 = 10 and x8 = 370 (emulator-confirmed)
+The stick angle is exactly 0 whenever `ls.y == 0` and `ls.x * facing >= 0`. That includes neutral, since
+`lb_8000D008(0, 0)` returns 0, and any y inside the deadzone. The fighter.c:1843-1853 deadzone stores a literal `0.0f`,
+so the zero is +0 and signed zero plays no part. The update then has two fixed points:
+* g = 0: `d = 0`, so `s = 0`. This gives **x8 = 10**.
+* g = 360: `d = 0 - 360 = -360 < -180`, which wraps to `d = 0`, so `s = 360`. `s > 360` is false, so it is kept. This gives **x8 = 370**.
+
+Which fixed point is reached depends on history. Easing toward 0 from an angle in (180, 360) climbs toward 360 from below.
+The sequence never exceeds 360 and, in float, lands on exactly 360.0, where it stays. Easing from [0, 180) reaches 0.
+A fresh shield starts at x8 = 10 (`ftCo_800921DC`). So forward and neutral tilts read frame 10 after a fresh
+shield or after coming from above. After coming from below while the shield stays held (for example 270 deg, then
+a forward stick), they read **frame 370** indefinitely. This is only visible where Guard frame 10 != frame 370.
+Measured bubble differences are DK 3.0, Young Link 1.5, Link 0.24 and Popo/Nana 0.012; other characters show about 0
+(section 8, item 4).
+Emulator: `data/validation/{Dk,Cl,Lk,Pp}.csv` rows at raw (19,-19), (24,-10) and (49,-20), captured right after the
+270/315 deg samples, read `x8 = 370.0`. The solver emits both variants: `angle` 0 and 360 for those grid sticks.
+All captured samples then match to within 4.3e-6.
 
 ---
 
@@ -178,9 +197,13 @@ Details, with the lines that establish each step:
 * **(e)** `ftAnim_80070108` (ftanim.c:977-999) walks the **ShieldPose** tree from `SP_root->child`,
   with the same part-index rule as (c). For each part with `!b0 && !b5`:
   * if `flags_b4`: `lb_8000B4FC(J2, SPjoint)`. **J2 := SP SRT verbatim, no blend.** `flags_b4` is set on
-    `GetBoneIndex(TransN)` and `GetBoneIndex(0x35)` for every fighter (ftparts.c:691-692), and again on
-    `parts[1]` for Mewtwo (ftMewtwo/ftmewtwo.c:295). Part 0x35 = 53 has no name in the decomp enum
-    (ft/forward.h:258-314 ends at TransN2 = 52): **UNKNOWN name**.
+    `parts[ftParts_GetBoneIndex(TransN)]` and `parts[ftParts_GetBoneIndex(0x35)]` for every fighter (ftparts.c:691-692).
+    `GetBoneIndex` looks the FtPart enum value up in `ftPartsTable[kind]->part_to_joint` (PlCo.dat BoneTables[kind]+0x04).
+    So the flagged part is **`part_to_joint[0x35]`, not part 53**: for example Fox part 72, Kirby part 58 (joint 45), Mario part 60.
+    `part_to_joint[1]` (TransN) is part 1 for most fighters but **part 2 for Mewtwo and Game & Watch**.
+    Mewtwo also flags `parts[1]` (ftMewtwo/ftmewtwo.c:295, literal enum index 1). For Mewtwo that is **not** redundant:
+    joint 1 is Guard-animated (tracks 1,2,3,5,6,7) and gets the SP value verbatim for 0 < x4 < 1, but it is not on the
+    shield chain. The FtPart 0x35 name is still unknown; the HSDLib table calls it "Extra".
   * else `lb_8000C868(SPjoint, J2, J2, t = 1-x4, t_inv = x4)` (lb_00B0.c:560-641), in pseudo-code:
 
 ```
@@ -200,7 +223,9 @@ else:
   `t=1 -> q`. It falls back to lerp if `1-cos < 1e-10`, and has a special antipodal branch.
   * Step (e) is **skipped entirely when x4 == 1**. Then flags_b4 joints (TransN) keep the anim/costume value
     instead of the SP value, so there is a potential discontinuity at |stick| = 1 if costume-rest TransN != SP TransN.
-    **UNKNOWN**: compare Pl??Nr.dat TransN with ShieldPose TransN.
+    **Resolved:** for every fighter the b4 joints on the shield chain have identical costume/anim and SP SRT, so there is no jump.
+    The only remaining discontinuity at x4 = 1 is at most 3.1e-4 (DK, Bowser, Pikachu, Pichu). It comes from the
+    near-equal Euler shortcut below, which snaps rotations within 1e-4 rad to SP when x4 < 1.
 * **(f)** `ftAnim_8006FF74` (ftanim.c:942-952): for every part i from 1 to `parts_num-1` with
   `b1 && !b0 && !b5`: `lbCopyJObjSRT(J2, live)` (lb_00B0.c:547-558). This copies rotate (Euler *or*
   quaternion), scale and translate, copies the `USE_QUATERNION` flag, and marks the matrix dirty.
@@ -227,7 +252,7 @@ for each joint j in SP preorder starting at TransN (skip b0/b5 parts):
           (ItemHold bone: A_j.scale = 1/model_scaling unless a scale track exists)
     if m == 0:   L_j = SP_j                                     // x4 == 0 branch
     elif m == 1: L_j = A_j                                      // no blend at all
-    elif b4(j):  L_j = SP_j                                     // TransN and part 53
+    elif b4(j):  L_j = SP_j                                     // parts part_to_joint[1], part_to_joint[0x35] (+ parts[1] Mewtwo)
     else:        L_j.T = lerp(SP_j.T, A_j.T, m)
                  L_j.S = lerp(SP_j.S, A_j.S, m)
                  L_j.R = slerp(q(SP_j.R), q(A_j.R), m), or SP_j.R if all |dEuler| <= 1e-4
@@ -264,7 +289,12 @@ the same instructions.
   ftcoll.c:3035-3038). If `x34_scale.z != 1`, `pos.z = cur_pos.z`.
 * The hit test uses the bone's full world matrix with radius `size = 1` (`lbColl_80006E58`,
   lbcollision.c:1121+). So world radius = bubble scale x parent-chain scales.
-  **UNKNOWN (not needed for position)**: exact ellipsoid handling.
+  **Ellipsoid handling (resolved, lbcollision.c:1407-1421):** after finding the closest points, the code maps both
+  through the inverse bone matrix. It then scales the local radius by |world separation| / |local separation|.
+  In effect the collider is the unit sphere pushed through the bone's world matrix, which gives an ellipsoid when the chain
+  scale is non-uniform. That happens for **Kirby and Jigglypuff**: their Guard figatree has SCA tracks on YRotN, giving up to
+  15% anisotropy at downward angles. Everyone else is uniform. Hurtboxes are handled the same way (lbColl_80007ECC).
+  In the solver, `shield_radius_*` is b x cbrt|det(parent world matrix)|, and the semi-axes are listed in each character's meta file.
 
 ### 4.2 The "translation reset" is transient
 `ftCo_800921DC` zeroes the translation of `parts[x11].joint` (ftCo_Guard.c:329-330). Yoshi does the same in
@@ -297,9 +327,10 @@ convention, so the quaternion path and the Euler path give the same rotation.
 If every joint on the chain has CLASSICAL_SCALE, scl stays NULL and `M_j = T*R*S`. The SP joints
 all carry flags 0x8. The **live** joint flags come from the costume model (`HSD_JObjLoadJoint`,
 fighter.c:574). Main anims can also set or clear them (`lbAnim_8001E6D8`/`8001E7E8` on `parts[].joint`).
-**UNKNOWN**: confirm the costume (Pl??Nr.dat) flags on the shield chain. IK and RObj constraints
-(`HSD_JObjSetupMatrixSub`, jobj.c:1386+) are not expected on the TopN-TransN-XRotN-YRotN chain,
-but that is **UNKNOWN** until the costume flags are read.
+**Resolved (costume flags read from Pl??Nr.dat):** every shield-chain and hurtbox-chain joint has flags 0x9 or 0x10000009
+(SKELETON | CLASSICAL_SCALE, plus ROOT_OPA), and TopN has 0x1005008E / 0x1005018E / 0x5015008E. All carry CLASSICAL_SCALE,
+so `scl` stays NULL and M_j = T*R*S. No joint on any shield or hurtbox chain has IK (JOINT1/2/EFFECTOR), RObj, INSTANCE,
+USER_DEF_MTX or MTX_INDEP flags.
 
 ### 4.4 TopN, facing, parent chains, RAM hooks
 * `TopN` = `GET_JOBJ(gobj)` = `parts[0].joint`. Its translation is set to `fp->cur_pos` every frame
@@ -314,7 +345,8 @@ but that is **UNKNOWN** until the costume flags are read.
   for the same stick angle relative to facing. The z offset is generally non-zero.
 * Parent chains observed in the SP trees (joint preorder indices, after the part-to-joint mapping in
   section 6): most fighters use shield -> 3 (YRotN) -> 2 (XRotN) -> 1 (TransN) -> 0 (TopN).
-  **Mewtwo (66 -> 4 -> 3 -> 2 -> 0) and G&W (51 -> 4 -> 3 -> 2 -> 0) do not have TransN as an ancestor.**
+  **Mewtwo (66 -> 4 -> 3 -> 2 -> 0) and G&W (51 -> 4 -> 3 -> 2 -> 0) do not have joint 1 as an ancestor.** Note that
+  for these two, `part_to_joint[FtPart_TransN]` = part 2, which *is* on the chain and is b4 (section 3.2e).
 * RAM hooks for emulator checks (decomp layout, ft/types.h): `mv.co.guard.x4/x8` at fp+0x2344/0x2348,
   `input.lstick[0]` at fp+0x620, `shield_health` fp+0x1998, `lightshield_amount` fp+0x199C,
   `shield_hit` (HitResult) at fp+0x19C0, with `pos` expected at +0x8 (**verify**: bitfield padding).
@@ -372,7 +404,9 @@ The tilt code has no thresholds of its own.
   (ftyoshiguard.c:90-98) and hold `ftYs_Shield_8012C1D4` (l.171-184) use normal animations
   (`Ft_MF_None`/0). The hold state first resets the live skeleton to the costume rest pose (`ftAnim_8006FA58`
   with `costume->child`, l.176). The bubble scale is constant `initial_shield_size` (`inlineB0`,
-  ftCo_Guard.c:179-180). **Yoshi has no shield tilt.** Exclude Yoshi, or plot a single point.
+  ftCo_Guard.c:179-180), independent of health and lightshield. Yoshi's shield hurtbox is also built with `hurt.scale = 1`
+  (ftyoshiguard.c:38 `ftYs_Init_8012BDA0`, :166 `inlineA0`). World radius = 6.0 x model_scaling 1.05 = **6.3, constant regardless of health**
+  (emulator-confirmed). The bubble centre is the shield bone in the costume rest pose. **Yoshi has no shield tilt.** Plot a single point.
 * **Marth** (`Ft_Kind_Mars`): `ftCo_800923B4`/`ftCo_800939B4` add `ftParts_80074B0C(gobj, 1, 1)`
   (a model-part visibility switch) and SFX 190115 (ftCo_Guard.c:342-346, 924-928). This is cosmetic and does not change
   position. Roy (`Ft_Kind_Emblem`) has no such case.
@@ -381,7 +415,8 @@ The tilt code has no thresholds of its own.
   stick follows Popo's (delay and values). Resolve via the CPU-input code (`ftCo_GetCpuLStickX`) or emulator RAM.
 * **Kirby**: hat parts are optional slots. `x594_bits = 0` in the shield states, so the Guard tree never
   animates the hats, and they are not in the SP tree. Only the index mapping above matters.
-* **Mewtwo**: `parts[FtPart_TransN].flags_b4 = true` (redundant with ftparts.c:691) and `x2221_b2 = true`
+* **Mewtwo**: `parts[FtPart_TransN].flags_b4 = true` (**not** redundant: ftparts.c:691 flags part_to_joint[1] = part 2,
+  while this flags part 1; see 3.2e) and `x2221_b2 = true`
   (ftmewtwo.c:292-296). `x2221_b2` only affects `ftAnim_8006DF0C` (called from CapturePulled). Mewtwo's Guard
   figatree animates TransN (tracks 1,2,3,5,6,7), but TransN is not an ancestor of its shield bone.
 * **Game & Watch**: the shield node has rotation and translation tracks, and the chain skips TransN (section 4.4).
@@ -425,13 +460,14 @@ affect the centre.**
 ---
 
 ## 8. Open items (UNKNOWN) and how to resolve them
-1. **Costume rest pose** (Pl??Nr.dat and the other costume files; `x108_costume_joint`) supplies every
-   channel the Guard figatree does not animate (section 3.2c). These files are not extracted yet, and the solver needs them.
-   Also check whether rest poses differ between costumes (costume_id picks the Joint, fighter.c:570-572).
-2. Costume joint flags (CLASSICAL_SCALE / IK / INSTANCE) on the shield chain (section 4.3).
-3. TransN discontinuity at x4 == 1 (the b4 path, section 3.2e). Compare costume TransN with SP TransN.
-4. Whether Guard figatree frame 370 equals frame 10. It is only reached transiently. Confirm by evaluating the FObjs.
+1. **Resolved (neutral costume):** the costume rest pose is taken from the extracted Pl??Nr.dat and used by
+   `tools/ShieldPose`. Other costumes are not extracted, so whether their rest poses differ is still unchecked.
+   Emulator captures on the default costume match the solver to within 4.3e-6.
+2. **Resolved:** costume joint flags (section 4.3). Everything is CLASSICAL_SCALE, with no IK, RObj or INSTANCE on any shield or hurtbox chain.
+3. **Resolved:** there is no TransN discontinuity (section 3.2e). The residual jump at x4 = 1 is at most 3.1e-4, from the 1e-4 rad Euler shortcut.
+4. **Resolved:** Guard frame 370 differs from frame 10 for DK (bubble 3.0), Young Link (1.5), Link (0.24) and Popo/Nana
+   (0.012). It is 0 for the rest. Frame 370 is **not** only transient: it is a stable settled state at 0 deg (section 1.2).
 5. Bubble position during GuardSetOff/shieldstun (section 3.1). Verify in emulator RAM.
-6. Name of part 0x35 (flags_b4).
+6. Name of FtPart 0x35 (flags_b4). The *part* it selects is resolved: `part_to_joint[0x35]`, per fighter (section 3.2e).
 7. Nana's CPU stick (section 6).
 8. Exact float rounding of the easing (fmadds vs fmuls+fadds). This does not matter for settled ranges.

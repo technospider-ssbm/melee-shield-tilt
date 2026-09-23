@@ -98,7 +98,7 @@ foreach (var code in codes)
     if (sanityOnly) { Sweep.Sanity(fm, common); continue; }
     var sw = System.Diagnostics.Stopwatch.StartNew();
     var res = Sweep.Run(fm, common, dataDir, !noHurt);
-    Console.WriteLine($"[{code}] {fm.Name}: {res.GridCount} grid + {res.PolarCount} polar samples, checks {(res.ChecksPass ? "PASS" : "FAIL")}, {sw.ElapsedMilliseconds} ms");
+    Console.WriteLine($"[{code}] {fm.Name}: {res.GridCount} grid (+{res.Grid370Rows} frame-370 rows) + {res.PolarCount} polar samples, checks {(res.ChecksPass ? "PASS" : "FAIL")}, {sw.ElapsedMilliseconds} ms");
     foreach (var n in fm.Notes) Console.WriteLine($"    note: {n}");
     if (!res.ChecksPass) failures++;
     summary.Add($"{code}\t{(res.ChecksPass ? "ok" : "CHECK FAIL")}\t{string.Join("; ", fm.Notes)}");
@@ -112,7 +112,7 @@ namespace ShieldPose
 {
     public sealed class RunResult
     {
-        public int GridCount, PolarCount;
+        public int GridCount, PolarCount, Grid370Rows;
         public bool ChecksPass;
     }
 
@@ -170,6 +170,27 @@ namespace ShieldPose
             float mag = MathF.Sqrt(lx * lx + ly * ly);
             if (mag > 1) mag = 1;
             return (deg, mag);
+        }
+
+        /// <summary>Iterates the x8 update of ftCo_80091BC4 (ftCo_Guard.c:130-162) in f32 with K = 0.5.</summary>
+        public static float SimulateX8(float x8, float lx, float ly, int facing, int frames)
+        {
+            for (int i = 0; i < frames; i++)
+            {
+                float rad = F32.LbAtan2(ly, lx * facing);
+                if (rad < 0) rad += 2 * (float)Math.PI;
+                float deg = rad * 57.29577951f;
+                if (deg < 0) deg = 0;
+                if (deg > 359) deg = 359;
+                float g = x8 - 10;
+                float d = deg - g;
+                if (d > 180) d -= 360; else if (d < -180) d += 360;
+                float sm = d * 0.5f + g;
+                if (sm > 360) { g = sm; g -= 360; }
+                else { g = sm; if (g < 0) g += 360; }
+                x8 = 10 + g;
+            }
+            return x8;
         }
 
         /// <summary>Angle in degrees (any real) -> tilt frame x8 = 10 + clamp(wrap(angle), 0, 359).</summary>
@@ -260,21 +281,28 @@ namespace ShieldPose
             }
 
             // (a) grid
+            // `angle` is the settled eased angle g = x8 - 10 in [0, 360]. A stick angle of exactly 0 deg has two
+            // fixed points (MECHANICS 1.2): g = 0 (frame 10: fresh shield or approached from above) and g = 360
+            // (frame 370: approached from below; absorbing). Both are emitted for m > 0 when the character tilts.
             foreach (var g in grid)
             {
                 var (deg, mag) = Settled(g.Lx, g.Ly, 1);
-                float frame = 10f + deg;
-                var s = Eval(fm, c, frame, mag, 1);
-                Track(s);
-                string key = $"grid,{g.Kx},{g.Ky},{F(deg)},{F(mag)}";
-                csv.Append(key).Append(',').Append(F(s.Bubble.X)).Append(',').Append(F(s.Bubble.Y)).Append(',').Append(F(s.Bubble.Z))
-                   .Append(',').Append(F(s.RadiusFull)).Append(',').Append(F(s.RadiusMin)).Append('\n');
-                if (hurt) HurtRows(key, s.W);
+                foreach (float gAng in (deg == 0f && mag > 0f && fm.HasTilt) ? new[] { 0f, 360f } : new[] { deg })
+                {
+                    float frame = 10f + gAng;
+                    var s = Eval(fm, c, frame, mag, 1);
+                    Track(s);
+                    string key = $"grid,{g.Kx},{g.Ky},{F(gAng)},{F(mag)}";
+                    csv.Append(key).Append(',').Append(F(s.Bubble.X)).Append(',').Append(F(s.Bubble.Y)).Append(',').Append(F(s.Bubble.Z))
+                       .Append(',').Append(F(s.RadiusFull)).Append(',').Append(F(s.RadiusMin)).Append('\n');
+                    if (hurt) HurtRows(key, s.W);
+                    if (gAng == 360f) res.Grid370Rows++;
+                }
             }
             res.GridCount = grid.Count;
 
-            // (b) polar
-            for (int th = 0; th <= 359; th++)
+            // (b) polar (angle 360 = frame 370, the from-below fixed point of 0 deg)
+            for (int th = 0; th <= 360; th++)
                 for (int k = 0; k <= 20; k++)
                 {
                     float m = (float)(k / 20.0);
@@ -427,6 +455,25 @@ namespace ShieldPose
                 };
             }
 
+            // 5. Easing history (ftCo_80091BC4 simulated in f32): a stick at exactly 0 deg settles at x8 = 10 from a
+            //    fresh shield but at x8 = 370 when approached from below (e.g. from 270 deg); 370 is absorbing.
+            {
+                float fromFresh = SimulateX8(10f, 0.3f, 0f, 1, 300);
+                float fromBelow = SimulateX8(280f, 0.3f, 0f, 1, 300);
+                float neutralFromBelow = SimulateX8(325f, 0f, 0f, 1, 300);
+                float fromAbove = SimulateX8(100f, 0.3f, 0f, 1, 300);
+                float leftFromBelow = SimulateX8(280f, -0.3f, 0f, -1, 300);
+                o["zero_angle_two_fixed_points"] = new Dictionary<string, object?>
+                {
+                    ["x8_fresh_then_(0.3,0)"] = fromFresh,
+                    ["x8_from_270deg_then_(0.3,0)"] = fromBelow,
+                    ["x8_from_315deg_then_neutral"] = neutralFromBelow,
+                    ["x8_from_90deg_then_(0.3,0)"] = fromAbove,
+                    ["x8_facing_left_from_270deg_then_(-0.3,0)"] = leftFromBelow,
+                    ["pass"] = fromFresh == 10f && fromBelow == 370f && neutralFromBelow == 370f && fromAbove == 10f && leftFromBelow == 370f,
+                };
+            }
+
             // 4. facing left mirrors (x, z) for the mirrored stick.
             {
                 double maxDx = 0, maxDy = 0, maxDz = 0;
@@ -536,10 +583,12 @@ namespace ShieldPose
                 ["notes"] = fm.Notes,
                 ["columns"] = new Dictionary<string, object?>
                 {
-                    ["sweep"] = "grid = every lstick value the engine can hold (MECHANICS 5); polar = theta 0..359 step 1 x mag 0..1 step 0.05",
+                    ["sweep"] = "grid = every lstick value the engine can hold (MECHANICS 5); polar = angle 0..360 step 1 x mag 0..1 step 0.05",
                     ["stick_x/stick_y"] = "grid only: integer stick units after HSD_PadClamp (radius 80) and the 0.28 per-axis deadzone; " +
                                           "lstick = k/80. Fighter faces right, +x = forward.",
-                    ["angle"] = "settled tilt angle in degrees (0 = forward, 90 = up); Guard figatree frame = 10 + angle",
+                    ["angle"] = "settled eased tilt angle g = x8 - 10 in degrees (0 = forward, 90 = up); Guard figatree frame = 10 + angle. " +
+                              "Grid sticks at exactly 0 deg (y = 0, x >= 0) with mag > 0 get two rows: angle 0 (frame 10, fresh " +
+                              "shield or approached from above) and angle 360 (frame 370, approached from below; absorbing). MECHANICS 1.2.",
                     ["mag"] = "settled blend weight x4 = min(1, |lstick|)",
                     ["bone_x/y/z"] = "shield bone world translation minus TopN translation (cur_pos), world axes, facing right, " +
                                      "including TopN model scale",

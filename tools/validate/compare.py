@@ -34,7 +34,7 @@ def load_solver_csv(code):
                 sx = float(sx)
                 sy = float(sy)
             rows.append({
-                "sx": sx, "sy": sy,
+                "sx": sx, "sy": sy, "angle": float(r["angle"]),
                 "bone": (float(r["bone_x"]), float(r["bone_y"]), float(r["bone_z"])),
                 "shield_radius_full": float(r["shield_radius_full"]),
                 "shield_radius_min": float(r["shield_radius_min"]),
@@ -63,15 +63,20 @@ def load_validation_csv(code):
     return rows
 
 
-def nearest(solver_rows, sx, sy):
+def nearest(solver_rows, sx, sy, g=None):
+    """Nearest row in stick space. Ties (same stick) are broken by the settled
+    angle: a stick at exactly 0 deg has two solver rows, angle 0 (x8 = 10) and
+    angle 360 (x8 = 370), and the capture's guard_x8 says which one the game is on
+    (MECHANICS 1.2)."""
     best = None
-    best_d = None
+    best_key = None
     for r in solver_rows:
         d = (r["sx"] - sx) ** 2 + (r["sy"] - sy) ** 2
-        if best_d is None or d < best_d:
-            best_d = d
+        key = (round(d, 9), abs(r["angle"] - g) if g is not None else 0.0)
+        if best_key is None or key < best_key:
+            best_key = key
             best = r
-    return best, math.sqrt(best_d) if best_d is not None else None
+    return best, math.sqrt(best_key[0]) if best_key is not None else None
 
 
 def main():
@@ -86,18 +91,18 @@ def main():
     print(f"{'angle':>8} {'mag':>5} {'stick_match_dist':>17} {'pos_err':>10} "
           f"{'val_bone':>28} {'solver_bone':>28}")
     for v in val_rows:
-        match, stick_dist = nearest(solver_rows, v["sx"], v["sy"])
+        match, stick_dist = nearest(solver_rows, v["sx"], v["sy"], v["guard_x8"] - 10.0)
         dx = v["bone"][0] - match["bone"][0]
         dy = v["bone"][1] - match["bone"][1]
         dz = v["bone"][2] - match["bone"][2]
         err = math.sqrt(dx * dx + dy * dy + dz * dz)
         errors.append(err)
-        print(f"{str(v['angle']):>8} {v['mag']:>5.2f} {stick_dist:>17.2f} {err:>10.4f} "
+        print(f"{str(v['angle']):>8} {v['mag']:>5.2f} {stick_dist:>17.2f} {err:>10.2e} "
               f"{str(tuple(round(c,3) for c in v['bone'])):>28} "
               f"{str(tuple(round(c,3) for c in match['bone'])):>28}")
 
     if errors:
-        print(f"\n{args.code}: n={len(errors)} max_err={max(errors):.4f} "
+        print(f"\n{args.code}: n={len(errors)} max_err={max(errors):.2e} "
               f"mean_err={sum(errors)/len(errors):.4f}")
     else:
         print("No comparable rows.")
