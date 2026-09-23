@@ -138,19 +138,49 @@ were affected that a full clean rerun was simpler than partial-resume logic.
   good extra confirmation since G&W's shield bone does *not* hang under
   TransN (per HANDOFF_PROMPT.md's Phase-3 watch-out); the pose-solver's
   alternate parent-chain handling for that case checks out live too.
-- **Yoshi (Ys): attempted, blocked.** Every sample retried out
-  (`action=NEUTRAL_B_CHARGING` instead of `Action.SHIELD` after ramping to
-  neutral with digital L held) and was recorded `reachable=False`. This
-  looks like a real harness bug, not a pose-solver issue: holding L on
-  Yoshi should still produce a normal `ftCo_Guard` shield (his tilt being a
-  no-op is a *pose* prediction from the brief, not a claim that the action
-  state differs). Not yet root-caused — possibly stale controller/menu
-  state carrying into the match, or a Yoshi-specific input quirk. Stopped
-  here rather than debug further against the budget; `data/validation/Ys.csv`
-  was not committed (all rows `reachable=False`, not useful). Next session:
-  add a print of the raw button/stick state each frame during the first
-  ramp, and check whether `Action.SHIELD` is even reachable manually (human
-  play) with this harness's Yoshi character-select path.
+- **Yoshi (Ys): attempted, blocked, root cause not found (2 attempts spent,
+  per instruction).** Diagnostic script (`scratchpad/diag_ys.py`, not
+  committed): character select is confirmed correct
+  (`gs.players[1].character == Character.YOSHI`); the fighter falls in
+  normally (`ENTRY_END` -> `FALLING` -> `LANDING`) with `lstick == (0, 0)`
+  the whole time (main stick genuinely neutral, our tilt_analog_unit(0,0)
+  is reaching the game correctly) and `facing_dir == 1.0` throughout; then
+  on the landing frame it settles into `Action.NEUTRAL_B_CHARGING` and
+  **stays there indefinitely**, with `guard_x4` pinned at `0.0` and
+  `guard_x8` pinned at a constant `1.05` the entire time (never eases, never
+  matches the `x4=0,x8=10` baseline every other character shows at rest).
+  This is despite `controller.press_button(BUTTON_L)` being sent every
+  frame from before the character even lands.
+  - **Attempt 1:** hypothesized stale menu-navigation input carrying into
+    the match (the pipe protocol is stateful — a `PRESS` stays held until an
+    explicit `RELEASE`, and `drive.start()` never cleared controller1's
+    state after CSS/stage-select, only controller2's). Added
+    `controller1.release_all()` right after the menu loop in `drive.py`
+    (harmless for the other 5 characters, keep it either way).
+  - **Attempt 2:** reran the same diagnostic with the fix in place — **no
+    change**, identical output down to the exact `x8=1.05` constant.
+  - **Not yet explained:** why L held from before landing doesn't produce
+    `Action.SHIELD`, and specifically why the landing frame goes to
+    `NEUTRAL_B_CHARGING` (a state that implies `B` is held, but we never
+    send `B` and `lstick`/`facing` both read as expected — no evidence of a
+    stray input on the *stick*, only a mystery on the *button* side, or
+    possibly on Yoshi's `mv.co.guard` fields being repurposed/not written by
+    `ftyoshiguard.c` the same way as the shared `ftCo_Guard.c` path other
+    characters use — the constant `x8=1.05` (not `10.0`) hints the guard
+    union might not even be what's active for Yoshi here, i.e. this could
+    be a real character-specific action-state quirk rather than a stuck
+    button. Not confirmed either way within the 2-attempt budget.
+  - **Next steps for a future session:** (a) verify manually/by controller
+    log whether `B` is truly never sent (log the raw pipe commands written,
+    not just our own belief about what we sent); (b) check whether
+    `Action.NEUTRAL_B_CHARGING`'s raw ID is being systematically
+    misdecoded by libmelee for Yoshi's custom action-state table
+    (`ftyoshiguard.c`) rather than actually being "neutral B charging"; (c)
+    try holding L starting from a fully-idle grounded state (wait several
+    seconds after landing with no input at all) instead of pressing L while
+    still airborne/landing, in case Yoshi's shield-entry requires being
+    already grounded and idle first. `data/validation/Ys.csv` was not
+    produced/committed (would be all `reachable=False`).
 - **Kirby (Kb): DONE.** 49/49 reachable, **max/mean position error = 0.0000**.
   The "part-index -> joint-index remap" concern above turned out to be a
   false alarm for RAM reads specifically: `fp->parts[]` in the running game

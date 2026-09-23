@@ -105,6 +105,15 @@ def start(scratch_dir: str, character: enums.Character, stage: enums.Stage = enu
         )
     controller2.release_all()
     controller2.flush()
+    # Also clear controller1: the pipe protocol is stateful (a PRESS stays
+    # held until an explicit RELEASE), so whatever the last CSS/stage-select
+    # frame happened to be holding (e.g. confirming a selection) would
+    # otherwise carry straight into the match. Diagnosed on Yoshi
+    # (technospider, 2026-09-23): without this, the fighter landed straight
+    # into Action.NEUTRAL_B_CHARGING with a neutral stick and no explicit B
+    # press from us, i.e. a stale held button from menu navigation.
+    controller1.release_all()
+    controller1.flush()
     return console, controller1, controller2
 
 
