@@ -1,0 +1,365 @@
+#!/usr/bin/env python
+"""Build all shield-tilt plots (Phase 5).
+
+Run with the project venv:
+    .venv/Scripts/python.exe tools/plots/make_plots.py
+
+Outputs (see plots/):
+  - <code>.png / <code>.svg   per-character side view
+  - all_characters.png        shared-axis comparison grid
+  - reach_summary.png / .svg  bar chart of reach extents
+  - data/reach_summary.csv    the underlying table
+  - shield_tilt_explorer.html interactive plotly picker (optional extra)
+"""
+import sys
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle, Polygon
+from matplotlib import font_manager
+
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
+from common import (
+    REPO, DATA, PLOTS, SURFACE, PAGE, INK_PRIMARY, INK_SECONDARY, INK_MUTED,
+    GRIDLINE, BASELINE, ACCENT, ACCENT_SEQ, ORANGE, STATUS_GOOD, VALIDATED,
+    DIRECTIONS, FONT, all_codes, char_meta, display_name, load_main,
+    load_hurtbox_poses,
+)
+
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Segoe UI", "DejaVu Sans", "Arial"],
+    "axes.edgecolor": BASELINE,
+    "axes.labelcolor": INK_SECONDARY,
+    "text.color": INK_PRIMARY,
+    "xtick.color": INK_MUTED,
+    "ytick.color": INK_MUTED,
+    "figure.facecolor": PAGE,
+    "axes.facecolor": SURFACE,
+    "savefig.facecolor": PAGE,
+})
+
+
+def stadium_polygon(x1, y1, x2, y2, r, n=20):
+    """2D stadium (capsule) polygon for a capsule from (x1,y1) to (x2,y2)."""
+    dx, dy = x2 - x1, y2 - y1
+    length = np.hypot(dx, dy)
+    if length < 1e-9:
+        ang0 = 0.0
+    else:
+        ang0 = np.arctan2(dy, dx)
+    t = np.linspace(0, np.pi, n)
+    # semicircle at end 2 (facing +ang0 direction), then end 1 (facing -ang0)
+    arc2 = np.stack([x2 + r * np.cos(ang0 - np.pi / 2 + t),
+                      y2 + r * np.sin(ang0 - np.pi / 2 + t)], axis=1)
+    arc1 = np.stack([x1 + r * np.cos(ang0 + np.pi / 2 + t),
+                      y1 + r * np.sin(ang0 + np.pi / 2 + t)], axis=1)
+    return np.concatenate([arc2, arc1], axis=0)
+
+
+def draw_hurtboxes(ax, df, color, alpha, lw=0.6, zorder=2):
+    for _, row in df.iterrows():
+        poly = stadium_polygon(row.x1, row.y1, row.x2, row.y2, row.radius)
+        ax.add_patch(Polygon(poly, closed=True, facecolor=color, edgecolor=color,
+                              alpha=alpha, linewidth=lw, zorder=zorder))
+
+
+def char_geometry(code):
+    """Compute the reusable geometry (rings, extremes, extents) for a character."""
+    df = load_main(code)
+    meta = char_meta(code)
+    r_full = float(df.shield_radius_full.iloc[0])
+    r_min = float(df.shield_radius_min.iloc[0])
+
+    polar = df[df.sweep == "polar"].copy()
+    untilted = df[(df.sweep == "polar") & (df.mag == 0)].iloc[0]
+    ux, uy = untilted.bone_x, untilted.bone_y
+
+    ring_full = polar[np.isclose(polar.mag, 1.0)].sort_values("angle")
+    rings_inner = {
+        m: polar[np.isclose(polar.mag, m)].sort_values("angle")
+        for m in (0.25, 0.5, 0.75)
+    }
+    extremes = {}
+    for ang, label in DIRECTIONS:
+        row = ring_full[ring_full.angle == ang]
+        if not row.empty:
+            extremes[label] = (float(row.bone_x.iloc[0]), float(row.bone_y.iloc[0]))
+
+    grid = df[df.sweep == "grid"]
+    all_x = np.concatenate([grid.bone_x.values, ring_full.bone_x.values])
+    all_y = np.concatenate([grid.bone_y.values, ring_full.bone_y.values])
+
+    xlo, xhi = float(all_x.min() - r_full), float(all_x.max() + r_full)
+    ylo, yhi = float(all_y.min() - r_full), float(all_y.max() + r_full)
+
+    # extend the view to fit the (untilted) body, which can be wider/taller
+    # than the shield bubble itself (e.g. Yoshi's tail, DK's arms)
+    poses = load_hurtbox_poses(code, angles=())
+    body = poses.get("untilted")
+    if body is not None and not body.empty:
+        bx = np.concatenate([body.x1.values, body.x2.values])
+        by = np.concatenate([body.y1.values, body.y2.values])
+        r = np.concatenate([body.radius.values, body.radius.values])
+        xlo = min(xlo, float((bx - r).min())); xhi = max(xhi, float((bx + r).max()))
+        ylo = min(ylo, float((by - r).min())); yhi = max(yhi, float((by + r).max()))
+
+    has_tilt = meta.get("has_tilt", True)
+    return dict(
+        code=code, meta=meta, r_full=r_full, r_min=r_min, has_tilt=has_tilt,
+        ux=ux, uy=uy, ring_full=ring_full, rings_inner=rings_inner,
+        extremes=extremes, all_x=all_x, all_y=all_y,
+        max_up=float(all_y.max() - uy), max_down=float(uy - all_y.min()),
+        max_fwd=float(all_x.max() - ux), max_back=float(ux - all_x.min()),
+        x_reach=(xlo, xhi), y_reach=(ylo, yhi),
+    )
+
+
+def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
+                    lim=None, title=True):
+    code, meta = geo["code"], geo["meta"]
+    standalone = ax is None
+    if standalone:
+        fig, ax = plt.subplots(figsize=(7, 7), dpi=150)
+    else:
+        fig = ax.figure
+
+    ux, uy, r_full, r_min = geo["ux"], geo["uy"], geo["r_full"], geo["r_min"]
+
+    # reachable-region fill + rings (accent hue, light -> dark = m 0.25 -> 1.0)
+    rf = geo["ring_full"]
+    ax.fill(rf.bone_x, rf.bone_y, color=ACCENT_SEQ[3], alpha=0.08, zorder=1)
+    for i, m in enumerate((0.25, 0.5, 0.75)):
+        r = geo["rings_inner"][m]
+        if not r.empty:
+            ax.plot(r.bone_x, r.bone_y, color=ACCENT_SEQ[1 + i], lw=1.0,
+                    alpha=0.8, zorder=2)
+    ax.plot(rf.bone_x, rf.bone_y, color=ACCENT, lw=1.8, zorder=3,
+            label="full tilt (m=1)")
+
+    # hurtboxes: untilted (opaque, secondary ink) + extremes (faint accent)
+    if show_hurtboxes:
+        poses = load_hurtbox_poses(code, angles=() if not geo["has_tilt"] else
+                                    (0, 45, 90, 135, 180, 225, 270, 315))
+        for label, sub in poses.items():
+            if label == "untilted":
+                draw_hurtboxes(ax, sub, INK_SECONDARY, alpha=0.55, lw=0.5, zorder=4)
+            else:
+                draw_hurtboxes(ax, sub, ACCENT, alpha=0.10, lw=0.4, zorder=2)
+
+    # bubbles: untilted (solid) + 8 extremes (faint), + min-size at untilted
+    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=INK_PRIMARY,
+                         lw=1.4, zorder=5))
+    ax.add_patch(Circle((ux, uy), r_min, fill=False, edgecolor=ORANGE,
+                         lw=1.0, ls=(0, (3, 2)), alpha=0.9, zorder=5,
+                         label="min-size bubble"))
+    ax.plot([ux], [uy], marker="o", ms=4, color=INK_PRIMARY, zorder=6)
+
+    if not geo["has_tilt"]:
+        # fixed bubble: every stick direction gives the same centre, so draw
+        # nothing extra (the untilted bubble already shows the whole story)
+        pass
+    else:
+        for label, (ex, ey) in geo["extremes"].items():
+            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=ACCENT,
+                                 lw=0.7, alpha=0.35, zorder=3))
+            if show_labels:
+                # place label just outside the bubble, along the radial direction
+                dx, dy = ex - ux, ey - uy
+                norm = np.hypot(dx, dy) or 1
+                lx = ex + dx / norm * (r_full * 0.35 + 1.0)
+                ly = ey + dy / norm * (r_full * 0.35 + 1.0)
+                ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
+                        va="center", zorder=7)
+
+    ax.set_aspect("equal", adjustable="box")
+    if lim is not None:
+        ax.set_xlim(*lim[0]); ax.set_ylim(*lim[1])
+    else:
+        ax.set_xlim(*geo["x_reach"]); ax.set_ylim(*geo["y_reach"])
+    ax.grid(True, color=GRIDLINE, lw=0.6, zorder=0)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    name = display_name(code, meta)
+    tag = ""
+    if code in VALIDATED:
+        tag = "  validated in emulator"
+    if not meta.get("has_tilt", True):
+        tag = "  fixed bubble (no tilt)"
+    if title:
+        ax.set_title(f"{name}", fontsize=13, color=INK_PRIMARY, loc="left",
+                     fontweight="bold")
+        if tag:
+            color = STATUS_GOOD if "validated" in tag else INK_MUTED
+            ax.text(0.99, 1.01, tag.strip(), transform=ax.transAxes, ha="right",
+                    va="bottom", fontsize=8, color=color)
+    else:
+        ax.set_title(name, fontsize=9, color=INK_PRIMARY)
+        if tag:
+            ax.text(0.5, -0.06, tag.strip(), transform=ax.transAxes, ha="center",
+                    va="top", fontsize=6.5, color=STATUS_GOOD if "validated" in tag else INK_MUTED)
+
+    if standalone:
+        from matplotlib.lines import Line2D
+        from matplotlib.patches import Patch
+        handles = [
+            Line2D([0], [0], color=INK_PRIMARY, lw=1.4, label="untilted bubble"),
+            Line2D([0], [0], color=ACCENT, lw=1.8, label="full-tilt centre path (m=1)"),
+            Line2D([0], [0], color=ACCENT_SEQ[1], lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
+            Line2D([0], [0], color=ORANGE, lw=1.0, ls=(0, (3, 2)), label="min-size bubble"),
+            Line2D([0], [0], color=ACCENT, lw=0.7, alpha=0.5, label="bubble at stick extreme"),
+            Patch(facecolor=INK_SECONDARY, edgecolor="none", alpha=0.55, label="hurtboxes (untilted)"),
+        ]
+        ax.legend(handles=handles, loc="lower right", fontsize=6.5, frameon=False,
+                 labelcolor=INK_SECONDARY)
+        ax.set_xlabel("forward →  (game units, relative to TopN)")
+        ax.set_ylabel("up →")
+        fig.text(0.01, 0.01,
+                 "Shield-centre position from the offline pose solver (Phase 3); "
+                 "faint rings/bubbles = stick extremes, hurtboxes shown in the "
+                 "tilted pose.", fontsize=6.5, color=INK_MUTED)
+        fig.tight_layout(rect=(0, 0.02, 1, 1))
+        return fig
+    return None
+
+
+def make_per_character_plots(codes):
+    for code in codes:
+        geo = char_geometry(code)
+        fig = plot_character(geo)
+        fig.savefig(PLOTS / f"{code}.png", dpi=150)
+        fig.savefig(PLOTS / f"{code}.svg")
+        plt.close(fig)
+        print(f"  {code}: {display_name(code, geo['meta'])} done")
+
+
+def make_comparison_grid(codes):
+    # Nana is a geometry/animation clone of Popo (data/Nn_meta.json notes
+    # field is empty but the two csvs are identical in shape); drop her from
+    # the shared-axis grid and cross-reference instead of duplicating a panel.
+    codes = [c for c in codes if c != "Nn"]
+    geos = {c: char_geometry(c) for c in codes}
+
+    # shared axes across every character so size differences are honest
+    xmin = min(g["x_reach"][0] for g in geos.values())
+    xmax = max(g["x_reach"][1] for g in geos.values())
+    ymin = min(g["y_reach"][0] for g in geos.values())
+    ymax = max(g["y_reach"][1] for g in geos.values())
+    lim = ((xmin, xmax), (ymin, ymax))
+
+    n = len(codes)
+    ncols = 6
+    nrows = int(np.ceil(n / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 2.6, nrows * 2.6), dpi=150)
+    axes = np.atleast_2d(axes)
+    order = sorted(codes, key=lambda c: display_name(c, geos[c]["meta"]))
+    for i, code in enumerate(order):
+        r, c = divmod(i, ncols)
+        ax = axes[r][c]
+        plot_character(geos[code], ax=ax, show_hurtboxes=False, show_labels=False,
+                        lim=lim, title=False)
+        ax.set_xticks([]); ax.set_yticks([])
+    for i in range(n, nrows * ncols):
+        r, c = divmod(i, ncols)
+        axes[r][c].axis("off")
+
+    fig.suptitle("Shield-centre reach by character (shared scale)", fontsize=15,
+                 color=INK_PRIMARY, x=0.02, ha="left", fontweight="bold")
+    fig.text(0.02, 0.985,
+             "Dark circle = untilted bubble; blue ring = full-tilt centre path; "
+             "faint rings = the 8 stick extremes. Nana matches Popo exactly and "
+             "is omitted. Yoshi's shield does not tilt (fixed bubble).",
+             fontsize=8.5, color=INK_SECONDARY)
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(PLOTS / "all_characters.png", dpi=150)
+    plt.close(fig)
+    print("  all_characters.png done")
+
+
+def make_reach_summary(codes):
+    import csv
+    codes = [c for c in codes if c != "Nn"]
+    rows = []
+    for code in codes:
+        geo = char_geometry(code)
+        rf = geo["ring_full"]
+        # shoelace area of the full-tilt boundary ring (the region is
+        # star-shaped about the untilted centre since mag scales the blend
+        # monotonically toward this boundary) -- an approximation, noted below
+        x = rf.bone_x.values - geo["ux"]
+        y = rf.bone_y.values - geo["uy"]
+        area = 0.5 * abs(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1)))
+        rows.append(dict(
+            code=code, name=display_name(code, geo["meta"]),
+            max_up=geo["max_up"], max_down=geo["max_down"],
+            max_forward=geo["max_fwd"], max_back=geo["max_back"],
+            centre_reach_area=area, shield_radius_full=geo["r_full"],
+            validated=code in VALIDATED,
+            has_tilt=geo["meta"].get("has_tilt", True),
+        ))
+
+    rows.sort(key=lambda r: r["centre_reach_area"], reverse=True)
+    out_csv = DATA / "reach_summary.csv"
+    with open(out_csv, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w.writeheader()
+        w.writerows(rows)
+    print(f"  {out_csv} done")
+
+    # bar chart: max up/down/forward/back per character, sorted by reach area
+    fig, ax = plt.subplots(figsize=(9, max(6, len(rows) * 0.32)), dpi=150)
+    names = [r["name"] for r in rows]
+    ypos = np.arange(len(rows))
+    bar_h = 0.2
+    metrics = [
+        ("max_up", ACCENT_SEQ[3], "up"),
+        ("max_down", ACCENT_SEQ[2], "down"),
+        ("max_forward", ORANGE, "forward"),
+        ("max_back", "#eda100", "back"),
+    ]
+    for i, (key, color, label) in enumerate(metrics):
+        vals = [r[key] for r in rows]
+        ax.barh(ypos + (i - 1.5) * bar_h, vals, height=bar_h, color=color,
+                label=label, edgecolor=SURFACE, linewidth=0.5)
+    ax.set_yticks(ypos)
+    labels = []
+    for r in rows:
+        tag = ""
+        if not r["has_tilt"]:
+            tag = "  (fixed)"
+        elif r["validated"]:
+            tag = "  (validated)"
+        labels.append(r["name"] + tag)
+    ax.set_yticklabels(labels, fontsize=8.5)
+    ax.invert_yaxis()
+    ax.set_xlabel("shield-centre shift from untilted (game units)")
+    ax.set_title("Maximum shield-centre shift by direction, sorted by reachable area",
+                 fontsize=13, loc="left", fontweight="bold", color=INK_PRIMARY)
+    ax.legend(loc="lower right", frameon=False, fontsize=8.5, ncols=4)
+    ax.grid(True, axis="x", color=GRIDLINE, lw=0.6)
+    ax.set_axisbelow(True)
+    for spine in ("top", "right", "left"):
+        ax.spines[spine].set_visible(False)
+    fig.text(0.01, 0.005,
+             "(validated) = matched the emulator exactly in Phase-4 validation. "
+             "'(fixed)' = Yoshi's shield does not tilt.",
+             fontsize=7.5, color=INK_MUTED)
+    fig.tight_layout(rect=(0, 0.02, 1, 1))
+    fig.savefig(PLOTS / "reach_summary.png", dpi=150)
+    fig.savefig(PLOTS / "reach_summary.svg")
+    plt.close(fig)
+    print("  reach_summary.png done")
+
+
+if __name__ == "__main__":
+    codes = all_codes()
+    print(f"Building per-character plots for {len(codes)} characters...")
+    make_per_character_plots(codes)
+    print("Building comparison grid...")
+    make_comparison_grid(codes)
+    print("Building reach summary...")
+    make_reach_summary(codes)
+    print("Done.")
