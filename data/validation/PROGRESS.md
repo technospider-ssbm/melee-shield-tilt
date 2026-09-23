@@ -138,7 +138,28 @@ were affected that a full clean rerun was simpler than partial-resume logic.
   good extra confirmation since G&W's shield bone does *not* hang under
   TransN (per HANDOFF_PROMPT.md's Phase-3 watch-out); the pose-solver's
   alternate parent-chain handling for that case checks out live too.
-- Kirby, Yoshi, Marth, Popo: not started (budget-permitting, per brief scope).
+- **Yoshi (Ys): attempted, blocked.** Every sample retried out
+  (`action=NEUTRAL_B_CHARGING` instead of `Action.SHIELD` after ramping to
+  neutral with digital L held) and was recorded `reachable=False`. This
+  looks like a real harness bug, not a pose-solver issue: holding L on
+  Yoshi should still produce a normal `ftCo_Guard` shield (his tilt being a
+  no-op is a *pose* prediction from the brief, not a claim that the action
+  state differs). Not yet root-caused — possibly stale controller/menu
+  state carrying into the match, or a Yoshi-specific input quirk. Stopped
+  here rather than debug further against the budget; `data/validation/Ys.csv`
+  was not committed (all rows `reachable=False`, not useful). Next session:
+  add a print of the raw button/stick state each frame during the first
+  ramp, and check whether `Action.SHIELD` is even reachable manually (human
+  play) with this harness's Yoshi character-select path.
+- Kirby (`Kb`, shield_bone_index=57), Marth (`Ms`, shield_bone_index=88),
+  Popo (`Pp`, shield_bone_index=47): not attempted. Kirby needs the
+  part-index -> joint-index remap noted in `HANDOFF_PROMPT.md` (his
+  `shield_bone_index` from `characters.json` is a lookup-table part index,
+  not necessarily the joint index `ram.py` assumes) — `capture.py`/`ram.py`
+  use the raw characters.json index directly, which was only verified
+  correct for Fox/Bowser/G&W (none of which have the optional-parts quirk).
+  Don't run Kirby without fixing that mapping first, or the result will be
+  silently wrong rather than erroring.
 
 ## Summary table
 
