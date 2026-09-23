@@ -36,6 +36,15 @@ CODE_TO_MELEE_CHAR = {
 }
 
 SETTLE_FRAMES = 75  # ~60 for eased x4/x8 to converge + margin
+# Yoshi (ftyoshiguard.c, ftYoshi/ftyoshi.c:29-51) uses character-specific
+# motion states GuardOn_0=341, GuardHold=342, GuardOff=343 with his own
+# fp->mv.ys.guard layout instead of the shared fp->mv.co.guard union, so
+# guard_x4/x8 (which alias mv.co.guard) are meaningless for him and
+# libmelee's shared Action enum mislabels 342 as NEUTRAL_B_CHARGING even
+# though he really is shielding (technospider, 2026-09-23). Accept on raw
+# motion_id == 342 instead of Action.SHIELD, with a fixed extra settle.
+YOSHI_GUARD_HOLD_MOTION_ID = 342
+YOSHI_EXTRA_SETTLE_FRAMES = 30
 MIN_HEALTH_BEFORE_HOLD = 55.0
 MAX_REGEN_WAIT_FRAMES = 1200
 REGEN_POLL_FRAMES = 30
@@ -160,9 +169,20 @@ def main():
                 # different (mirrored) stick target to mean the same
                 # in-fighter-space angle -- just retry until facing is right.
                 facing_ok = ram.get_facing_dir(0) > 0
-                if action_name == "SHIELD" and facing_ok:
-                    ok = True
-                    break
+                if args.code == "Ys":
+                    raw_motion_id = ram._read_u32(ram.get_fighter_ptr(0) + ram.FP_MOTION_ID)
+                    action_name = f"motion_id={raw_motion_id}"
+                    in_guard = raw_motion_id == YOSHI_GUARD_HOLD_MOTION_ID
+                    if in_guard and facing_ok:
+                        for _ in range(YOSHI_EXTRA_SETTLE_FRAMES):
+                            console.step()
+                            ram.pin_shield_health(0)
+                        ok = True
+                        break
+                else:
+                    if action_name == "SHIELD" and facing_ok:
+                        ok = True
+                        break
                 print(f"  retry (attempt {attempt}) angle={t['angle']} mag={t['mag']} "
                       f"action={action_name} facing_ok={facing_ok} step={step} -> slowing down, from neutral")
                 drive.release(c1)
