@@ -1,0 +1,22 @@
+# Nintendo game data — never commit
+*.iso
+*.gcm
+*.ciso
+*.dat
+*.usd
+*.dol
+gamedata/
+
+# Third-party clones (re-create with setup commands in README)
+external/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
