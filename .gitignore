@@ -29,3 +29,6 @@ HANDOFF_PROMPT.md
 data/*_hurtboxes.csv
 # ad-hoc pose dumps
 *_posedump*.csv
+
+# Web export (skeleton + raw Guard FObj bytes); regenerate with ShieldPose --export-web
+data/shieldpose_web.json

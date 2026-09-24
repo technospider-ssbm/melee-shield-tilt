@@ -7,13 +7,14 @@ using ShieldPose;
 //   dotnet run -c Release --project tools/ShieldPose                       -> all characters
 //   dotnet run -c Release --project tools/ShieldPose -- --char Fx Ms       -> selected characters
 //   dotnet run -c Release --project tools/ShieldPose -- --pose-dump --char Fx --angle 90 --mag 1 [--facing -1] [--out file.csv]
+//   dotnet run -c Release --project tools/ShieldPose -- --export-web [--out data/shieldpose_web.json] [--char ...]
 //   options: --gamedata <dir> (default gamedata)  --data <dir> (default data)  --no-hurtboxes  --sanity
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
 string gamedata = "gamedata", dataDir = "data";
 var codes = new List<string>();
-bool poseDump = false, noHurt = false, sanityOnly = false, selfTest = false;
+bool exportWeb = false, poseDump = false, noHurt = false, sanityOnly = false, selfTest = false;
 float dumpAngle = 0, dumpMag = 1;
 int dumpFacing = 1;
 string? dumpOut = null;
@@ -27,6 +28,7 @@ for (int i = 0; i < args.Length; i++)
             while (i + 1 < args.Length && !args[i + 1].StartsWith("--")) codes.Add(args[++i]);
             break;
         case "--pose-dump": poseDump = true; break;
+        case "--export-web": exportWeb = true; break;
         case "--angle": dumpAngle = float.Parse(args[++i], CultureInfo.InvariantCulture); break;
         case "--mag": dumpMag = float.Parse(args[++i], CultureInfo.InvariantCulture); break;
         case "--facing": dumpFacing = int.Parse(args[++i]); break;
@@ -41,6 +43,12 @@ if (codes.Count == 0) codes = CharTable.All.Select(c => c.Code).ToList();
 
 var common = CommonData.Load(Path.Combine(gamedata, "PlCo.dat"));
 Directory.CreateDirectory(dataDir);
+
+if (exportWeb)
+{
+    WebExport.Write(codes, gamedata, common, dumpOut ?? Path.Combine(dataDir, "shieldpose_web.json"));
+    return 0;
+}
 
 if (poseDump)
 {
