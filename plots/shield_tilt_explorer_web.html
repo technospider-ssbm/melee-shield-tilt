@@ -179,7 +179,8 @@
       <ul class="legend" aria-label="Legend">
         <li><span class="sw ring"></span>Tilted bubble</li>
         <li><span class="sw ring dot"></span>Untilted bubble</li>
-        <li><span class="sw line"></span>Centre path, full tilt</li>
+        <li><span class="sw line"></span>Reachable edge (dots: straight up/down/forward/back)</li>
+        <li><span class="sw line weak"></span>Out of reach: the stick snaps onto the axis</li>
         <li><span class="sw line cur"></span>Centre path, current strength</li>
         <li><span class="sw box"></span>Hurtbox (blue inside → orange outside)</li>
         <li><span class="sw pts"></span>Part outside the bubble</li>
@@ -994,11 +995,55 @@ const pathCache = new Map();
 function centrePath(code, m, step) {
   const key = code + '|' + m + '|' + step;
   if (pathCache.has(key)) return pathCache.get(key);
-  const xs = [], ys = [];
-  for (let a = 0; a <= 360; a += step) { const c = SP.pose(code, a, m, { hurtboxes: false }).centre; xs.push(c[0]); ys.push(c[1]); }
+  const xs = [], ys = [], gx = [], gy = [];
+  for (let a = 0; a <= 360; a += step) {
+    const c = SP.pose(code, a, m, { hurtboxes: false }).centre;
+    gx.push(c[0]); gy.push(c[1]);
+    const ok = holdable(a, m);                 // null breaks the Plotly line where the stick can't be held
+    xs.push(ok ? c[0] : null); ys.push(ok ? c[1] : null);
+  }
   if (pathCache.size > 64) pathCache.clear();
-  const r = { x: xs, y: ys };
+  const r = { x: xs, y: ys, allX: gx, allY: gy };
   pathCache.set(key, r);
+  return r;
+}
+
+// Can the stick be held at (angle, strength)? Each axis is either exactly 0 or at least 23/80 (the per-axis dead
+// zone zeroes |k| <= 22), so angles within ~16.6 deg of an axis snap onto the axis. Continuous approximation of
+// the integer stick grid, used for the current-strength guide path.
+function holdable(a, m) {
+  const cx = Math.abs(m * Math.cos(a * Math.PI / 180)), cy = Math.abs(m * Math.sin(a * Math.PI / 180));
+  return (cx < 1e-9 || cx >= 0.2875) && (cy < 1e-9 || cy >= 0.2875);
+}
+
+// The reachable outer edge: every stick value the game can register (integer units inside the radius-80 gate,
+// after the dead zone), keeping the strongest strength at each settled angle. Angles that only appear in
+// isolation (the four axes) are returned as points; the rest are continuous stretches between the snap bands.
+// Forward also gets its angle-360 (frame 370) variant, since which one you get depends on the stick's path.
+const rimCache = new Map();
+function reachableRim(code) {
+  if (rimCache.has(code)) return rimCache.get(code);
+  const best = new Map();
+  for (let x = -80; x <= 80; x++) for (let y = -80; y <= 80; y++) {
+    if (x * x + y * y > 6400) continue;
+    const st = SP.settle(x, y, 'fresh');
+    if (st.mag > 0 && (best.get(st.target) || 0) < st.mag) best.set(st.target, st.mag);
+  }
+  const pts = [...best.entries()].sort((p, q) => p[0] - q[0]);
+  const at = (a, m) => SP.pose(code, a, m, { hurtboxes: false }).centre;
+  const lx = [], ly = [], px = [], py = [];
+  let last = -1e9;
+  pts.forEach(([a, m], i) => {
+    const prev = i ? pts[i - 1][0] : -1e9, next = i < pts.length - 1 ? pts[i + 1][0] : 1e9;
+    if (a - prev > 3 && next - a > 3) {        // an axis: only the exact direction can be held
+      for (const aa of a === 0 ? [0, 360] : [a]) { const c = at(aa, m); px.push(c[0]); py.push(c[1]); }
+      return;
+    }
+    if (a - prev > 3) { lx.push(null); ly.push(null); last = -1e9; }
+    if (a - last >= 0.25 || next - a > 3) { const c = at(a, m); lx.push(c[0]); ly.push(c[1]); last = a; }
+  });
+  const r = { x: lx, y: ly, px, py };
+  rimCache.set(code, r);
   return r;
 }
 
@@ -1124,12 +1169,17 @@ function draw() {
 
   const traces = [];
   if ($('paths').checked && fm.hasTilt) {
-    // Where the shield centre goes as the stick sweeps 0-360 deg, at full tilt and at the current strength.
-    const full = centrePath(code, 1, 1);
-    traces.push({ x: full.x, y: full.y, mode: 'lines', hoverinfo: 'skip', line: { color: C.ink, width: 2.5 } });
+    // Where the shield centre can go: the reachable edge (strongest stick the game registers at each angle),
+    // the unreachable remainder of an ideal full-tilt sweep (faint), and the current strength (gaps where the
+    // stick would snap onto an axis).
+    const full = centrePath(code, 1, 1), rim = reachableRim(code);
+    traces.push({ x: full.allX, y: full.allY, mode: 'lines', hoverinfo: 'skip', line: { color: C.ink2, width: 1, dash: 'dot' } });
+    traces.push({ x: rim.x, y: rim.y, mode: 'lines', hoverinfo: 'skip', connectgaps: false, line: { color: C.ink, width: 2.5 } });
+    traces.push({ x: rim.px, y: rim.py, mode: 'markers', hoverinfo: 'skip', marker: { color: C.ink, size: 7 } });
     if (s.mag > 0 && s.mag < 1) {
       const pc = centrePath(code, s.mag, dragging ? 4 : 1);
-      traces.push({ x: pc.x, y: pc.y, mode: 'lines', hoverinfo: 'skip', line: { color: C.acc, width: 1.8, dash: 'dash' } });
+      traces.push({ x: pc.x, y: pc.y, mode: 'lines', hoverinfo: 'skip', connectgaps: false,
+        line: { color: C.acc, width: 1.8, dash: 'dash' } });
     }
   }
   traces.push(
