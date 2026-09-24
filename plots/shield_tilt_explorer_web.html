@@ -186,16 +186,18 @@ function capsulePoints(b) {
   return pts;
 }
 
+// Plotly shape paths support only M/L/C/Q/Z (no SVG arcs), so capsules are polygons.
 function stadiumPath(x1, y1, x2, y2, r) {
   const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy);
-  const nx = l < 1e-9 ? 1 : -dy / l, ny = l < 1e-9 ? 0 : dx / l;
-  if (l < 1e-9) return circlePath(x1, y1, r);
-  return `M ${x1 + nx * r},${y1 + ny * r} L ${x2 + nx * r},${y2 + ny * r} ` +
-    `A ${r},${r} 0 1,1 ${x2 - nx * r},${y2 - ny * r} L ${x1 - nx * r},${y1 - ny * r} ` +
-    `A ${r},${r} 0 1,1 ${x1 + nx * r},${y1 + ny * r} Z`;
+  const a0 = l < 1e-9 ? 0 : Math.atan2(dy, dx);
+  const pts = [], N = 12;
+  for (let k = 0; k <= N; k++) { const a = a0 - Math.PI / 2 + Math.PI * k / N; pts.push([x2 + r * Math.cos(a), y2 + r * Math.sin(a)]); }
+  for (let k = 0; k <= N; k++) { const a = a0 + Math.PI / 2 + Math.PI * k / N; pts.push([x1 + r * Math.cos(a), y1 + r * Math.sin(a)]); }
+  return 'M ' + pts.map(q => q[0].toFixed(3) + ',' + q[1].toFixed(3)).join(' L ') + ' Z';
 }
-function circlePath(cx, cy, r) {
-  return `M ${cx - r},${cy} A ${r},${r} 0 1,1 ${cx + r},${cy} A ${r},${r} 0 1,1 ${cx - r},${cy} Z`;
+function circleShape(cx, cy, r, line, fill) {
+  return { type: 'circle', xref: 'x', yref: 'y', x0: cx - r, y0: cy - r, x1: cx + r, y1: cy + r,
+    line, fillcolor: fill || 'rgba(0,0,0,0)' };
 }
 
 function radius(d) {
@@ -271,9 +273,8 @@ function draw() {
   });
 
   // Bubble outlines.
-  shapes.push({ type: 'path', path: circlePath(d.centers[0][0][0], d.centers[0][0][1], R), fillcolor: 'rgba(0,0,0,0)',
-    line: { color: C.ink2, width: 1, dash: 'dot' } });
-  shapes.push({ type: 'path', path: circlePath(c[0], c[1], R), fillcolor: 'rgba(0,0,0,0)', line: { color: C.acc, width: 2.5 } });
+  shapes.push(circleShape(d.centers[0][0][0], d.centers[0][0][1], R, { color: C.ink2, width: 1, dash: 'dot' }));
+  shapes.push(circleShape(c[0], c[1], R, { color: C.acc, width: 3 }, mix(C.acc, C.acc, 0, 0.07)));
 
   const traces = [
     { type: 'scattergl', x: outX, y: outY, mode: 'markers', name: 'outside the bubble',
