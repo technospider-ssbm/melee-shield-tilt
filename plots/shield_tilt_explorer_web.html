@@ -102,6 +102,9 @@
   .readout { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12px; color: var(--ink-2); margin-top: 8px; }
   .readout .val { text-align: right; }
   .check input:disabled + span { opacity: 0.5; }
+  .btn { font: inherit; font-size: 12px; margin-top: 6px; padding: 5px 10px; border-radius: 6px; cursor: pointer;
+    background: var(--surface-1); color: var(--ink); border: 1px solid var(--baseline); justify-self: start; }
+  .btn:hover { border-color: var(--accent); }
 </style>
 <div class="wrap">
   <header style="display:grid; gap:6px">
@@ -138,8 +141,8 @@
         </g>
       </svg>
       <div class="xy">
-        <label for="sx" style="margin:0">x</label><input type="number" id="sx" min="-80" max="80" step="1" value="80">
-        <label for="sy" style="margin:0">y</label><input type="number" id="sy" min="-80" max="80" step="1" value="0">
+        <label for="sx" style="margin:0">x</label><input type="number" id="sx" min="-127" max="127" step="1" value="80">
+        <label for="sy" style="margin:0">y</label><input type="number" id="sy" min="-127" max="127" step="1" value="0">
       </div>
       <div class="hint">Drag the pad or type integer stick units. It snaps to what the game registers: the stick is pulled
       back to the circle of radius 80 (truncating), and an axis reads 0 when it is within ±22 (the shaded cross).
@@ -150,9 +153,15 @@
         <span>Strength</span><span class="val" id="magval"></span>
       </div>
       <div class="hint">0° = forward, 90° = up, 180° = back, 270° = down. Strength 0 = untilted, 1 = full tilt.</div>
-      <label class="check"><input type="checkbox" id="below"><span>Arrived at forward from below (angle 360)</span></label>
-      <div class="hint">A stick held straight forward has two resting tilts: 0° from a fresh shield or from above, and 360°
-      if the stick swept in from below. Only applies when the settled angle is exactly 0.</div>
+      <label class="check"><input type="checkbox" id="ucf"><span>UCF 0.84 1.0 cardinals (Slippi default)</span></label>
+      <div class="hint">With UCF, a stick pushed 80+ units along one axis with the other axis within ±6 reads exactly 1.0
+      (full strength). In vanilla the rim clamp truncates those inputs to 0.9875.</div>
+      <div class="readout"><span>Guard frame</span><span class="val" id="frameval"></span></div>
+      <button type="button" id="reshield" class="btn">Release and re-shield</button>
+      <div class="hint">The tilt eases toward the stick every frame, just as in game, so the stick's path matters. Held
+      straight forward (or at neutral), the shield rests at 0° (frame 10) after a fresh shield or when you come from above,
+      and at 360° (frame 370) when you sweep in from below. Most characters look identical either way; Donkey Kong,
+      Young Link and Link don't. Re-shielding starts again from frame 10.</div>
 
       <h2>Shield size</h2>
       <label for="health">Shield health <span class="val" id="healthval"></span></label>
@@ -223,7 +232,9 @@
  * API
  *   const SP = ShieldPose.load(exportJson);         // parsed object or JSON string
  *   SP.codes                                         // character codes in the export
- *   SP.settle(kx, ky, approach)  -> {kx, ky, lx, ly, angle, mag, zeroAngle}
+ *   SP.settle(kx, ky, approach, {ucf})  -> {kx, ky, lx, ly, angle, mag, zeroAngle, ucf}
+ *       opts.ucf: apply UCF 0.84 1.0 cardinals (see ucfCardinal); off = vanilla. `target` = raw stick angle.
+ *   SP.easeGuard(x8, targetDeg) -> settled x8 after holding the stick (history-dependent 10 vs 370 at 0 deg).
  *       kx, ky: raw integer stick units (s8 range, e.g. -80..80); applies HSD_PadClampCheck3 (radius 80,
  *       float->s8 truncation), /80, the per-axis 0.28 deadzone, then ftCo_80091BC4's settled angle/weight.
  *       approach: 'below' (or 360 / true) selects the frame-370 rest state for a stick at exactly 0 deg
@@ -813,13 +824,46 @@
       return [x, y];
     }
 
-    function settle(kx, ky, approach) {
+    /** UCF 0.84 "1.0 cardinals" (Slippi `UCF Pad Buffer + 1.0 Cardinals.asm`, hook 8006B460): when one raw
+     *  hardware axis is >= 80 from centre and the other is within +/-6, the fighter's stick is overwritten with
+     *  exactly (+/-1.0, 0) or (0, +/-1.0). Vanilla truncation would give 0.9875 there. */
+    function ucfCardinal(kx, ky) {
+      if (Math.abs(kx) >= 80 && Math.abs(ky) <= 6) return [kx > 0 ? 80 : -80, 0];
+      if (Math.abs(ky) >= 80 && Math.abs(kx) <= 6) return [0, ky > 0 ? 80 : -80];
+      return null;
+    }
+
+    /** ftCo_80091BC4's angle update (ftCo_Guard.c:130-175), run each frame until it stops changing.
+     *  x8 = Guard frame (10 + eased angle); targetDeg = stick angle in [0, 359] (0 for neutral too).
+     *  Reproduces the hysteresis: easing to 0 from (180, 360) settles at x8 = 370, from [0, 180) at 10.
+     *  x44C (easing rate) is 0.5 in PlCo.dat. */
+    function easeGuard(x8, targetDeg) {
+      const k = fr(0.5);
+      targetDeg = fr(targetDeg);
+      for (let i = 0; i < 600; i++) {
+        const g = fr(x8 - 10);
+        let d = fr(targetDeg - g);
+        if (d > 180) d = fr(d - 360); else if (d < -180) d = fr(d + 360);
+        const sm = fr(fr(d * k) + g);
+        let ng;
+        if (sm > 360) ng = fr(sm - 360);
+        else { ng = sm; if (ng < 0) ng = fr(ng + 360); }
+        const nx8 = fr(10 + ng);
+        if (nx8 === x8) return x8;
+        x8 = nx8;
+      }
+      return x8;
+    }
+
+    function settle(kx, ky, approach, opts) {
       kx = Math.max(-128, Math.min(127, Math.trunc(kx)));
       ky = Math.max(-128, Math.min(127, Math.trunc(ky)));
       const [x, y] = clamp(kx, ky);
       const nx = fr(x / 80), ny = fr(y / 80);
-      const qx = Math.abs(nx) <= C.dzx ? 0 : x;
-      const qy = Math.abs(ny) <= C.dzy ? 0 : y;
+      let qx = Math.abs(nx) <= C.dzx ? 0 : x;
+      let qy = Math.abs(ny) <= C.dzy ? 0 : y;
+      const ucf = opts && opts.ucf ? ucfCardinal(kx, ky) : null;
+      if (ucf) [qx, qy] = ucf;
       const lx = fr(qx / 80), ly = fr(qy / 80);
       let rad = lbAtan2(ly, lx);
       if (rad < 0) rad = fr(rad + fr(2 * F_PI));
@@ -830,10 +874,10 @@
       if (mag > 1) mag = 1;
       const zeroAngle = deg === 0 && mag > 0;
       const below = approach === 'below' || approach === 360 || approach === true;
-      return { kx: qx, ky: qy, lx, ly, angle: zeroAngle && below ? 360 : deg, mag, zeroAngle };
+      return { kx: qx, ky: qy, lx, ly, angle: zeroAngle && below ? 360 : deg, target: deg, mag, zeroAngle, ucf: !!ucf };
     }
 
-    return { codes: Object.keys(chars), chars, common: C, settle, pose, bubbleScale, clamp,
+    return { codes: Object.keys(chars), chars, common: C, settle, easeGuard, pose, bubbleScale, clamp,
       _internal: { evalTrack, fmaf, lbAtan2, livePose, world } };
   }
 
@@ -960,9 +1004,12 @@ function centrePath(code, m, step) {
 
 // ---- stick state: raw integer stick units, before the game's clamp and deadzone
 const stick = { x: 80, y: 0 };
+let guardX8 = 10;   // mv.co.guard.x8, starts at 10 on a fresh shield (ftCo_800921DC)
 function settled(code) {
-  const s = SP.settle(stick.x, stick.y, $('below').checked ? 'below' : 'fresh');
-  return SP.chars[code].hasTilt ? s : { ...s, angle: 0, mag: 0 };
+  const s = SP.settle(stick.x, stick.y, 'fresh', { ucf: $('ucf').checked });
+  if (!SP.chars[code].hasTilt) return { ...s, angle: 0, mag: 0 };
+  guardX8 = SP.easeGuard(guardX8, s.target);   // hold the new stick until the tilt settles
+  return { ...s, angle: Math.fround(guardX8 - 10) };
 }
 function setStick(x, y) {
   stick.x = Math.max(-127, Math.min(127, Math.round(x)));
@@ -985,12 +1032,12 @@ pad.addEventListener('keydown', ev => {
   const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] }[ev.key];
   if (!d) return;
   ev.preventDefault();
-  setStick(Math.max(-80, Math.min(80, stick.x + d[0])), Math.max(-80, Math.min(80, stick.y + d[1])));
+  setStick(stick.x + d[0], stick.y + d[1]);
 });
 for (const [id, k] of [['sx', 'x'], ['sy', 'y']]) {
   $(id).addEventListener('input', () => {
     const v = parseInt($(id).value, 10);
-    if (Number.isFinite(v)) { stick[k] = Math.max(-80, Math.min(80, v)); schedule(); }
+    if (Number.isFinite(v)) { stick[k] = Math.max(-127, Math.min(127, v)); schedule(); }
   });
 }
 
@@ -1005,10 +1052,12 @@ function updateStickUI(s, code) {
   $('padRay').setAttribute('x2', s.kx); $('padRay').setAttribute('y2', s.ky);
   if (document.activeElement !== $('sx')) $('sx').value = stick.x;
   if (document.activeElement !== $('sy')) $('sy').value = stick.y;
-  $('regval').textContent = `(${s.kx}, ${s.ky})`;
+  $('regval').textContent = `(${s.kx}, ${s.ky})` + (s.ucf ? ' UCF' : '');
   pad.classList.toggle('off', !fm.hasTilt);
   for (const id of ['sx', 'sy']) $(id).disabled = !fm.hasTilt;
-  $('below').disabled = !(fm.hasTilt && s.zeroAngle);
+  $('frameval').textContent = fm.hasTilt ? (Number.isInteger(guardX8) ? guardX8 : guardX8.toFixed(3)) +
+    (s.target === 0 && s.mag > 0 && guardX8 === 370 ? ' (from below)' : '') : '–';
+  $('reshield').disabled = !fm.hasTilt;
   if (!fm.hasTilt) { $('angleval').textContent = '–'; $('magval').textContent = 'no tilt'; }
   else {
     $('angleval').textContent = (Number.isInteger(s.angle) ? s.angle : s.angle.toFixed(3)) + '°';
@@ -1126,7 +1175,8 @@ function draw() {
 
 sel.addEventListener('change', schedule);
 for (const id of ['health', 'press']) $(id).addEventListener('input', schedule);
-for (const id of ['ghost', 'paths', 'below']) $(id).addEventListener('change', schedule);
+for (const id of ['ghost', 'paths', 'ucf']) $(id).addEventListener('change', schedule);
+$('reshield').addEventListener('click', () => { guardX8 = 10; schedule(); });
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', schedule); } catch (e) {}
 new MutationObserver(schedule).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 draw();

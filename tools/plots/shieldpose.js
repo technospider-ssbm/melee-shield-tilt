@@ -14,7 +14,9 @@
  * API
  *   const SP = ShieldPose.load(exportJson);         // parsed object or JSON string
  *   SP.codes                                         // character codes in the export
- *   SP.settle(kx, ky, approach)  -> {kx, ky, lx, ly, angle, mag, zeroAngle}
+ *   SP.settle(kx, ky, approach, {ucf})  -> {kx, ky, lx, ly, angle, mag, zeroAngle, ucf}
+ *       opts.ucf: apply UCF 0.84 1.0 cardinals (see ucfCardinal); off = vanilla. `target` = raw stick angle.
+ *   SP.easeGuard(x8, targetDeg) -> settled x8 after holding the stick (history-dependent 10 vs 370 at 0 deg).
  *       kx, ky: raw integer stick units (s8 range, e.g. -80..80); applies HSD_PadClampCheck3 (radius 80,
  *       float->s8 truncation), /80, the per-axis 0.28 deadzone, then ftCo_80091BC4's settled angle/weight.
  *       approach: 'below' (or 360 / true) selects the frame-370 rest state for a stick at exactly 0 deg
@@ -604,13 +606,46 @@
       return [x, y];
     }
 
-    function settle(kx, ky, approach) {
+    /** UCF 0.84 "1.0 cardinals" (Slippi `UCF Pad Buffer + 1.0 Cardinals.asm`, hook 8006B460): when one raw
+     *  hardware axis is >= 80 from centre and the other is within +/-6, the fighter's stick is overwritten with
+     *  exactly (+/-1.0, 0) or (0, +/-1.0). Vanilla truncation would give 0.9875 there. */
+    function ucfCardinal(kx, ky) {
+      if (Math.abs(kx) >= 80 && Math.abs(ky) <= 6) return [kx > 0 ? 80 : -80, 0];
+      if (Math.abs(ky) >= 80 && Math.abs(kx) <= 6) return [0, ky > 0 ? 80 : -80];
+      return null;
+    }
+
+    /** ftCo_80091BC4's angle update (ftCo_Guard.c:130-175), run each frame until it stops changing.
+     *  x8 = Guard frame (10 + eased angle); targetDeg = stick angle in [0, 359] (0 for neutral too).
+     *  Reproduces the hysteresis: easing to 0 from (180, 360) settles at x8 = 370, from [0, 180) at 10.
+     *  x44C (easing rate) is 0.5 in PlCo.dat. */
+    function easeGuard(x8, targetDeg) {
+      const k = fr(0.5);
+      targetDeg = fr(targetDeg);
+      for (let i = 0; i < 600; i++) {
+        const g = fr(x8 - 10);
+        let d = fr(targetDeg - g);
+        if (d > 180) d = fr(d - 360); else if (d < -180) d = fr(d + 360);
+        const sm = fr(fr(d * k) + g);
+        let ng;
+        if (sm > 360) ng = fr(sm - 360);
+        else { ng = sm; if (ng < 0) ng = fr(ng + 360); }
+        const nx8 = fr(10 + ng);
+        if (nx8 === x8) return x8;
+        x8 = nx8;
+      }
+      return x8;
+    }
+
+    function settle(kx, ky, approach, opts) {
       kx = Math.max(-128, Math.min(127, Math.trunc(kx)));
       ky = Math.max(-128, Math.min(127, Math.trunc(ky)));
       const [x, y] = clamp(kx, ky);
       const nx = fr(x / 80), ny = fr(y / 80);
-      const qx = Math.abs(nx) <= C.dzx ? 0 : x;
-      const qy = Math.abs(ny) <= C.dzy ? 0 : y;
+      let qx = Math.abs(nx) <= C.dzx ? 0 : x;
+      let qy = Math.abs(ny) <= C.dzy ? 0 : y;
+      const ucf = opts && opts.ucf ? ucfCardinal(kx, ky) : null;
+      if (ucf) [qx, qy] = ucf;
       const lx = fr(qx / 80), ly = fr(qy / 80);
       let rad = lbAtan2(ly, lx);
       if (rad < 0) rad = fr(rad + fr(2 * F_PI));
@@ -621,10 +656,10 @@
       if (mag > 1) mag = 1;
       const zeroAngle = deg === 0 && mag > 0;
       const below = approach === 'below' || approach === 360 || approach === true;
-      return { kx: qx, ky: qy, lx, ly, angle: zeroAngle && below ? 360 : deg, mag, zeroAngle };
+      return { kx: qx, ky: qy, lx, ly, angle: zeroAngle && below ? 360 : deg, target: deg, mag, zeroAngle, ucf: !!ucf };
     }
 
-    return { codes: Object.keys(chars), chars, common: C, settle, pose, bubbleScale, clamp,
+    return { codes: Object.keys(chars), chars, common: C, settle, easeGuard, pose, bubbleScale, clamp,
       _internal: { evalTrack, fmaf, lbAtan2, livePose, world } };
   }
 
