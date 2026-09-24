@@ -121,7 +121,7 @@ def char_geometry(code):
     # Reachable edge: the game's own discretisation (`grid` rows), largest
     # magnitude per settled angle, split into holdable stretches (charcoal
     # path) and isolated axis snaps (dots) more than EDGE_GAP_DEG apart.
-    edge, edge_segments, edge_isolated = reachable_grid_edge(grid)
+    edge, edge_segments, edge_isolated = reachable_grid_edge(grid, ux, uy)
 
     # 8 cardinal/diagonal extremes and the untilted/forward-hysteresis pair
     # now come from the grid's real max-mag row at each angle (holdable

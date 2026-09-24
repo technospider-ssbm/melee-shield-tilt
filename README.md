@@ -50,31 +50,31 @@ any near-axis input onto that axis, so most angles within about 17° of forward/
 
 | Character | Up | Down | Forward | Back | Area covered by centre | Bubble radius |
 |---|---:|---:|---:|---:|---:|---:|
-| [Falco](plots/Fc.png) | 6.60 | 6.60 | 3.04 | 5.76 | 74.9 | 7.91 |
-| [Fox](plots/Fx.png) | 5.76 | 5.76 | 2.66 | 5.02 | 57.0 | 7.94 |
-| [Bowser](plots/Kp.png) | 3.55 | 3.04 | 3.10 | 6.18 | 41.1 | 12.40 |
-| [Link](plots/Lk.png) ¹ | 4.31 | 3.72 | 3.71 | 4.00 | 39.3 | 8.15 |
-| [Luigi](plots/Lg.png) | 5.00 | 4.12 | 3.12 | 3.75 | 35.2 | 7.73 |
-| [Pikachu](plots/Pk.png) | 3.49 | 3.69 | 2.24 | 4.51 | 33.7 | 6.21 |
-| [Zelda](plots/Zd.png) | 2.87 | 6.82 | 3.73 | 2.21 | 31.1 | 8.60 |
-| [Young Link](plots/Cl.png) ¹ | 4.69 | 2.71 | 2.91 | 3.15 | 30.4 | 6.42 |
-| [Popo / Nana](plots/Pp.png) | 4.59 | 3.80 | 2.88 | 3.48 | 29.8 | 7.11 |
-| [Dr. Mario](plots/Dr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 27.3 | 6.80 |
-| [Mario](plots/Mr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 27.3 | 6.80 |
-| [Jigglypuff](plots/Pr.png) ² | 2.92 | 2.81 | 3.96 | 3.50 | 26.9 | 7.09 |
-| [Peach](plots/Pe.png) | 2.62 | 6.23 | 3.40 | 2.02 | 25.9 | 7.85 |
-| [Kirby](plots/Kb.png) ² | 2.86 | 2.75 | 3.88 | 3.42 | 25.8 | 7.78 |
-| [Ness](plots/Ns.png) | 4.01 | 3.29 | 2.50 | 2.50 | 21.9 | 7.91 |
-| [Donkey Kong](plots/Dk.png) ¹ | 5.16 | 2.84 | 2.96 | 0.93 | 17.9 | 10.06 |
-| [Marth](plots/Ms.png) | 3.30 | 2.84 | 2.16 | 2.83 | 17.0 | 7.77 |
-| [Roy](plots/Fe.png) | 3.10 | 2.67 | 2.03 | 2.66 | 15.0 | 7.30 |
-| [Mewtwo](plots/Mt.png) | 2.77 | 3.24 | 2.22 | 1.42 | 14.2 | 9.34 |
-| [Ganondorf](plots/Gn.png) | 4.86 | 1.94 | 3.24 | 1.08 | 13.5 | 9.32 |
-| [Sheik](plots/Sk.png) | 3.55 | 2.05 | 2.03 | 2.17 | 12.6 | 9.36 |
-| [Captain Falcon](plots/Ca.png) | 4.37 | 1.75 | 2.91 | 0.97 | 10.9 | 8.37 |
-| [Pichu](plots/Pc.png) | 1.94 | 2.05 | 1.24 | 2.51 | 10.4 | 6.99 |
-| [Samus](plots/Ss.png) | 3.96 | 1.58 | 2.64 | 0.88 | 9.0 | 8.22 |
-| [Mr. Game & Watch](plots/Gw.png) | 2.03 | 1.33 | 1.53 | 2.04 | 4.9 | 6.30 |
+| [Falco](plots/Fc.png) | 6.60 | 6.60 | 3.04 | 5.76 | 89.1 | 7.91 |
+| [Fox](plots/Fx.png) | 5.76 | 5.76 | 2.66 | 5.02 | 67.9 | 7.94 |
+| [Bowser](plots/Kp.png) | 3.55 | 3.04 | 3.10 | 6.18 | 48.5 | 12.40 |
+| [Link](plots/Lk.png) ¹ | 4.31 | 3.72 | 3.71 | 4.00 | 47.1 | 8.15 |
+| [Luigi](plots/Lg.png) | 5.00 | 4.12 | 3.12 | 3.75 | 41.9 | 7.73 |
+| [Pikachu](plots/Pk.png) | 3.49 | 3.69 | 2.24 | 4.51 | 40.1 | 6.21 |
+| [Zelda](plots/Zd.png) | 2.87 | 6.82 | 3.73 | 2.21 | 37.5 | 8.60 |
+| [Young Link](plots/Cl.png) ¹ | 4.69 | 2.71 | 2.91 | 3.15 | 36.0 | 6.42 |
+| [Popo / Nana](plots/Pp.png) | 4.59 | 3.80 | 2.88 | 3.48 | 35.6 | 7.11 |
+| [Dr. Mario](plots/Dr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 32.5 | 6.80 |
+| [Mario](plots/Mr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 32.5 | 6.80 |
+| [Jigglypuff](plots/Pr.png) ² | 2.92 | 2.81 | 3.96 | 3.50 | 31.8 | 7.09 |
+| [Peach](plots/Pe.png) | 2.62 | 6.23 | 3.40 | 2.02 | 31.3 | 7.85 |
+| [Kirby](plots/Kb.png) ² | 2.86 | 2.75 | 3.88 | 3.42 | 30.5 | 7.78 |
+| [Ness](plots/Ns.png) | 4.01 | 3.29 | 2.50 | 2.50 | 26.4 | 7.91 |
+| [Donkey Kong](plots/Dk.png) ¹ | 5.16 | 2.84 | 2.96 | 0.93 | 21.0 | 10.06 |
+| [Marth](plots/Ms.png) | 3.30 | 2.84 | 2.16 | 2.83 | 20.7 | 7.77 |
+| [Roy](plots/Fe.png) | 3.10 | 2.67 | 2.03 | 2.66 | 18.2 | 7.30 |
+| [Mewtwo](plots/Mt.png) | 2.77 | 3.24 | 2.22 | 1.42 | 16.9 | 9.34 |
+| [Ganondorf](plots/Gn.png) | 4.86 | 1.94 | 3.24 | 1.08 | 16.1 | 9.32 |
+| [Sheik](plots/Sk.png) | 3.55 | 2.05 | 2.03 | 2.17 | 15.3 | 9.36 |
+| [Captain Falcon](plots/Ca.png) | 4.37 | 1.75 | 2.91 | 0.97 | 13.0 | 8.37 |
+| [Pichu](plots/Pc.png) | 1.94 | 2.05 | 1.24 | 2.51 | 12.4 | 6.99 |
+| [Samus](plots/Ss.png) | 3.96 | 1.58 | 2.64 | 0.88 | 10.7 | 8.22 |
+| [Mr. Game & Watch](plots/Gw.png) | 2.03 | 1.33 | 1.53 | 2.04 | 5.8 | 6.30 |
 | [Yoshi](plots/Ys.png) | – | – | – | – | 0 (no tilt) | 6.30 |
 
 ¹ A straight-forward tilt has two resting positions, depending on how the stick got there (see below).

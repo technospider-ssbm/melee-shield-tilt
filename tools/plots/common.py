@@ -73,6 +73,12 @@ FONT = "system-ui, -apple-system, Segoe UI, sans-serif"
 # discretisation) for the full derivation.
 HOLD_THRESH = 23.0 / 80.0  # 0.2875
 EDGE_GAP_DEG = 3.0  # grid angle-gap that marks a dead-zone snap band
+# `grid` rows raster integer (stick_x, stick_y) pairs, so many rows land at
+# almost-but-not-quite the same settled angle with different radii (separate
+# stick_y "rows" of the raster interleave in angle order). Bin to this width
+# and keep only the outer envelope per bin, or the edge folds back on itself
+# and reads as a filled blob instead of a line (technospider, 2026-09-24).
+EDGE_BIN_DEG = 1.0
 
 
 def char_meta(code):
@@ -124,23 +130,33 @@ def holdable_ring_segments(ring_df, m, min_len=2):
     return [ring_df.iloc[s:e + 1] for s, e in runs if (e - s + 1) >= min_len]
 
 
-def reachable_grid_edge(grid_df, gap_deg=EDGE_GAP_DEG):
+def reachable_grid_edge(grid_df, ux, uy, gap_deg=EDGE_GAP_DEG, bin_deg=EDGE_BIN_DEG):
     """From a character's `grid` rows (the game's actual stick
-    discretisation), keep the largest-magnitude row per unique settled
-    angle, sorted by angle - this is the true reachable boundary. Split it
-    into continuous stretches (consecutive angles <= gap_deg apart, drawn as
-    a path) and isolated single-angle points (the axis snaps, including the
-    forward 0/360 hysteresis twin), drawn as dots with a gap either side.
+    discretisation), keep the outer-envelope row (farthest from the
+    untilted centre (ux, uy)) per bin_deg-wide angle bin, sorted by angle -
+    this is the true reachable boundary. Binning (rather than one row per
+    exact angle float) matters: the raster of integer (stick_x, stick_y)
+    pairs puts many rows at almost-but-not-quite the same angle with very
+    different radii, and connecting every one of those in angle order
+    zigzags back on itself enough to render as a filled blob instead of a
+    line. Split into continuous stretches (consecutive angles <= gap_deg
+    apart, drawn as a path) and isolated single-angle points (the axis
+    snaps, including the forward 0/360 hysteresis twin), drawn as dots with
+    a gap either side.
 
     Returns (edge, segments, isolated):
-      edge       - the full max-mag-per-angle frame, angle-sorted (used for
-                   the reach-area polygon, which bridges the snap gaps with
-                   a straight edge rather than pretending they're reachable)
+      edge       - the envelope frame, angle-sorted (used for the reach-area
+                   polygon, which bridges the snap gaps with a straight edge
+                   rather than pretending they're reachable)
       segments   - list of DataFrames, each a holdable stretch (len >= 2)
       isolated   - DataFrame of the single-angle axis points
     """
-    idx = grid_df.groupby("angle")["mag"].idxmax()
-    edge = grid_df.loc[idx].sort_values("angle").reset_index(drop=True)
+    g = grid_df.copy()
+    g["_bin"] = np.round(g.angle.to_numpy() / bin_deg) * bin_deg
+    g["_rad"] = np.hypot(g.bone_x.to_numpy() - ux, g.bone_y.to_numpy() - uy)
+    idx = g.groupby("_bin")["_rad"].idxmax()
+    edge = (g.loc[idx].sort_values("angle")
+             .drop(columns=["_bin", "_rad"]).reset_index(drop=True))
     diffs = np.diff(edge.angle.values)
     breaks = np.where(diffs > gap_deg)[0]
     bounds = list(breaks) + [len(edge) - 1]
