@@ -37,6 +37,8 @@
   h2 { font-size: 13px; margin: 0; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
   p { margin: 0; max-width: 72ch; line-height: 1.5; }
   .sub { color: var(--ink-2); font-size: 13.5px; }
+  .ai-note { font-size: 13px; color: var(--ink); background: var(--surface-1); border: 1px solid var(--orange);
+    border-left-width: 4px; border-radius: 6px; padding: 8px 12px; max-width: 80ch; }
   .note { color: var(--ink-muted); font-size: 12px; }
   .layout { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
   .panel {
@@ -54,7 +56,20 @@
   .check { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink-2); margin-top: 6px; }
   .val { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  #plot { flex: 3 1 380px; min-width: 0; padding: 0; overflow: hidden; }
+  .plotpanel { flex: 3 1 380px; min-width: 0; padding: 0; overflow: hidden; }
+  #plot { height: 600px; }
+  .legend { list-style: none; margin: 0; padding: 8px 14px 12px; display: flex; flex-wrap: wrap; gap: 6px 16px;
+    font-size: 12px; color: var(--ink-2); border-top: 1px solid var(--grid); }
+  .legend li { display: flex; align-items: center; gap: 6px; }
+  .sw { display: inline-block; width: 22px; height: 12px; flex: none; }
+  .sw.ring { border: 2.5px solid var(--accent); border-radius: 50%; }
+  .sw.ring.dot { border: 1.5px dotted var(--ink-2); }
+  .sw.line { height: 0; border-top: 2.5px solid var(--ink); }
+  .sw.line.cur { border-top: 2px dashed var(--accent); }
+  .sw.line.weak { border-top: 1.5px dotted var(--ink-2); }
+  .sw.box { border-radius: 6px; border: 1px solid var(--exposed);
+    background: linear-gradient(90deg, var(--safe), var(--exposed)); opacity: 0.8; }
+  .sw.pts { background: radial-gradient(circle, var(--exposed) 2px, transparent 2.5px) 0 0 / 7px 6px; }
   .results { flex: 1 1 250px; max-width: 320px; display: grid; gap: 10px; }
   .big { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
   .big small { font-size: 12px; font-weight: 500; color: var(--ink-2); }
@@ -73,6 +88,10 @@
 <div class="wrap">
   <header style="display:grid; gap:6px">
     <h1>Melee Shield-Tilt Explorer</h1>
+    <p class="ai-note" role="note"><strong>Made entirely with AI.</strong> Claude (Anthropic's AI model), running in Claude
+    Code, did all of it: the research into the game's code, the solver, the Dolphin testing, and this page. technospider
+    only directed it, doesn't claim it as their own work, and is sharing it only for people who are curious. The numbers
+    were checked against Dolphin, but treat them as AI-produced and verify anything that matters to you.</p>
     <p class="sub">Where each character's shield bubble sits for any stick angle and strength, with the
     hurtboxes in that tilted pose, and how much of the body is left outside the shield (open to shield pokes).
     Side view in game units, facing right (x = forward, y = up).</p>
@@ -104,7 +123,18 @@
       <label class="check"><input type="checkbox" id="ghost" checked> Show the untilted body</label>
     </div>
 
-    <div class="panel" id="plot"></div>
+    <div class="panel plotpanel">
+      <div id="plot"></div>
+      <ul class="legend" aria-label="Legend">
+        <li><span class="sw ring"></span>Tilted bubble</li>
+        <li><span class="sw ring dot"></span>Untilted bubble</li>
+        <li><span class="sw line"></span>Centre path, full tilt</li>
+        <li><span class="sw line cur"></span>Centre path, current strength</li>
+        <li><span class="sw line weak"></span>Centre path, weaker tilts</li>
+        <li><span class="sw box"></span>Hurtbox (blue inside → orange outside)</li>
+        <li><span class="sw pts"></span>Part outside the bubble</li>
+      </ul>
+    </div>
 
     <div class="panel results" aria-live="polite">
       <h2>Outside the shield</h2>
@@ -130,7 +160,7 @@
   </div>
   <p class="note">Hurtboxes are coloured from blue (fully inside the bubble) to orange (fully outside). Orange dots mark the parts
   outside the bubble, seen from the side; because they are measured in 3D, a dot can appear over the bubble when that part
-  sticks out towards or away from the camera. The solid dark line is the path of the shield centre at full tilt, the dotted lines are weaker tilts, and the dashed line is the current strength. Sampled every 5° and every 0.2 of stick strength. Kirby's and Jigglypuff's
+  sticks out towards or away from the camera. Sampled every 5° and every 0.2 of stick strength. Kirby's and Jigglypuff's
   bubbles are slightly oval in game; here they are drawn as spheres of the average radius. Hurtboxes marked ≈ sit on
   physics-driven bones and use the rest pose, so they are approximate. Yoshi's shield neither tilts nor changes size.</p>
 </div>
@@ -283,8 +313,7 @@ function draw() {
     for (let m = 1; m < MAGS.length; m++) {
       const full = m === MAGS.length - 1, cur = m === mi;
       traces.push({ x: d.centers.map(r => r[m][0]), y: d.centers.map(r => r[m][1]), mode: 'lines',
-        name: full ? 'centre path, full tilt' : (cur ? `centre path, strength ${MAGS[m].toFixed(1)}` : undefined),
-        showlegend: full || (cur && !full), hoverinfo: 'skip',
+        hoverinfo: 'skip',
         line: full ? { color: C.ink, width: 2.5 } : { color: cur ? C.acc : C.ink2, width: cur ? 1.8 : 0.8, dash: cur ? 'dash' : 'dot' },
         opacity: full || cur ? 1 : 0.6 });
     }
@@ -301,9 +330,8 @@ function draw() {
       scaleanchor: 'y', scaleratio: 1, color: C.ink2 },
     yaxis: { range: rg.y, title: 'up →', zeroline: false, gridcolor: C.grid, color: C.ink2 },
     plot_bgcolor: C.surf, paper_bgcolor: C.surf, margin: { l: 50, r: 16, t: 36, b: 44 },
-    title: { text: d.name, x: 0.02, font: { size: 16 } }, showlegend: true,
-    legend: { orientation: 'h', y: -0.14, font: { color: C.ink2 } },
-    font: { family: 'system-ui, -apple-system, Segoe UI, sans-serif', color: C.ink }, height: 600,
+    title: { text: d.name, x: 0.02, font: { size: 16 } }, showlegend: false,
+    font: { family: 'system-ui, -apple-system, Segoe UI, sans-serif', color: C.ink }, height: 600, autosize: true,
   };
   const cfg = { displayModeBar: false, responsive: true };
   if (firstDraw) { Plotly.newPlot('plot', traces, layout, cfg); firstDraw = false; }
