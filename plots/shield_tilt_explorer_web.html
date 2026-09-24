@@ -1180,4 +1180,9 @@ $('reshield').addEventListener('click', () => { guardX8 = 10; schedule(); });
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', schedule); } catch (e) {}
 new MutationObserver(schedule).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 draw();
+// Plotly keeps the 1:1 aspect by stretching the axis ranges to the plot's size at draw time. If the first draw
+// lands before the layout settles, or the window is resized, redraw so the ranges come from the data again.
+window.addEventListener('load', schedule);
+window.addEventListener('resize', schedule);
+if (window.ResizeObserver) new ResizeObserver(schedule).observe($('plot'));
 </script>
