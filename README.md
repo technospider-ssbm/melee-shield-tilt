@@ -10,12 +10,11 @@
 > - the Dolphin testing;
 > - the charts, the explorer and this README.
 >
-> I (technospider) only directed it and made decisions along the way. I didn't write the code, I'm not presenting it as
-> my own work, and I'm not proud of it as a project. I'm putting it up because the results might interest people who are
-> curious about shield tilting.
+> I (hi technospider here, this is the only text in this repos written by me) did pretty much nothing, and I know I have many friends
+> who will get bad vibes from this. I just want to say that I get it, but that if people find the results interesting, they should 
+> have full access. Much love <3
 >
-> The numbers were checked against Dolphin (see below). Still, treat everything here as AI-produced, and verify anything
-> that matters to you yourself.
+
 
 How far every character can move their shield bubble by tilting it in Super Smash Bros. Melee (NTSC v1.02).
 
