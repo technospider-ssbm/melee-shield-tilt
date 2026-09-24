@@ -29,9 +29,15 @@ open it in a browser.
 
 In the explorer you can:
 - pick a character;
-- set the stick angle and strength, shield health and trigger pressure;
+- move a control-stick pad that snaps to the stick values the game can actually read (the dead zone and the gate
+  are shown);
+- set shield health and trigger pressure;
 - see the tilted bubble, the hurtboxes in that pose, and how much of the body is left outside the shield. That exposure
   is measured in 3D and shows what's open to shield pokes.
+
+Everything is computed live in the browser by a JavaScript port of the solver (`tools/plots/shieldpose.js`). It
+reproduces the solver's output for every row of every character's data to within 0.00001 units. The page embeds the
+per-character pose data this needs: bone rest poses, shield poses and Guard animation keyframes.
 
 ![Shield-centre reach for every character on shared axes](plots/all_characters.png)
 
