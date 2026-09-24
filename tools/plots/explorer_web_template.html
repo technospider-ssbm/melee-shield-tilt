@@ -100,6 +100,7 @@
       <input type="range" id="press" min="0" max="100" step="1" value="100">
       <div class="hint">Right end = hard press (digital, or analog all the way in). Left end = lightest analog shield,
       which is larger. Radius = size × (0.15 + 0.85 × health/60 × (1 − 0.5 × press)).</div>
+      <label class="check"><input type="checkbox" id="paths" checked> Show shield-centre paths</label>
       <label class="check"><input type="checkbox" id="ghost" checked> Show the untilted body</label>
     </div>
 
@@ -129,7 +130,7 @@
   </div>
   <p class="note">Hurtboxes are coloured from blue (fully inside the bubble) to orange (fully outside). Orange dots mark the parts
   outside the bubble, seen from the side; because they are measured in 3D, a dot can appear over the bubble when that part
-  sticks out towards or away from the camera. Sampled every 5° and every 0.2 of stick strength. Kirby's and Jigglypuff's
+  sticks out towards or away from the camera. The solid dark line is the path of the shield centre at full tilt, the dotted lines are weaker tilts, and the dashed line is the current strength. Sampled every 5° and every 0.2 of stick strength. Kirby's and Jigglypuff's
   bubbles are slightly oval in game; here they are drawn as spheres of the average radius. Hurtboxes marked ≈ sit on
   physics-driven bones and use the rest pose, so they are approximate. Yoshi's shield neither tilts nor changes size.</p>
 </div>
@@ -276,12 +277,24 @@ function draw() {
   shapes.push(circleShape(d.centers[0][0][0], d.centers[0][0][1], R, { color: C.ink2, width: 1, dash: 'dot' }));
   shapes.push(circleShape(c[0], c[1], R, { color: C.acc, width: 3 }, mix(C.acc, C.acc, 0, 0.07)));
 
-  const traces = [
+  const traces = [];
+  if ($('paths').checked && d.has_tilt) {
+    // Where the shield centre goes as the stick sweeps 0-360 deg at each strength.
+    for (let m = 1; m < MAGS.length; m++) {
+      const full = m === MAGS.length - 1, cur = m === mi;
+      traces.push({ x: d.centers.map(r => r[m][0]), y: d.centers.map(r => r[m][1]), mode: 'lines',
+        name: full ? 'centre path, full tilt' : (cur ? `centre path, strength ${MAGS[m].toFixed(1)}` : undefined),
+        showlegend: full || (cur && !full), hoverinfo: 'skip',
+        line: full ? { color: C.ink, width: 2.5 } : { color: cur ? C.acc : C.ink2, width: cur ? 1.8 : 0.8, dash: cur ? 'dash' : 'dot' },
+        opacity: full || cur ? 1 : 0.6 });
+    }
+  }
+  traces.push(
     { type: 'scattergl', x: outX, y: outY, mode: 'markers', name: 'outside the bubble',
       marker: { color: C.bad, size: 3, opacity: 0.7 }, hoverinfo: 'skip' },
     { x: [c[0]], y: [c[1]], mode: 'markers', name: 'shield centre', marker: { color: C.acc, size: 8 },
       hovertemplate: 'shield centre<br>x=%{x:.2f} y=%{y:.2f}<extra></extra>' },
-  ];
+  );
   const rg = ranges(code);
   const layout = {
     shapes, xaxis: { range: rg.x, title: 'forward → (game units)', zeroline: false, gridcolor: C.grid,
@@ -320,7 +333,7 @@ function draw() {
 
 sel.addEventListener('change', draw);
 for (const id of ['angle', 'mag', 'health', 'press']) $(id).addEventListener('input', draw);
-$('ghost').addEventListener('change', draw);
+for (const id of ['ghost', 'paths']) $(id).addEventListener('change', draw);
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw); } catch (e) {}
 new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 draw();
