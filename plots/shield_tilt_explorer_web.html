@@ -1017,9 +1017,10 @@ function holdable(a, m) {
 }
 
 // The reachable outer edge: every stick value the game can register (integer units inside the radius-80 gate,
-// after the dead zone), keeping the strongest strength at each settled angle. Angles that only appear in
-// isolation (the four axes) are returned as points; the rest are continuous stretches between the snap bands.
-// Forward also gets its angle-360 (frame 370) variant, since which one you get depends on the stick's path.
+// after the dead zone). Integer sticks give slightly different strengths at nearly equal angles, so the edge is
+// the outer envelope: in each 1-degree bin, the pose farthest from the untilted centre. The four axes can only be
+// held exactly and are returned as points (forward twice: frame 10 and frame 370, which one you get depends on the
+// stick's path). Matches tools/plots/common.py reachable_grid_edge.
 const rimCache = new Map();
 function reachableRim(code) {
   if (rimCache.has(code)) return rimCache.get(code);
@@ -1029,19 +1030,25 @@ function reachableRim(code) {
     const st = SP.settle(x, y, 'fresh');
     if (st.mag > 0 && (best.get(st.target) || 0) < st.mag) best.set(st.target, st.mag);
   }
-  const pts = [...best.entries()].sort((p, q) => p[0] - q[0]);
   const at = (a, m) => SP.pose(code, a, m, { hurtboxes: false }).centre;
-  const lx = [], ly = [], px = [], py = [];
-  let last = -1e9;
-  pts.forEach(([a, m], i) => {
-    const prev = i ? pts[i - 1][0] : -1e9, next = i < pts.length - 1 ? pts[i + 1][0] : 1e9;
-    if (a - prev > 3 && next - a > 3) {        // an axis: only the exact direction can be held
+  const u = at(0, 0);
+  const px = [], py = [], bins = new Map();
+  for (const [a, m] of best) {
+    if (a % 90 === 0) {                        // an axis: only the exact direction can be held
       for (const aa of a === 0 ? [0, 360] : [a]) { const c = at(aa, m); px.push(c[0]); py.push(c[1]); }
-      return;
+      continue;
     }
-    if (a - prev > 3) { lx.push(null); ly.push(null); last = -1e9; }
-    if (a - last >= 0.25 || next - a > 3) { const c = at(a, m); lx.push(c[0]); ly.push(c[1]); last = a; }
-  });
+    if (m < 0.9) continue;                     // interior sticks never form the outer envelope
+    const c = at(a, m), d = Math.hypot(c[0] - u[0], c[1] - u[1]), k = Math.floor(a);
+    const cur = bins.get(k);
+    if (!cur || d > cur.d) bins.set(k, { a, d, c });
+  }
+  const lx = [], ly = [];
+  let prev = -1e9;
+  for (const b of [...bins.values()].sort((p, q) => p.a - q.a)) {
+    if (b.a - prev > 3) { lx.push(null); ly.push(null); }   // gap across a snap band
+    lx.push(b.c[0]); ly.push(b.c[1]); prev = b.a;
+  }
   const r = { x: lx, y: ly, px, py };
   rimCache.set(code, r);
   return r;
