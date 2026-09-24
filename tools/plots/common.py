@@ -1,9 +1,10 @@
 """Shared constants and loaders for the shield-tilt plots.
 
-Palette and mark conventions follow the project's dataviz skill
-(references/palette.md): categorical slot 1 (blue) as the single accent hue
-for "reachable region" geometry, chart-chrome ink/gridline roles for
-everything else.
+Static-chart marks use an Okabe-Ito colour-blind-safe subset (technospider,
+2026-09-23): sky blue, orange, bluish green and charcoal - never red or
+green. Chart chrome (surfaces/ink/gridlines) stays on the dataviz-skill
+neutral tokens. make_explorer.py is intentionally on its own palette and
+is not touched by this module's constants.
 """
 import json
 from pathlib import Path
@@ -26,13 +27,16 @@ GRIDLINE = "#e1e0d9"
 BASELINE = "#c3c2b7"
 BORDER = "rgba(11,11,11,0.10)"
 
-ACCENT = "#2a78d6"       # categorical slot 1 (blue) - reachable-region geometry
-ACCENT_SEQ = ["#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#184f95"]  # light->dark
-ORANGE = "#eb6834"       # categorical slot 2 - used only for the min-shield ring
+# Okabe-Ito colour-blind-safe subset - the only hues used on any static mark.
+SKY_BLUE = "#56B4E9"      # partial-tilt rings, extreme-tilt/body-grid bubbles
+ORANGE = "#E69F00"        # min-size bubble, forward-hysteresis diamond/dash
+BLUISH_GREEN = "#009E73"  # untilted bubble + its centre marker
+CHARCOAL = "#333333"      # full-tilt centre path (thick, white halo)
+
+# Back-compat aliases (still referenced as ACCENT/PATH_NAVY around the code).
+ACCENT = SKY_BLUE
+PATH_NAVY = CHARCOAL
 STATUS_GOOD = "#0ca30c"  # reserved status color (unused on charts; kept for parity)
-# High-contrast path colour for the "where the shield can go" panel - darker
-# than ACCENT so it survives a white halo (path_effects) over any fill.
-PATH_NAVY = "#0d2b52"
 
 # All 26 selectable characters (everyone but Nana, whose pose is identical to
 # Popo's) now match the emulator exactly - see data/validation/PROGRESS.md

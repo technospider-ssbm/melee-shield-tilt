@@ -25,10 +25,15 @@ from matplotlib import font_manager
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
 from common import (
     REPO, DATA, PLOTS, SURFACE, PAGE, INK_PRIMARY, INK_SECONDARY, INK_MUTED,
-    GRIDLINE, BASELINE, ACCENT, ACCENT_SEQ, ORANGE, STATUS_GOOD, PATH_NAVY,
-    VALIDATION_NOTE, NANA_VALIDATION_NOTE, HYSTERESIS_EPS, DIRECTIONS, FONT,
-    all_codes, char_meta, display_name, load_main, load_hurtbox_poses,
+    GRIDLINE, BASELINE, ACCENT, SKY_BLUE, ORANGE, BLUISH_GREEN, CHARCOAL,
+    STATUS_GOOD, PATH_NAVY, VALIDATION_NOTE, NANA_VALIDATION_NOTE,
+    HYSTERESIS_EPS, DIRECTIONS, FONT, all_codes, char_meta, display_name,
+    load_main, load_hurtbox_poses,
 )
+
+# partial-tilt rings (m=0.25/0.5/0.75): one hue (sky blue), increasing
+# opacity with magnitude rather than a light->dark ramp of different blues
+RING_ALPHAS = (0.35, 0.55, 0.85)
 
 plt.rcParams.update({
     "font.family": "sans-serif",
@@ -172,29 +177,31 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
         # 2. extreme-tilt hurtboxes: very faint, still behind the bubbles/path
         for label, sub in poses.items():
             if label != "untilted":
-                draw_hurtboxes(ax, sub, ACCENT, alpha=0.08, lw=0.3, zorder=2)
+                draw_hurtboxes(ax, sub, SKY_BLUE, alpha=0.08, lw=0.3, zorder=2)
 
     # 3. bubbles
     if geo["has_tilt"]:
         for label, (ex, ey) in geo["extremes"].items():
-            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=ACCENT,
-                                 lw=0.7, alpha=0.35, zorder=3))
-    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=INK_PRIMARY,
+            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=SKY_BLUE,
+                                 lw=0.7, alpha=0.5, zorder=3))
+    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=BLUISH_GREEN,
                          lw=1.4, zorder=4))
     ax.add_patch(Circle((ux, uy), r_min, fill=False, edgecolor=ORANGE,
                          lw=1.0, ls=(0, (3, 2)), alpha=0.9, zorder=4,
                          label="min-size bubble"))
 
-    # 4. centre path, partial rings, markers and labels - always on top
-    ax.fill(rf.bone_x, rf.bone_y, color=ACCENT_SEQ[3], alpha=0.08, zorder=5)
+    # 4. centre path, partial rings, markers and labels - always on top.
+    # Path is charcoal (with a white halo in the two-panel chart below) so
+    # colour is never the only cue distinguishing it from the sky-blue rings.
+    ax.fill(rf.bone_x, rf.bone_y, color=SKY_BLUE, alpha=0.08, zorder=5)
     for i, m in enumerate((0.25, 0.5, 0.75)):
         r = geo["rings_inner"][m]
         if not r.empty:
-            ax.plot(r.bone_x, r.bone_y, color=ACCENT_SEQ[1 + i], lw=1.0,
-                    alpha=0.9, zorder=6)
-    ax.plot(rf.bone_x, rf.bone_y, color=ACCENT, lw=1.8, zorder=7,
+            ax.plot(r.bone_x, r.bone_y, color=SKY_BLUE, lw=1.0,
+                    alpha=RING_ALPHAS[i], zorder=6)
+    ax.plot(rf.bone_x, rf.bone_y, color=CHARCOAL, lw=1.8, zorder=7,
             label="full tilt (m=1)")
-    ax.plot([ux], [uy], marker="o", ms=4, color=INK_PRIMARY, zorder=9)
+    ax.plot([ux], [uy], marker="o", ms=4, color=BLUISH_GREEN, zorder=9)
 
     if geo["has_tilt"] and show_labels:
         for label, (ex, ey) in geo["extremes"].items():
@@ -257,11 +264,11 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
         from matplotlib.lines import Line2D
         from matplotlib.patches import Patch
         handles = [
-            Line2D([0], [0], color=INK_PRIMARY, lw=1.4, label="untilted bubble"),
-            Line2D([0], [0], color=ACCENT, lw=1.8, label="full-tilt centre path (m=1)"),
-            Line2D([0], [0], color=ACCENT_SEQ[1], lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
+            Line2D([0], [0], color=BLUISH_GREEN, lw=1.4, label="untilted bubble"),
+            Line2D([0], [0], color=CHARCOAL, lw=1.8, label="full-tilt centre path (m=1)"),
+            Line2D([0], [0], color=SKY_BLUE, lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
             Line2D([0], [0], color=ORANGE, lw=1.0, ls=(0, (3, 2)), label="min-size bubble"),
-            Line2D([0], [0], color=ACCENT, lw=0.7, alpha=0.5, label="bubble at stick extreme"),
+            Line2D([0], [0], color=SKY_BLUE, lw=0.7, alpha=0.6, label="bubble at stick extreme"),
             Patch(facecolor=INK_SECONDARY, edgecolor=INK_MUTED, alpha=0.35, label="hurtboxes (untilted)"),
         ]
         ax.legend(handles=handles, loc="lower right", fontsize=6.5, frameon=False,
@@ -352,16 +359,17 @@ def draw_left_panel(ax, geo):
         draw_hurtboxes(ax, body, BASELINE, alpha=0, lw=0.5, zorder=1,
                         edgecolor=BASELINE, edge_alpha=0.7, edge_only=True)
 
-    # partial rings: thin and light
+    # partial rings: one hue (sky blue), thin, increasing opacity with magnitude
     for i, m in enumerate((0.25, 0.5, 0.75)):
         r = geo["rings_inner"][m]
         if not r.empty:
-            ax.plot(r.bone_x, r.bone_y, color=ACCENT_SEQ[1 + i], lw=0.8,
-                    alpha=0.55, zorder=3)
+            ax.plot(r.bone_x, r.bone_y, color=SKY_BLUE, lw=0.8,
+                    alpha=RING_ALPHAS[i], zorder=3)
 
-    # full-tilt centre path: thick, dark, high-contrast, white halo so it
-    # reads over the body outline/bubbles regardless of what's underneath
-    ax.plot(rf.bone_x, rf.bone_y, color=PATH_NAVY, lw=2.5, zorder=6,
+    # full-tilt centre path: thick charcoal, white halo so it reads over the
+    # body outline/bubbles regardless of what's underneath (colour-blind-safe
+    # Okabe-Ito subset - never relies on being "the blue one")
+    ax.plot(rf.bone_x, rf.bone_y, color=CHARCOAL, lw=2.5, zorder=6,
             solid_capstyle="round",
             path_effects=[pe.Stroke(linewidth=4.5, foreground=SURFACE), pe.Normal()],
             label="full tilt (m=1)")
@@ -373,8 +381,8 @@ def draw_left_panel(ax, geo):
     direction_texts = []
     if geo["has_tilt"]:
         for label, (ex, ey) in geo["extremes"].items():
-            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=ACCENT,
-                                 lw=0.6, alpha=0.45, zorder=4))
+            ax.add_patch(Circle((ex, ey), r_full, fill=False, edgecolor=SKY_BLUE,
+                                 lw=0.6, alpha=0.6, zorder=4))
             if label == "Forward" and geo["fwd_alt"] is not None:
                 continue
             dx, dy = ex - ux, ey - uy
@@ -384,12 +392,12 @@ def draw_left_panel(ax, geo):
             t = ax.text(lx, ly, label, fontsize=6.5, color=INK_MUTED, ha="center",
                         va="center", zorder=7)
             direction_texts.append(t)
-    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=INK_PRIMARY,
+    ax.add_patch(Circle((ux, uy), r_full, fill=False, edgecolor=BLUISH_GREEN,
                          lw=1.4, zorder=5))
     ax.add_patch(Circle((ux, uy), r_min, fill=False, edgecolor=ORANGE,
                          lw=1.0, ls=(0, (3, 2)), alpha=0.9, zorder=5,
                          label="min-size bubble"))
-    ax.plot([ux], [uy], marker="o", ms=4, color=INK_PRIMARY, zorder=8)
+    ax.plot([ux], [uy], marker="o", ms=4, color=BLUISH_GREEN, zorder=8)
 
     # axis limits/aspect must be final before we measure any text bounding
     # boxes below (they depend on the data->display transform)
@@ -397,11 +405,11 @@ def draw_left_panel(ax, geo):
     ax.set_xlim(*geo["x_reach"]); ax.set_ylim(*geo["y_reach"])
 
     handles = [
-        Line2D([0], [0], color=INK_PRIMARY, lw=1.4, label="untilted bubble"),
-        Line2D([0], [0], color=PATH_NAVY, lw=2.5, label="full-tilt centre path (m=1)"),
-        Line2D([0], [0], color=ACCENT_SEQ[1], lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
+        Line2D([0], [0], color=BLUISH_GREEN, lw=1.4, label="untilted bubble"),
+        Line2D([0], [0], color=CHARCOAL, lw=2.5, label="full-tilt centre path (m=1)"),
+        Line2D([0], [0], color=SKY_BLUE, lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
         Line2D([0], [0], color=ORANGE, lw=1.0, ls=(0, (3, 2)), label="min-size bubble"),
-        Line2D([0], [0], color=ACCENT, lw=0.6, alpha=0.6, label="bubble at stick extreme"),
+        Line2D([0], [0], color=SKY_BLUE, lw=0.6, alpha=0.6, label="bubble at stick extreme"),
         Line2D([0], [0], color=BASELINE, lw=0.5, label="untilted body outline"),
     ]
     if geo["fwd_alt"] is not None:
@@ -471,7 +479,7 @@ def draw_body_grid(fig, gs_cell, geo):
             draw_hurtboxes(ax, sub, INK_SECONDARY, alpha=0.3, lw=0.5, zorder=1,
                             edgecolor=INK_MUTED, edge_alpha=0.7)
         if centre is not None:
-            ax.add_patch(Circle(centre, r_full, fill=False, edgecolor=ACCENT,
+            ax.add_patch(Circle(centre, r_full, fill=False, edgecolor=SKY_BLUE,
                                  lw=1.0, zorder=2))
         ax.set_xlim(*lim[0]); ax.set_ylim(*lim[1])
         ax.set_aspect("equal", adjustable="box")
@@ -604,11 +612,12 @@ def make_reach_summary(codes):
     names = [r["name"] for r in rows]
     ypos = np.arange(len(rows))
     bar_h = 0.2
+    # one hue per metric from the Okabe-Ito subset - no red or green
     metrics = [
-        ("max_up", ACCENT_SEQ[3], "up"),
-        ("max_down", ACCENT_SEQ[2], "down"),
+        ("max_up", CHARCOAL, "up"),
+        ("max_down", SKY_BLUE, "down"),
         ("max_forward", ORANGE, "forward"),
-        ("max_back", "#eda100", "back"),
+        ("max_back", BLUISH_GREEN, "back"),
     ]
     for i, (key, color, label) in enumerate(metrics):
         vals = [r[key] for r in rows]
