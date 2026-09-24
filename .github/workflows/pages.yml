@@ -1,0 +1,49 @@
+# Publishes the interactive explorer to GitHub Pages:
+#   https://technospider-ssbm.github.io/melee-shield-tilt/
+# Static deployment only: no build step. The page (plots/shield_tilt_explorer_web.html, built locally by
+# tools/plots/make_explorer_web.py) is written without <!doctype>/<head>, so it is wrapped into a full
+# HTML document here and uploaded as index.html.
+name: Deploy explorer to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - plots/shield_tilt_explorer_web.html
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          {
+            printf '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
+            printf '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+            printf '<meta name="description" content="Melee (NTSC 1.02) shield-tilt explorer: where each character'"'"'s shield bubble and hurtboxes sit for any stick input. Made entirely with AI.">\n'
+            cat plots/shield_tilt_explorer_web.html
+            printf '\n</html>\n'
+          } > _site/index.html
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

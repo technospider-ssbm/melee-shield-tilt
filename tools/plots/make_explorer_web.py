@@ -8,7 +8,8 @@ The page computes every pose live in the browser. It embeds:
 The only external resource is the Plotly CDN script. In the browser the page:
   * takes a stick position on a pad (or as integer stick units), snaps it to what the game registers
     (clamp to radius 80 with truncation, /80, per-axis 0.28 deadzone), and settles the tilt angle and
-    strength (ftCo_80091BC4), including the angle-0/360 hysteresis toggle;
+    strength (ftCo_80091BC4), easing the angle frame by frame so the 0/360 forward rest state follows the
+    stick's path (a re-shield button resets it); optional UCF 0.84 1.0 cardinals;
   * poses the fighter (Guard figatree + ShieldPose blend, HSD world matrices) and draws the bubble,
     hurtboxes and the shield-centre paths (current strength and full tilt, 361 samples each);
   * sizes the bubble from shield health and trigger pressure (inlineB0, ftCo_Guard.c:177-191; Yoshi is fixed);

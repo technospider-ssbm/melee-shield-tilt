@@ -22,10 +22,9 @@ The numbers come from the game's own data and the engine logic in the [doldecomp
 decompilation. They were then checked frame-exactly in Dolphin. All 26 selectable characters match the emulator to within
 0.00001 units. Nana is identical to Popo.
 
-**Interactive explorer:** [Melee Shield-Tilt Explorer](https://claude.ai/artifact/1yUPcEPjkd5K3EorbJDLWX). It's a private
-link, so only people the owner has shared it with can open it. The same page is in the repo as
-[`plots/shield_tilt_explorer_web.html`](plots/shield_tilt_explorer_web.html). GitHub doesn't render HTML, so download it and
-open it in a browser.
+**Interactive explorer: <https://technospider-ssbm.github.io/melee-shield-tilt/>**. It runs in your browser, hosted on
+GitHub Pages. The page source is [`plots/shield_tilt_explorer_web.html`](plots/shield_tilt_explorer_web.html), and
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml) redeploys it whenever it changes.
 
 In the explorer you can:
 - pick a character;
