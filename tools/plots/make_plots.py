@@ -28,8 +28,13 @@ from common import (
     GRIDLINE, BASELINE, ACCENT, SKY_BLUE, ORANGE, BLUISH_GREEN, CHARCOAL,
     STATUS_GOOD, PATH_NAVY, VALIDATION_NOTE, NANA_VALIDATION_NOTE,
     HYSTERESIS_EPS, DIRECTIONS, FONT, all_codes, char_meta, display_name,
-    load_main, load_hurtbox_poses,
+    load_main, load_hurtbox_poses, HOLD_THRESH, EDGE_GAP_DEG,
+    holdable_ring_segments, reachable_grid_edge, grid_row_at_angle,
 )
+
+# faint "out of reach" ring: the continuous polar mag=1 sweep, most of which
+# the dead zone actually snaps onto an axis before the player can hold it.
+OUT_OF_REACH_LABEL = "out of reach: stick snaps onto the axis"
 
 # partial-tilt rings (m=0.25/0.5/0.75): one hue (sky blue), increasing
 # opacity with magnitude rather than a light->dark ramp of different blues
@@ -97,30 +102,49 @@ def char_geometry(code):
     # 0 means the full-tilt ring closes through the real angle=360 sample
     # (matplotlib's fill()/plot() already connects last->first automatically,
     # so if the two differ this draws the true cusp instead of a fake wrap).
+    # Out-of-reach reference: the continuous polar mag=1 sweep. Kept only as
+    # a faint backdrop now - the dead zone snaps most of these onto an axis
+    # before a player can actually hold them (see reachable_edge below).
     ring_full = polar[np.isclose(polar.mag, 1.0)].sort_values("angle")
     rings_inner = {
         m: polar[np.isclose(polar.mag, m)].sort_values("angle")
         for m in (0.25, 0.5, 0.75)
     }
+    # Holdable stretches of each partial-tilt ring (dense synthetic samples,
+    # so a straight holdable_mask split is enough - no grid lookup needed).
+    rings_inner_holdable = {
+        m: holdable_ring_segments(rings_inner[m], m) for m in (0.25, 0.5, 0.75)
+    }
+
+    grid = df[df.sweep == "grid"]
+
+    # Reachable edge: the game's own discretisation (`grid` rows), largest
+    # magnitude per settled angle, split into holdable stretches (charcoal
+    # path) and isolated axis snaps (dots) more than EDGE_GAP_DEG apart.
+    edge, edge_segments, edge_isolated = reachable_grid_edge(grid)
+
+    # 8 cardinal/diagonal extremes and the untilted/forward-hysteresis pair
+    # now come from the grid's real max-mag row at each angle (holdable
+    # strength is 0.95-1.0 near the rim, not exactly 1) rather than the
+    # unreachable polar mag=1 ring.
     extremes = {}
     for ang, label in DIRECTIONS:
-        row = ring_full[ring_full.angle == ang]
-        if not row.empty:
-            extremes[label] = (float(row.bone_x.iloc[0]), float(row.bone_y.iloc[0]))
+        row = grid_row_at_angle(edge, ang)
+        if row is not None:
+            extremes[label] = (float(row.bone_x), float(row.bone_y))
 
     # forward (angle 0) hysteresis: compare the frame-10 and frame-370 poses
     # in full 3D (bone_z included) even though the chart only plots x/y.
     fwd_alt = None
-    r0 = ring_full[ring_full.angle == 0]
-    r360 = ring_full[ring_full.angle == 360]
-    if not r0.empty and not r360.empty:
-        d = float(np.sqrt((r0.bone_x.iloc[0] - r360.bone_x.iloc[0]) ** 2 +
-                           (r0.bone_y.iloc[0] - r360.bone_y.iloc[0]) ** 2 +
-                           (r0.bone_z.iloc[0] - r360.bone_z.iloc[0]) ** 2))
+    r0 = grid_row_at_angle(edge, 0)
+    r360 = grid_row_at_angle(edge, 360)
+    if r0 is not None and r360 is not None:
+        d = float(np.sqrt((r0.bone_x - r360.bone_x) ** 2 +
+                           (r0.bone_y - r360.bone_y) ** 2 +
+                           (r0.bone_z - r360.bone_z) ** 2))
         if d > HYSTERESIS_EPS:
-            fwd_alt = (float(r360.bone_x.iloc[0]), float(r360.bone_y.iloc[0]), d)
+            fwd_alt = (float(r360.bone_x), float(r360.bone_y), d)
 
-    grid = df[df.sweep == "grid"]
     all_x = np.concatenate([grid.bone_x.values, ring_full.bone_x.values])
     all_y = np.concatenate([grid.bone_y.values, ring_full.bone_y.values])
 
@@ -139,14 +163,61 @@ def char_geometry(code):
         ylo = min(ylo, float((by - r).min())); yhi = max(yhi, float((by + r).max()))
 
     has_tilt = meta.get("has_tilt", True)
+    # Reach extents come from the grid (holdable) rows only, not the
+    # out-of-reach polar ring - a chart must not claim a reach the dead
+    # zone doesn't actually let a player hold.
     return dict(
         code=code, meta=meta, r_full=r_full, r_min=r_min, has_tilt=has_tilt,
         ux=ux, uy=uy, ring_full=ring_full, rings_inner=rings_inner,
+        rings_inner_holdable=rings_inner_holdable,
+        edge=edge, edge_segments=edge_segments, edge_isolated=edge_isolated,
         extremes=extremes, fwd_alt=fwd_alt, all_x=all_x, all_y=all_y,
-        max_up=float(all_y.max() - uy), max_down=float(uy - all_y.min()),
-        max_fwd=float(all_x.max() - ux), max_back=float(ux - all_x.min()),
+        max_up=float(grid.bone_y.max() - uy), max_down=float(uy - grid.bone_y.min()),
+        max_fwd=float(grid.bone_x.max() - ux), max_back=float(ux - grid.bone_x.min()),
         x_reach=(xlo, xhi), y_reach=(ylo, yhi),
     )
+
+
+def draw_reach_layers(ax, geo, path_lw=1.8, halo=False, ring_lw=1.0,
+                       out_lw=0.7, dot_ms=None, region_alpha=0.08, z0=5):
+    """The shared reachable/out-of-reach geometry: a faint fill + dotted
+    grey ring for the unreachable polar sweep, holdable stretches of the
+    m=0.25/0.5/0.75 rings, and the true full-tilt reachable edge (grid-based,
+    gapped at the dead-zone snap bands, dots at the isolated axis angles).
+    Used by both the per-character left panel (thicker, haloed) and the
+    all_characters.png small multiples (thinner, no halo)."""
+    edge, segments, isolated = geo["edge"], geo["edge_segments"], geo["edge_isolated"]
+    rf = geo["ring_full"]
+
+    # region fill under the *real* reachable boundary (not the unreachable
+    # polar ring - filling that would visually overstate the reach)
+    ax.fill(edge.bone_x, edge.bone_y, color=SKY_BLUE, alpha=region_alpha, zorder=z0)
+
+    # out-of-reach backdrop: thin dotted muted grey, never the same style as
+    # the real path so it can't be mistaken for a holdable boundary
+    ax.plot(rf.bone_x, rf.bone_y, color=INK_MUTED, lw=out_lw,
+            ls=(0, (1, 1.6)), alpha=0.55, zorder=z0 + 1, label=OUT_OF_REACH_LABEL)
+
+    # holdable stretches of the partial-tilt rings only (gaps elsewhere)
+    for i, m in enumerate((0.25, 0.5, 0.75)):
+        for seg in geo["rings_inner_holdable"][m]:
+            ax.plot(seg.bone_x, seg.bone_y, color=SKY_BLUE, lw=ring_lw,
+                    alpha=RING_ALPHAS[i], zorder=z0 + 2)
+
+    # full-tilt reachable edge: thick charcoal, gapped at each snap band
+    path_kwargs = dict(color=CHARCOAL, lw=path_lw, zorder=z0 + 3,
+                        solid_capstyle="round")
+    if halo:
+        path_kwargs["path_effects"] = [
+            pe.Stroke(linewidth=path_lw + 2.0, foreground=SURFACE), pe.Normal()]
+    for i, seg in enumerate(segments):
+        ax.plot(seg.bone_x, seg.bone_y,
+                label=("full tilt, holdable (m=1)" if i == 0 else None),
+                **path_kwargs)
+    if not isolated.empty:
+        ax.plot(isolated.bone_x, isolated.bone_y, linestyle="none", marker="o",
+                ms=(dot_ms if dot_ms is not None else path_lw * 2.4),
+                mfc=CHARCOAL, mec=SURFACE, mew=0.6, zorder=z0 + 4)
 
 
 def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
@@ -163,7 +234,6 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
     # Draw order (back to front): untilted hurtboxes -> extreme-tilt
     # hurtboxes -> bubbles -> centre path/rings/markers/labels. Hurtboxes
     # used to be opaque and on top, hiding the path entirely (e.g. Dk.png).
-    rf = geo["ring_full"]
 
     # 1. untilted hurtboxes: light fill, thin mid-grey outline, at the back
     if show_hurtboxes:
@@ -193,14 +263,8 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
     # 4. centre path, partial rings, markers and labels - always on top.
     # Path is charcoal (with a white halo in the two-panel chart below) so
     # colour is never the only cue distinguishing it from the sky-blue rings.
-    ax.fill(rf.bone_x, rf.bone_y, color=SKY_BLUE, alpha=0.08, zorder=5)
-    for i, m in enumerate((0.25, 0.5, 0.75)):
-        r = geo["rings_inner"][m]
-        if not r.empty:
-            ax.plot(r.bone_x, r.bone_y, color=SKY_BLUE, lw=1.0,
-                    alpha=RING_ALPHAS[i], zorder=6)
-    ax.plot(rf.bone_x, rf.bone_y, color=CHARCOAL, lw=1.8, zorder=7,
-            label="full tilt (m=1)")
+    draw_reach_layers(ax, geo, path_lw=1.4, halo=False, ring_lw=0.8,
+                       out_lw=0.5, dot_ms=2.5, region_alpha=0.06, z0=5)
     ax.plot([ux], [uy], marker="o", ms=4, color=BLUISH_GREEN, zorder=9)
 
     if geo["has_tilt"] and show_labels:
@@ -265,8 +329,10 @@ def plot_character(geo, ax=None, show_hurtboxes=True, show_labels=True,
         from matplotlib.patches import Patch
         handles = [
             Line2D([0], [0], color=BLUISH_GREEN, lw=1.4, label="untilted bubble"),
-            Line2D([0], [0], color=CHARCOAL, lw=1.8, label="full-tilt centre path (m=1)"),
-            Line2D([0], [0], color=SKY_BLUE, lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
+            Line2D([0], [0], color=CHARCOAL, lw=1.8, marker="o", ms=4,
+                   label="full-tilt reachable edge (holdable)"),
+            Line2D([0], [0], color=SKY_BLUE, lw=1.0, label="partial tilt, holdable (m=0.25/0.5/0.75)"),
+            Line2D([0], [0], color=INK_MUTED, lw=0.7, ls=(0, (1, 1.6)), label=OUT_OF_REACH_LABEL),
             Line2D([0], [0], color=ORANGE, lw=1.0, ls=(0, (3, 2)), label="min-size bubble"),
             Line2D([0], [0], color=SKY_BLUE, lw=0.7, alpha=0.6, label="bubble at stick extreme"),
             Patch(facecolor=INK_SECONDARY, edgecolor=INK_MUTED, alpha=0.35, label="hurtboxes (untilted)"),
@@ -350,7 +416,6 @@ def draw_left_panel(ax, geo):
     outline of the untilted body for scale."""
     code = geo["code"]
     ux, uy, r_full, r_min = geo["ux"], geo["uy"], geo["r_full"], geo["r_min"]
-    rf = geo["ring_full"]
 
     # faint untilted body silhouette: outline only, no fill
     poses = load_hurtbox_poses(code, angles=())
@@ -359,20 +424,12 @@ def draw_left_panel(ax, geo):
         draw_hurtboxes(ax, body, BASELINE, alpha=0, lw=0.5, zorder=1,
                         edgecolor=BASELINE, edge_alpha=0.7, edge_only=True)
 
-    # partial rings: one hue (sky blue), thin, increasing opacity with magnitude
-    for i, m in enumerate((0.25, 0.5, 0.75)):
-        r = geo["rings_inner"][m]
-        if not r.empty:
-            ax.plot(r.bone_x, r.bone_y, color=SKY_BLUE, lw=0.8,
-                    alpha=RING_ALPHAS[i], zorder=3)
-
-    # full-tilt centre path: thick charcoal, white halo so it reads over the
-    # body outline/bubbles regardless of what's underneath (colour-blind-safe
-    # Okabe-Ito subset - never relies on being "the blue one")
-    ax.plot(rf.bone_x, rf.bone_y, color=CHARCOAL, lw=2.5, zorder=6,
-            solid_capstyle="round",
-            path_effects=[pe.Stroke(linewidth=4.5, foreground=SURFACE), pe.Normal()],
-            label="full tilt (m=1)")
+    # out-of-reach polar ring (faint, dotted) + holdable partial rings (sky
+    # blue, gapped at the dead-zone snap bands) + the true full-tilt
+    # reachable edge (thick charcoal, white halo, gapped, dots on the
+    # isolated axis snaps) - see draw_reach_layers for the full stack.
+    draw_reach_layers(ax, geo, path_lw=2.5, halo=True, ring_lw=0.8,
+                       out_lw=0.7, dot_ms=6, region_alpha=0.08, z0=3)
 
     # bubbles: untilted (black), min-size (dashed), 8 extremes (thin outline).
     # Skip the plain "Forward" text label when there's a forward-hysteresis
@@ -406,8 +463,10 @@ def draw_left_panel(ax, geo):
 
     handles = [
         Line2D([0], [0], color=BLUISH_GREEN, lw=1.4, label="untilted bubble"),
-        Line2D([0], [0], color=CHARCOAL, lw=2.5, label="full-tilt centre path (m=1)"),
-        Line2D([0], [0], color=SKY_BLUE, lw=1.0, label="partial tilt (m=0.25/0.5/0.75)"),
+        Line2D([0], [0], color=CHARCOAL, lw=2.5, marker="o", ms=5,
+               label="full-tilt reachable edge (holdable, dots = axis snaps)"),
+        Line2D([0], [0], color=SKY_BLUE, lw=1.0, label="partial tilt, holdable (m=0.25/0.5/0.75)"),
+        Line2D([0], [0], color=INK_MUTED, lw=0.8, ls=(0, (1, 1.6)), label=OUT_OF_REACH_LABEL),
         Line2D([0], [0], color=ORANGE, lw=1.0, ls=(0, (3, 2)), label="min-size bubble"),
         Line2D([0], [0], color=SKY_BLUE, lw=0.6, alpha=0.6, label="bubble at stick extreme"),
         Line2D([0], [0], color=BASELINE, lw=0.5, label="untilted body outline"),
@@ -567,7 +626,8 @@ def make_comparison_grid(codes):
                  color=INK_PRIMARY, x=0.02, y=0.995, ha="left", va="top",
                  fontweight="bold")
     fig.text(0.02, 0.975,
-             "Dark circle = untilted bubble; blue ring = full-tilt centre path; "
+             "Dark circle = untilted bubble; dark dotted line/dots = the reachable full-tilt "
+             "edge (gaps mark dead-zone axis snaps); faint dotted ring = out of reach; "
              "faint rings = the 8 stick extremes. Nana matches Popo exactly and\n"
              "is omitted. Yoshi's shield does not tilt (fixed bubble). " + VALIDATION_NOTE,
              fontsize=8.5, color=INK_SECONDARY, va="top", linespacing=1.6)
@@ -583,12 +643,13 @@ def make_reach_summary(codes):
     rows = []
     for code in codes:
         geo = char_geometry(code)
-        rf = geo["ring_full"]
-        # shoelace area of the full-tilt boundary ring (the region is
-        # star-shaped about the untilted centre since mag scales the blend
-        # monotonically toward this boundary) -- an approximation, noted below
-        x = rf.bone_x.values - geo["ux"]
-        y = rf.bone_y.values - geo["uy"]
+        # shoelace area of the *reachable* edge (grid max-mag-per-angle,
+        # in angle order, including the isolated axis points) - the snap
+        # gaps are bridged with a straight line same as the drawn polygon,
+        # not the unreachable polar ring, so this can't overstate reach.
+        edge = geo["edge"]
+        x = edge.bone_x.values - geo["ux"]
+        y = edge.bone_y.values - geo["uy"]
         area = 0.5 * abs(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1)))
         rows.append(dict(
             code=code, name=display_name(code, geo["meta"]),

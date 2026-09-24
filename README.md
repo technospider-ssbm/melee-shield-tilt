@@ -44,35 +44,37 @@ per-character pose data this needs: bone rest poses, shield poses and Guard anim
 
 This is how far the shield **centre** moves from its untilted position at full tilt, in game units, facing right. The
 bubble radius is at full health with a hard press. Characters are sorted by the area the centre can cover. Each name links
-to that character's chart.
+to that character's chart. Only stick positions a player can actually hold count: the control stick's dead zone snaps
+any near-axis input onto that axis, so most angles within about 17° of forward/back/up/down are unreachable (see
+[Findings](#findings)).
 
 | Character | Up | Down | Forward | Back | Area covered by centre | Bubble radius |
 |---|---:|---:|---:|---:|---:|---:|
-| [Falco](plots/Fc.png) | 6.60 | 6.60 | 3.04 | 5.76 | 90.4 | 7.91 |
-| [Fox](plots/Fx.png) | 5.76 | 5.76 | 2.66 | 5.02 | 68.8 | 7.94 |
-| [Bowser](plots/Kp.png) | 3.55 | 3.04 | 3.10 | 6.18 | 49.2 | 12.40 |
-| [Link](plots/Lk.png) ¹ | 4.32 | 3.72 | 3.73 | 4.00 | 47.8 | 8.15 |
-| [Luigi](plots/Lg.png) | 5.00 | 4.12 | 3.12 | 3.75 | 42.3 | 7.73 |
-| [Pikachu](plots/Pk.png) | 3.49 | 3.69 | 2.31 | 4.52 | 40.7 | 6.21 |
-| [Zelda](plots/Zd.png) | 2.87 | 6.82 | 3.73 | 2.23 | 38.1 | 8.60 |
-| [Young Link](plots/Cl.png) ¹ | 4.72 | 2.72 | 2.93 | 3.15 | 36.5 | 6.42 |
-| [Popo / Nana](plots/Pp.png) | 4.59 | 3.80 | 2.98 | 3.48 | 36.0 | 7.11 |
-| [Dr. Mario](plots/Dr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 32.8 | 6.80 |
-| [Mario](plots/Mr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 32.8 | 6.80 |
-| [Jigglypuff](plots/Pr.png) ² | 2.93 | 2.81 | 3.96 | 3.50 | 32.3 | 7.09 |
-| [Peach](plots/Pe.png) | 2.62 | 6.23 | 3.40 | 2.04 | 31.7 | 7.85 |
-| [Kirby](plots/Kb.png) ² | 2.86 | 2.75 | 3.88 | 3.42 | 31.0 | 7.78 |
-| [Ness](plots/Ns.png) | 4.01 | 3.29 | 2.50 | 2.50 | 26.7 | 7.91 |
-| [Donkey Kong](plots/Dk.png) ¹ | 5.16 | 2.84 | 3.03 | 0.93 | 21.4 | 10.06 |
-| [Marth](plots/Ms.png) | 3.30 | 2.84 | 2.16 | 2.83 | 21.0 | 7.77 |
-| [Roy](plots/Fe.png) | 3.10 | 2.67 | 2.03 | 2.66 | 18.5 | 7.30 |
-| [Mewtwo](plots/Mt.png) | 2.77 | 3.24 | 2.22 | 1.42 | 17.1 | 9.34 |
-| [Ganondorf](plots/Gn.png) | 4.86 | 1.94 | 3.24 | 1.08 | 16.2 | 9.32 |
-| [Sheik](plots/Sk.png) | 3.55 | 2.05 | 2.03 | 2.17 | 15.5 | 9.36 |
-| [Captain Falcon](plots/Ca.png) | 4.37 | 1.75 | 2.91 | 0.97 | 13.1 | 8.37 |
-| [Pichu](plots/Pc.png) | 1.94 | 2.05 | 1.28 | 2.51 | 12.5 | 6.99 |
-| [Samus](plots/Ss.png) | 3.96 | 1.58 | 2.64 | 0.88 | 10.8 | 8.22 |
-| [Mr. Game & Watch](plots/Gw.png) | 2.03 | 1.33 | 1.53 | 2.04 | 5.8 | 6.30 |
+| [Falco](plots/Fc.png) | 6.60 | 6.60 | 3.04 | 5.76 | 74.9 | 7.91 |
+| [Fox](plots/Fx.png) | 5.76 | 5.76 | 2.66 | 5.02 | 57.0 | 7.94 |
+| [Bowser](plots/Kp.png) | 3.55 | 3.04 | 3.10 | 6.18 | 41.1 | 12.40 |
+| [Link](plots/Lk.png) ¹ | 4.31 | 3.72 | 3.71 | 4.00 | 39.3 | 8.15 |
+| [Luigi](plots/Lg.png) | 5.00 | 4.12 | 3.12 | 3.75 | 35.2 | 7.73 |
+| [Pikachu](plots/Pk.png) | 3.49 | 3.69 | 2.24 | 4.51 | 33.7 | 6.21 |
+| [Zelda](plots/Zd.png) | 2.87 | 6.82 | 3.73 | 2.21 | 31.1 | 8.60 |
+| [Young Link](plots/Cl.png) ¹ | 4.69 | 2.71 | 2.91 | 3.15 | 30.4 | 6.42 |
+| [Popo / Nana](plots/Pp.png) | 4.59 | 3.80 | 2.88 | 3.48 | 29.8 | 7.11 |
+| [Dr. Mario](plots/Dr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 27.3 | 6.80 |
+| [Mario](plots/Mr.png) | 4.40 | 3.63 | 2.75 | 3.30 | 27.3 | 6.80 |
+| [Jigglypuff](plots/Pr.png) ² | 2.92 | 2.81 | 3.96 | 3.50 | 26.9 | 7.09 |
+| [Peach](plots/Pe.png) | 2.62 | 6.23 | 3.40 | 2.02 | 25.9 | 7.85 |
+| [Kirby](plots/Kb.png) ² | 2.86 | 2.75 | 3.88 | 3.42 | 25.8 | 7.78 |
+| [Ness](plots/Ns.png) | 4.01 | 3.29 | 2.50 | 2.50 | 21.9 | 7.91 |
+| [Donkey Kong](plots/Dk.png) ¹ | 5.16 | 2.84 | 2.96 | 0.93 | 17.9 | 10.06 |
+| [Marth](plots/Ms.png) | 3.30 | 2.84 | 2.16 | 2.83 | 17.0 | 7.77 |
+| [Roy](plots/Fe.png) | 3.10 | 2.67 | 2.03 | 2.66 | 15.0 | 7.30 |
+| [Mewtwo](plots/Mt.png) | 2.77 | 3.24 | 2.22 | 1.42 | 14.2 | 9.34 |
+| [Ganondorf](plots/Gn.png) | 4.86 | 1.94 | 3.24 | 1.08 | 13.5 | 9.32 |
+| [Sheik](plots/Sk.png) | 3.55 | 2.05 | 2.03 | 2.17 | 12.6 | 9.36 |
+| [Captain Falcon](plots/Ca.png) | 4.37 | 1.75 | 2.91 | 0.97 | 10.9 | 8.37 |
+| [Pichu](plots/Pc.png) | 1.94 | 2.05 | 1.24 | 2.51 | 10.4 | 6.99 |
+| [Samus](plots/Ss.png) | 3.96 | 1.58 | 2.64 | 0.88 | 9.0 | 8.22 |
+| [Mr. Game & Watch](plots/Gw.png) | 2.03 | 1.33 | 1.53 | 2.04 | 4.9 | 6.30 |
 | [Yoshi](plots/Ys.png) | – | – | – | – | 0 (no tilt) | 6.30 |
 
 ¹ A straight-forward tilt has two resting positions, depending on how the stick got there (see below).
@@ -86,6 +88,11 @@ The same data is in [`data/reach_summary.csv`](data/reach_summary.csv). The full
 
 - **Space animals move furthest.** Falco's shield centre travels 6.6 units up and down, and Fox's travels 5.8.
   Mr. Game & Watch's barely moves.
+- **Most of the tilt circle isn't holdable.** The stick is clamped to a radius-80 circle, then each axis is dead-zoned
+  (a raw component of 22 or less snaps to 0), so a held stick angle is either exactly on an axis (0/90/180/270) or
+  strictly between about 16.84° and 73.16° within a quadrant - never in between. The charts' full-tilt path shows gaps
+  at those snap bands instead of a full circle, and every reach number and area above is measured from the game's own
+  holdable stick grid, not the theoretical continuous sweep.
 - **Many characters tilt very unevenly.** Zelda and Peach can drop their shield much further than they can raise it.
   Ganondorf, Captain Falcon, Samus and Donkey Kong can hardly angle it backwards at all.
 - **Yoshi's shield neither tilts nor shrinks.** It stays at the same place and size whatever the stick input or shield
@@ -104,8 +111,9 @@ The same data is in [`data/reach_summary.csv`](data/reach_summary.csv). The full
 ## Per-character charts
 
 Each chart has two panels. On the left, **where the shield can go**:
-- the full-tilt centre path (thick charcoal);
-- weaker tilts (sky blue);
+- the full-tilt reachable edge (thick charcoal, with a gap and axis dots at each dead-zone snap band) and, faint and
+  dotted behind it, the unreachable rest of the continuous sweep;
+- weaker holdable tilts (sky blue), similarly gapped;
 - the untilted bubble (bluish green) and the smallest bubble just before a break (dashed orange);
 - the bubble at each of the 8 stick extremes.
 
