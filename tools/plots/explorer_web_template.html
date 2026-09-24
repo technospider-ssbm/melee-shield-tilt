@@ -84,6 +84,24 @@
   .bar { height: 6px; border-radius: 3px; background: var(--grid); position: relative; min-width: 50px; }
   .bar > span { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
   .tablewrap { max-height: 360px; overflow: auto; }
+  .pad { width: 100%; max-width: 230px; aspect-ratio: 1; display: block; margin: 6px auto 0; touch-action: none;
+    cursor: crosshair; border-radius: 8px; background: var(--page); }
+  .pad:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pad.off { opacity: 0.45; pointer-events: none; }
+  .pad .frame { fill: none; stroke: var(--baseline); stroke-width: 0.8; }
+  .pad .dz { fill: var(--grid); }
+  .pad .gate { fill: none; stroke: var(--ink-2); stroke-width: 1.2; }
+  .pad .axis { stroke: var(--baseline); stroke-width: 0.6; }
+  .pad .raw { fill: none; stroke: var(--ink-muted); stroke-width: 1; }
+  .pad .reg { fill: var(--accent); stroke: var(--surface-1); stroke-width: 1; }
+  .pad .ray { stroke: var(--accent); stroke-width: 1.4; }
+  .xy { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 4px 6px; align-items: center; font-size: 12px;
+    color: var(--ink-2); margin-top: 8px; }
+  .xy input { width: 100%; font: inherit; padding: 3px 5px; background: var(--surface-1); color: var(--ink);
+    border: 1px solid var(--baseline); border-radius: 6px; font-variant-numeric: tabular-nums; }
+  .readout { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12px; color: var(--ink-2); margin-top: 8px; }
+  .readout .val { text-align: right; }
+  .check input:disabled + span { opacity: 0.5; }
 </style>
 <div class="wrap">
   <header style="display:grid; gap:6px">
@@ -92,7 +110,7 @@
     Code, did all of it: the research into the game's code, the solver, the Dolphin testing, and this page. technospider
     only directed it, doesn't claim it as their own work, and is sharing it only for people who are curious. The numbers
     were checked against Dolphin, but treat them as AI-produced and verify anything that matters to you.</p>
-    <p class="sub">Where each character's shield bubble sits for any stick angle and strength, with the
+    <p class="sub">Where each character's shield bubble sits for any stick position the game can read, with the
     hurtboxes in that tilted pose, and how much of the body is left outside the shield (open to shield pokes).
     Side view in game units, facing right (x = forward, y = up).</p>
     <p class="note">Computed from vanilla NTSC 1.02 game data and the decompiled engine logic. Every character's
@@ -105,12 +123,36 @@
       <div id="tagbox"></div>
 
       <h2>Stick</h2>
-      <label for="angle">Angle <span class="val" id="angleval"></span></label>
-      <input type="range" id="angle" min="0" max="360" step="5" value="0">
-      <div class="hint">0° = forward, 90° = up, 180° = back, 270° = down. 360° = forward, reached by sweeping in from below.</div>
-      <label for="mag">Strength <span class="val" id="magval"></span></label>
-      <input type="range" id="mag" min="0" max="5" step="1" value="5">
-      <div class="hint">0 = untilted, 1 = full tilt.</div>
+      <svg id="pad" class="pad" viewBox="-92 -92 184 184" tabindex="0" role="slider"
+           aria-label="Control stick. Arrow keys move one unit; hold Shift for ten." aria-valuetext="">
+        <g transform="scale(1,-1)">
+          <rect class="frame" x="-80" y="-80" width="160" height="160"></rect>
+          <rect class="dz" x="-22.5" y="-80" width="45" height="160"></rect>
+          <rect class="dz" x="-80" y="-22.5" width="160" height="45"></rect>
+          <line class="axis" x1="-80" y1="0" x2="80" y2="0"></line>
+          <line class="axis" x1="0" y1="-80" x2="0" y2="80"></line>
+          <circle class="gate" cx="0" cy="0" r="80"></circle>
+          <line class="ray" id="padRay" x1="0" y1="0" x2="0" y2="0"></line>
+          <circle class="raw" id="padRaw" r="3.2"></circle>
+          <circle class="reg" id="padReg" r="4.2"></circle>
+        </g>
+      </svg>
+      <div class="xy">
+        <label for="sx" style="margin:0">x</label><input type="number" id="sx" min="-80" max="80" step="1" value="80">
+        <label for="sy" style="margin:0">y</label><input type="number" id="sy" min="-80" max="80" step="1" value="0">
+      </div>
+      <div class="hint">Drag the pad or type integer stick units. It snaps to what the game registers: the stick is pulled
+      back to the circle of radius 80 (truncating), and an axis reads 0 when it is within ±22 (the shaded cross).
+      The hollow dot is your input, the filled dot what the game reads.</div>
+      <div class="readout">
+        <span>Game reads</span><span class="val" id="regval"></span>
+        <span>Settled angle</span><span class="val" id="angleval"></span>
+        <span>Strength</span><span class="val" id="magval"></span>
+      </div>
+      <div class="hint">0° = forward, 90° = up, 180° = back, 270° = down. Strength 0 = untilted, 1 = full tilt.</div>
+      <label class="check"><input type="checkbox" id="below"><span>Arrived at forward from below (angle 360)</span></label>
+      <div class="hint">A stick held straight forward has two resting tilts: 0° from a fresh shield or from above, and 360°
+      if the stick swept in from below. Only applies when the settled angle is exactly 0.</div>
 
       <h2>Shield size</h2>
       <label for="health">Shield health <span class="val" id="healthval"></span></label>
@@ -130,7 +172,6 @@
         <li><span class="sw ring dot"></span>Untilted bubble</li>
         <li><span class="sw line"></span>Centre path, full tilt</li>
         <li><span class="sw line cur"></span>Centre path, current strength</li>
-        <li><span class="sw line weak"></span>Centre path, weaker tilts</li>
         <li><span class="sw box"></span>Hurtbox (blue inside → orange outside)</li>
         <li><span class="sw pts"></span>Part outside the bubble</li>
       </ul>
@@ -160,20 +201,26 @@
   </div>
   <p class="note">Hurtboxes are coloured from blue (fully inside the bubble) to orange (fully outside). Orange dots mark the parts
   outside the bubble, seen from the side; because they are measured in 3D, a dot can appear over the bubble when that part
-  sticks out towards or away from the camera. Sampled every 5° and every 0.2 of stick strength. Kirby's and Jigglypuff's
+  sticks out towards or away from the camera. Everything is computed live in your browser from the game data by a
+  JavaScript port of the solver, which matches it to within 0.00001 units for every stick value. Kirby's and Jigglypuff's
   bubbles are slightly oval in game; here they are drawn as spheres of the average radius. Hurtboxes marked ≈ sit on
   physics-driven bones and use the rest pose, so they are approximate. Yoshi's shield neither tilts nor changes size.</p>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script>/*__SHIELDPOSE_JS__*/</script>
 <script>
-const DATA = /*__DATA__*/{};
-const MAGS = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
-const codes = Object.keys(DATA);
+// Pose data exported by `ShieldPose --export-web`; posed live by shieldpose.js (the solver's JS port).
+const SP = ShieldPose.load(/*__EXPORT__*/{});
+const TYPES = ['Low', 'Mid', 'High'];
+const NAMES = { CaptainFalcon: 'Captain Falcon', DonkeyKong: 'Donkey Kong', YoungLink: 'Young Link', DrMario: 'Dr. Mario',
+  MrGameAndWatch: 'Mr. Game & Watch' };
+const disp = c => NAMES[SP.chars[c].name] || SP.chars[c].name;
+const codes = SP.codes.slice().sort((a, b) => SP.chars[a].name.localeCompare(SP.chars[b].name));
 const $ = id => document.getElementById(id);
 const sel = $('char');
 for (const c of codes) {
   const o = document.createElement('option');
-  o.value = c; o.textContent = DATA[c].name; sel.appendChild(o);
+  o.value = c; o.textContent = disp(c); sel.appendChild(o);
 }
 sel.value = codes.includes('Fx') ? 'Fx' : codes[0];
 
@@ -231,98 +278,182 @@ function circleShape(cx, cy, r, line, fill) {
     line, fillcolor: fill || 'rgba(0,0,0,0)' };
 }
 
-function radius(d) {
-  if (d.fixed_r) return d.r_full;
-  const h = +$('health').value / 60, ls = +$('press').value / 100;
-  return d.size_chain * (0.15 + 0.85 * h * (1 - 0.5 * ls));
+// ---- per-character derived info
+const hinfoCache = {};
+function hinfo(code) {
+  if (hinfoCache[code]) return hinfoCache[code];
+  const fm = SP.chars[code];
+  return (hinfoCache[code] = fm.hurtboxes.map((h, i) =>
+    ({ i, type: TYPES[h.type] || String(h.type), approx: h.joint >= 0 && fm.joints[h.joint].dyn })));
 }
+const fixedR = code => SP.chars[code].kind === 14;   // Yoshi: bubble scale is the constant initial_shield_size
+
+// Bubble scale b (inlineB0 in float32, shieldpose.js) from the health / press sliders.
+const bScale = code => SP.bubbleScale(code, +$('health').value, +$('press').value / 100);
 
 // Axis ranges per character: fixed across stick/size so motion is visible.
 const rangeCache = {};
 function ranges(code) {
   if (rangeCache[code]) return rangeCache[code];
-  const d = DATA[code]; const R = d.fixed_r ? d.r_full : d.size_chain; // lightest shield = largest
+  const fm = SP.chars[code];
+  const bMax = SP.bubbleScale(code, 60, 0);   // lightest shield at full health = largest
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-  d.centers.forEach((row, ai) => row.forEach((c, mi) => {
-    x0 = Math.min(x0, c[0] - R); x1 = Math.max(x1, c[0] + R); y0 = Math.min(y0, c[1] - R); y1 = Math.max(y1, c[1] + R);
-    for (const b of d.boxes[ai][mi]) for (const [x, y] of [[b[0], b[1]], [b[3], b[4]]]) {
-      x0 = Math.min(x0, x - b[6]); x1 = Math.max(x1, x + b[6]); y0 = Math.min(y0, y - b[6]); y1 = Math.max(y1, y + b[6]);
+  const ext = (x, y, r) => { x0 = Math.min(x0, x - r); x1 = Math.max(x1, x + r); y0 = Math.min(y0, y - r); y1 = Math.max(y1, y + r); };
+  const mags = fm.hasTilt ? [0, 0.5, 1] : [0];
+  for (let a = 0; a <= 360; a += fm.hasTilt ? 10 : 361)
+    for (const m of mags) {
+      const p = SP.pose(code, a, m);
+      ext(p.centre[0], p.centre[1], bMax * p.radiusScale);
+      for (const b of p.hurtboxes) if (b) { ext(b[0], b[1], b[6]); ext(b[3], b[4], b[6]); }
     }
-  }));
   const pad = 0.5, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, half = Math.max(x1 - x0, y1 - y0) / 2 + pad;
   return (rangeCache[code] = { x: [cx - half, cx + half], y: [cy - half, cy + half] });
 }
 
+// Shield-centre path over angle 0..360 at strength m (361 samples; every `step` degrees while dragging),
+// computed live and cached.
+const pathCache = new Map();
+function centrePath(code, m, step) {
+  const key = code + '|' + m + '|' + step;
+  if (pathCache.has(key)) return pathCache.get(key);
+  const xs = [], ys = [];
+  for (let a = 0; a <= 360; a += step) { const c = SP.pose(code, a, m, { hurtboxes: false }).centre; xs.push(c[0]); ys.push(c[1]); }
+  if (pathCache.size > 64) pathCache.clear();
+  const r = { x: xs, y: ys };
+  pathCache.set(key, r);
+  return r;
+}
+
+// ---- stick state: raw integer stick units, before the game's clamp and deadzone
+const stick = { x: 80, y: 0 };
+function settled(code) {
+  const s = SP.settle(stick.x, stick.y, $('below').checked ? 'below' : 'fresh');
+  return SP.chars[code].hasTilt ? s : { ...s, angle: 0, mag: 0 };
+}
+function setStick(x, y) {
+  stick.x = Math.max(-127, Math.min(127, Math.round(x)));
+  stick.y = Math.max(-127, Math.min(127, Math.round(y)));
+  schedule();
+}
+
+const pad = $('pad');
+function padPoint(ev) {
+  const r = pad.getBoundingClientRect();
+  return [((ev.clientX - r.left) / r.width) * 184 - 92, -(((ev.clientY - r.top) / r.height) * 184 - 92)];
+}
+let dragging = false;
+pad.addEventListener('pointerdown', ev => { dragging = true; pad.setPointerCapture(ev.pointerId); setStick(...padPoint(ev)); });
+pad.addEventListener('pointermove', ev => { if (dragging) setStick(...padPoint(ev)); });
+pad.addEventListener('pointerup', () => { dragging = false; schedule(); });
+pad.addEventListener('pointercancel', () => { dragging = false; schedule(); });
+pad.addEventListener('keydown', ev => {
+  const step = ev.shiftKey ? 10 : 1;
+  const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] }[ev.key];
+  if (!d) return;
+  ev.preventDefault();
+  setStick(Math.max(-80, Math.min(80, stick.x + d[0])), Math.max(-80, Math.min(80, stick.y + d[1])));
+});
+for (const [id, k] of [['sx', 'x'], ['sy', 'y']]) {
+  $(id).addEventListener('input', () => {
+    const v = parseInt($(id).value, 10);
+    if (Number.isFinite(v)) { stick[k] = Math.max(-80, Math.min(80, v)); schedule(); }
+  });
+}
+
+// Redraw at most once per animation frame.
+let pending = false;
+function schedule() { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; draw(); }); } }
+
+function updateStickUI(s, code) {
+  const fm = SP.chars[code];
+  $('padRaw').setAttribute('cx', stick.x); $('padRaw').setAttribute('cy', stick.y);
+  $('padReg').setAttribute('cx', s.kx); $('padReg').setAttribute('cy', s.ky);
+  $('padRay').setAttribute('x2', s.kx); $('padRay').setAttribute('y2', s.ky);
+  if (document.activeElement !== $('sx')) $('sx').value = stick.x;
+  if (document.activeElement !== $('sy')) $('sy').value = stick.y;
+  $('regval').textContent = `(${s.kx}, ${s.ky})`;
+  pad.classList.toggle('off', !fm.hasTilt);
+  for (const id of ['sx', 'sy']) $(id).disabled = !fm.hasTilt;
+  $('below').disabled = !(fm.hasTilt && s.zeroAngle);
+  if (!fm.hasTilt) { $('angleval').textContent = '–'; $('magval').textContent = 'no tilt'; }
+  else {
+    $('angleval').textContent = (Number.isInteger(s.angle) ? s.angle : s.angle.toFixed(3)) + '°';
+    $('magval').textContent = Number.isInteger(s.mag) ? String(s.mag) : s.mag.toFixed(4);
+  }
+  pad.setAttribute('aria-valuetext', `stick ${stick.x}, ${stick.y}; game reads ${s.kx}, ${s.ky}; ` +
+    (fm.hasTilt ? `angle ${$('angleval').textContent}, strength ${$('magval').textContent}` : 'no tilt'));
+}
+
 let firstDraw = true;
 function draw() {
-  const code = sel.value, d = DATA[code];
-  const ai = Math.round(+$('angle').value / 5), mi = +$('mag').value;
+  const code = sel.value, fm = SP.chars[code], info = hinfo(code), fixed = fixedR(code);
   const C = { ink: tok('--ink'), ink2: tok('--ink-2'), grid: tok('--grid'), surf: tok('--surface-1'), acc: tok('--accent'),
     org: tok('--orange'), safe: tok('--safe'), bad: tok('--exposed'), ghost: tok('--ghost') };
-  $('angleval').textContent = (ai * 5) + '°';
-  $('magval').textContent = MAGS[mi].toFixed(1);
+  const s = settled(code);
+  updateStickUI(s, code);
   $('healthval').textContent = $('health').value + ' / 60';
   const p = +$('press').value;
   $('pressval').textContent = p === 100 ? 'hard' : p === 0 ? 'lightest' : p + '%';
-  for (const id of ['angle', 'mag']) $(id).disabled = !d.has_tilt;
-  for (const id of ['health', 'press']) $(id).disabled = d.fixed_r;
+  for (const id of ['health', 'press']) $(id).disabled = fixed;
 
   const tags = [];
-  if (!d.has_tilt) tags.push('<span class="tag">Shield does not tilt</span>');
-  if (d.fixed_r) tags.push('<span class="tag">Bubble size is fixed</span>');
-  if (d.hinfo.some(h => h.approx)) tags.push('<span class="tag warn">≈ some hurtboxes approximate</span>');
+  if (!fm.hasTilt) tags.push('<span class="tag">Shield does not tilt</span>');
+  if (fixed) tags.push('<span class="tag">Bubble size is fixed</span>');
+  if (info.some(h => h.approx)) tags.push('<span class="tag warn">≈ some hurtboxes approximate</span>');
   $('tagbox').innerHTML = tags.join(' ');
 
-  const c = d.centers[ai][mi], R = radius(d), R2 = R * R;
-  const boxes = d.boxes[ai][mi];
+  // Live pose: the bubble's world radius is b times the uniform scale of the shield bone's parent chain.
+  const b = bScale(code);
+  const cur = SP.pose(code, s.angle, s.mag), rest = SP.pose(code, 0, 0);
+  const c = cur.centre, R = b * cur.radiusScale, R2 = R * R, R0 = b * rest.radiusScale;
   const shapes = [];
   if ($('ghost').checked) {
-    for (const b of d.boxes[0][0]) shapes.push({ type: 'path', path: stadiumPath(b[0], b[1], b[3], b[4], b[6]),
+    for (const bx of rest.hurtboxes) if (bx) shapes.push({ type: 'path', path: stadiumPath(bx[0], bx[1], bx[3], bx[4], bx[6]),
       fillcolor: 'rgba(0,0,0,0)', line: { color: C.ghost, width: 1, dash: 'dot' }, layer: 'below' });
   }
 
   // Measure exposure per hurtbox.
   let volAll = 0, volOut = 0, maxOut = -Infinity, maxIdx = -1, nOut = 0;
   const outX = [], outY = [], rows = [];
-  boxes.forEach((b, k) => {
-    const pts = capsulePoints(b);
+  cur.hurtboxes.forEach((bx, k) => {
+    if (!bx) return;
+    const pts = capsulePoints(bx);
     let out = 0;
     pts.forEach((q, j) => {
       const dx = q[0] - c[0], dy = q[1] - c[1], dz = q[2] - c[2];
       if (dx * dx + dy * dy + dz * dz > R2) { out++; if (j % 2 === 0) { outX.push(q[0]); outY.push(q[1]); } }
     });
     const frac = pts.length ? out / pts.length : 0;
-    const L = len(sub([b[3], b[4], b[5]], [b[0], b[1], b[2]])), r = b[6];
+    const L = len(sub([bx[3], bx[4], bx[5]], [bx[0], bx[1], bx[2]])), r = bx[6];
     const vol = Math.PI * r * r * L + 4 / 3 * Math.PI * r ** 3;
     volAll += vol; volOut += vol * frac;
-    const far = Math.max(len(sub([b[0], b[1], b[2]], c)), len(sub([b[3], b[4], b[5]], c))) + r - R;
+    const far = Math.max(len(sub([bx[0], bx[1], bx[2]], c)), len(sub([bx[3], bx[4], bx[5]], c))) + r - R;
     if (far > maxOut) { maxOut = far; maxIdx = k; }
     if (far > 0) nOut++;
-    rows.push({ k, frac, far, info: d.hinfo[k] || { i: k, type: '?', approx: false } });
-    shapes.push({ type: 'path', path: stadiumPath(b[0], b[1], b[3], b[4], r),
+    rows.push({ k, frac, far, info: info[k] });
+    shapes.push({ type: 'path', path: stadiumPath(bx[0], bx[1], bx[3], bx[4], r),
       fillcolor: mix(C.safe, C.bad, frac, 0.28), line: { color: mix(C.safe, C.bad, frac, 0.9), width: 1 } });
   });
 
   // Bubble outlines.
-  shapes.push(circleShape(d.centers[0][0][0], d.centers[0][0][1], R, { color: C.ink2, width: 1, dash: 'dot' }));
+  shapes.push(circleShape(rest.centre[0], rest.centre[1], R0, { color: C.ink2, width: 1, dash: 'dot' }));
   shapes.push(circleShape(c[0], c[1], R, { color: C.acc, width: 3 }, mix(C.acc, C.acc, 0, 0.07)));
 
   const traces = [];
-  if ($('paths').checked && d.has_tilt) {
-    // Where the shield centre goes as the stick sweeps 0-360 deg at each strength.
-    for (let m = 1; m < MAGS.length; m++) {
-      const full = m === MAGS.length - 1, cur = m === mi;
-      traces.push({ x: d.centers.map(r => r[m][0]), y: d.centers.map(r => r[m][1]), mode: 'lines',
-        hoverinfo: 'skip',
-        line: full ? { color: C.ink, width: 2.5 } : { color: cur ? C.acc : C.ink2, width: cur ? 1.8 : 0.8, dash: cur ? 'dash' : 'dot' },
-        opacity: full || cur ? 1 : 0.6 });
+  if ($('paths').checked && fm.hasTilt) {
+    // Where the shield centre goes as the stick sweeps 0-360 deg, at full tilt and at the current strength.
+    const full = centrePath(code, 1, 1);
+    traces.push({ x: full.x, y: full.y, mode: 'lines', hoverinfo: 'skip', line: { color: C.ink, width: 2.5 } });
+    if (s.mag > 0 && s.mag < 1) {
+      const pc = centrePath(code, s.mag, dragging ? 4 : 1);
+      traces.push({ x: pc.x, y: pc.y, mode: 'lines', hoverinfo: 'skip', line: { color: C.acc, width: 1.8, dash: 'dash' } });
     }
   }
   traces.push(
     { type: 'scattergl', x: outX, y: outY, mode: 'markers', name: 'outside the bubble',
       marker: { color: C.bad, size: 3, opacity: 0.7 }, hoverinfo: 'skip' },
     { x: [c[0]], y: [c[1]], mode: 'markers', name: 'shield centre', marker: { color: C.acc, size: 8 },
-      hovertemplate: 'shield centre<br>x=%{x:.2f} y=%{y:.2f}<extra></extra>' },
+      hovertemplate: 'shield centre<br>x=%{x:.3f} y=%{y:.3f}<extra></extra>' },
   );
   const rg = ranges(code);
   const layout = {
@@ -330,7 +461,7 @@ function draw() {
       scaleanchor: 'y', scaleratio: 1, color: C.ink2 },
     yaxis: { range: rg.y, title: 'up →', zeroline: false, gridcolor: C.grid, color: C.ink2 },
     plot_bgcolor: C.surf, paper_bgcolor: C.surf, margin: { l: 50, r: 16, t: 36, b: 44 },
-    title: { text: d.name, x: 0.02, font: { size: 16 } }, showlegend: false,
+    title: { text: disp(code), x: 0.02, font: { size: 16 } }, showlegend: false,
     font: { family: 'system-ui, -apple-system, Segoe UI, sans-serif', color: C.ink }, height: 600, autosize: true,
   };
   const cfg = { displayModeBar: false, responsive: true };
@@ -340,7 +471,7 @@ function draw() {
   // Results panel.
   $('pctOut').innerHTML = `${(100 * volOut / volAll).toFixed(1)}<small> %</small>`;
   if (maxOut > 0) {
-    const h = d.hinfo[maxIdx] || { i: maxIdx, type: '?' };
+    const h = info[maxIdx] || { i: maxIdx, type: '?' };
     $('protrude').innerHTML = `${maxOut.toFixed(2)}<small> units</small>`;
     $('protrudeNote').textContent = `furthest any hurtbox sticks out past the bubble surface (#${h.i}, ${h.type})`;
   } else {
@@ -348,7 +479,7 @@ function draw() {
     $('protrudeNote').textContent = 'every hurtbox is fully inside the bubble';
   }
   $('radval').textContent = R.toFixed(2);
-  $('countOut').textContent = `${nOut} of ${boxes.length}`;
+  $('countOut').textContent = `${nOut} of ${rows.length}`;
   rows.sort((a, b) => b.frac - a.frac || b.far - a.far);
   $('rows').innerHTML = rows.map(rw => {
     const col = mix(C.safe, C.bad, rw.frac, 1);
@@ -359,10 +490,10 @@ function draw() {
   }).join('');
 }
 
-sel.addEventListener('change', draw);
-for (const id of ['angle', 'mag', 'health', 'press']) $(id).addEventListener('input', draw);
-for (const id of ['ghost', 'paths']) $(id).addEventListener('change', draw);
-try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw); } catch (e) {}
-new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+sel.addEventListener('change', schedule);
+for (const id of ['health', 'press']) $(id).addEventListener('input', schedule);
+for (const id of ['ghost', 'paths', 'below']) $(id).addEventListener('change', schedule);
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', schedule); } catch (e) {}
+new MutationObserver(schedule).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 draw();
 </script>

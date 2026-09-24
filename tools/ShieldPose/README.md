@@ -12,12 +12,29 @@ dotnet tools/ShieldPose/bin/Release/net8.0/ShieldPose.dll --char Fx Ms    # a su
 dotnet tools/ShieldPose/bin/Release/net8.0/ShieldPose.dll --sanity        # bubble at neutral/up/down/forward/back
 dotnet tools/ShieldPose/bin/Release/net8.0/ShieldPose.dll --selftest      # FObj port vs HSDLib FOBJ_Player
 dotnet tools/ShieldPose/bin/Release/net8.0/ShieldPose.dll --pose-dump --char Fx --angle 90 --mag 1 [--facing -1] [--out f.csv]
+dotnet tools/ShieldPose/bin/Release/net8.0/ShieldPose.dll --export-web [--out data/shieldpose_web.json] [--char ...]
 ```
 Options: `--gamedata <dir>` (default `gamedata`), `--data <dir>` (default `data`), `--no-hurtboxes`.
 The exit code is non-zero if a character fails to load or fails a check.
 
 `--pose-dump` writes one row per joint for a single (θ, m, facing). Each row has the part index, parent, costume flags, and the live local
 SRT (Euler or quaternion). It also has the world translation, so you can compare it with emulator RAM (`parts[i].joint->mtx`).
+
+`--export-web` writes `data/shieldpose_web.json` (about 190 KiB for all 27 characters; not committed, as it holds raw
+Guard FObj bytes). It has everything `tools/plots/shieldpose.js` needs to pose a character in the browser:
+* `common`: the PlCo stick deadzones and the inlineB0 shield constants (x260, x264, x2D4, x2D8);
+* per character: name, kind, `has_tilt` (false for Yoshi, whose fixed pose is the costume rest pose), the figatree
+  end frame, model scale, initial shield size and the shield joint;
+* `joints`: only the joints on the shield chain and the hurtbox chains (closed under parent, preorder, re-indexed).
+  Each is `[parent, flags, rest SRT, ShieldPose SRT, tracks]`. Flags: 1 = classical scale, 2 = item-hold part
+  (scale 1/model_scale), 4 = dynamics (flags_b0, not blended), 8 = flags_b4 (TransN, part_to_joint[0x35], Mewtwo
+  parts[1]; take ShieldPose when m < 1). Tracks are `[type, startframe, frac_value, frac_slope, length, base64 bytes]`;
+* `hurtboxes`: `[joint, part, type, grabbable, x1, y1, z1, x2, y2, z2, radius]` (local);
+* Nana is exported too (Popo's Guard figatree) with a note; the explorer skips her.
+
+`tools/plots/verify_shieldpose_js.js` (Node) re-computes every row of `data/<code>.csv` and `data/<code>_hurtboxes.csv`
+with the JS port and reports the max error per character. Bubble centres and radii match bit-for-bit (Donkey Kong: 1 ulp
+in 0.03% of rows); posed hurtboxes are within 5.7e-6 (the port rounds libm results from double, see shieldpose.js).
 
 ## Outputs
 * `data/<code>.csv`: `sweep,stick_x,stick_y,angle,mag,bone_x,bone_y,bone_z,shield_radius_full,shield_radius_min`.
