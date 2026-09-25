@@ -395,8 +395,12 @@ function settled(code) {
   return { ...s, angle: Math.fround(guardX8 - 10) };
 }
 function setStick(x, y) {
-  stick.x = Math.max(-127, Math.min(127, Math.round(x)));
-  stick.y = Math.max(-127, Math.min(127, Math.round(y)));
+  // Raw stick bytes stop at +/-127. Scale the whole vector down rather than clamping each axis, so dragging far
+  // outside the pad keeps the direction instead of pinning to the (+/-127, +/-127) diagonals.
+  const big = Math.max(Math.abs(x), Math.abs(y));
+  if (big > 127) { x *= 127 / big; y *= 127 / big; }
+  stick.x = Math.round(x);
+  stick.y = Math.round(y);
   schedule();
 }
 
